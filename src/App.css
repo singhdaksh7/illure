@@ -1,0 +1,8 @@
+/* Custom global utilities for İLLURÊ FRAGRANCE luxury website */
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #C0A46D 0%, #B89A62 50%, #A98B55 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
