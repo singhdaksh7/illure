@@ -8,6 +8,9 @@ import { env } from './config/env.js';
 
 export const app = express();
 
+// Trust reverse proxy (Traefik) for correct client IP detection and rate limiting
+app.set('trust proxy', 1);
+
 // Security Headers
 app.use(
   helmet({
