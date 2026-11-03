@@ -13,6 +13,7 @@ describe('Inventory Management & Movement History API', () => {
   let variantId: string;
 
   beforeAll(async () => {
+    await prisma.adminUser.deleteMany({ where: { email: 'inv-manager-1@illure.com' } });
     const passwordHash = await hashPassword('Password123!');
     const adminUser = await prisma.adminUser.create({
       data: {

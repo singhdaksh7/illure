@@ -1,10 +1,13 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import { InventoryController } from './inventory.controller.js';
+import { requireAdminAuth } from '../../middleware/auth.middleware.js';
+
+export const adminInventoryRouter = Router();
+adminInventoryRouter.use(requireAdminAuth);
+adminInventoryRouter.get('/low-stock', InventoryController.getLowStock);
+adminInventoryRouter.get('/movements', InventoryController.getMovements);
+adminInventoryRouter.post('/:variantId/adjust', InventoryController.adjust);
 
 const router = Router();
-
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Inventory API module boundary established.' });
-});
-
+router.use('/', adminInventoryRouter);
 export default router;

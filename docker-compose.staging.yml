@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  illure-db:
+    image: postgres:16-alpine
+    container_name: illure-staging-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-illure_staging_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-illure_staging_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-illure_staging_db}
+    volumes:
+      - illure_postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - illure-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  illure-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: illure-staging-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-illure_staging_user}:${POSTGRES_PASSWORD:-illure_staging_secure_pass_2026}@illure-db:5432/${POSTGRES_DB:-illure_staging_db}?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-15m}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-7d}
+      FRONTEND_URL: ${FRONTEND_URL}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@illurefragrance.com}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Illure Staging Super Admin}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-İLLURÊ FRAGRANCE}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
+      ORDER_NOTIFICATION_EMAIL: ${ORDER_NOTIFICATION_EMAIL}
+    depends_on:
+      illure-db:
+        condition: service_healthy
+    networks:
+      - illure-internal
+      - traefik_public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-kp-proxy}"
+      - "traefik.http.routers.illure-api.rule=Host(`${STAGING_DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.illure-api.entrypoints=websecure"
+      - "traefik.http.routers.illure-api.tls=true"
+      - "traefik.http.routers.illure-api.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}"
+      - "traefik.http.routers.illure-api.priority=100"
+      - "traefik.http.services.illure-api.loadbalancer.server.port=5000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:5000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  illure-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: illure-staging-web
+    restart: unless-stopped
+    depends_on:
+      - illure-api
+    networks:
+      - illure-internal
+      - traefik_public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-kp-proxy}"
+      - "traefik.http.routers.illure-web.rule=Host(`${STAGING_DOMAIN}`)"
+      - "traefik.http.routers.illure-web.entrypoints=websecure"
+      - "traefik.http.routers.illure-web.tls=true"
+      - "traefik.http.routers.illure-web.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}"
+      - "traefik.http.routers.illure-web.priority=1"
+      - "traefik.http.services.illure-web.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  illure-internal:
+    driver: bridge
+    internal: false
+  traefik_public:
+    external: true
+    name: ${TRAEFIK_NETWORK:-kp-proxy}
+
+volumes:
+  illure_postgres_staging_data:
+    driver: local

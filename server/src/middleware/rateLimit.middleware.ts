@@ -5,6 +5,7 @@ export const loginLimiter = rateLimit({
   max: 10, // Limit each IP to 10 requests per 15 minutes
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
   message: {
     success: false,
     error: {

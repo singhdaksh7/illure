@@ -1,10 +1,18 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import { ReferenceBrandsController } from './referenceBrands.controller.js';
+import { requireAdminAuth } from '../../middleware/auth.middleware.js';
+
+export const publicReferenceBrandsRouter = Router();
+publicReferenceBrandsRouter.get('/public', ReferenceBrandsController.list);
+
+export const adminReferenceBrandsRouter = Router();
+adminReferenceBrandsRouter.use(requireAdminAuth);
+adminReferenceBrandsRouter.get('/', ReferenceBrandsController.list);
+adminReferenceBrandsRouter.post('/', ReferenceBrandsController.create);
+adminReferenceBrandsRouter.get('/:id', ReferenceBrandsController.getById);
+adminReferenceBrandsRouter.patch('/:id', ReferenceBrandsController.update);
+adminReferenceBrandsRouter.delete('/:id', ReferenceBrandsController.delete);
 
 const router = Router();
-
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Reference Brands API module boundary established.' });
-});
-
+router.use('/', publicReferenceBrandsRouter);
 export default router;

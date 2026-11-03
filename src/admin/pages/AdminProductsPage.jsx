@@ -3,7 +3,7 @@ import { useAdminAuth } from '../AdminAuthContext';
 import AdminProductEditorModal from './AdminProductEditorModal';
 import { Package, Plus, Search, Edit2, Archive, Star, Flame, Sparkles, Filter } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export default function AdminProductsPage() {
   const { accessToken } = useAdminAuth();

@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import { CouponController } from './coupons.controller.js';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Coupons API module boundary established.' });
-});
+router.post('/validate', CouponController.validate);
 
 export default router;

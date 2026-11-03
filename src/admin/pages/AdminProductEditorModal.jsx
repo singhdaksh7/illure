@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '../AdminAuthContext';
 import { X, Plus, Trash2, Image, Check } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export default function AdminProductEditorModal({ product, onClose, onSaved }) {
   const { accessToken } = useAdminAuth();

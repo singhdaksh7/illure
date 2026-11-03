@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import { PaymentsController } from './payments.controller.js';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Payments API module boundary established.' });
-});
+router.post('/razorpay/create-order', PaymentsController.createRazorpayOrder);
+router.post('/razorpay/verify', PaymentsController.verifyRazorpayPayment);
+router.post('/razorpay/webhook', PaymentsController.handleWebhook);
 
 export default router;

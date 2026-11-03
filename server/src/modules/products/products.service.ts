@@ -186,9 +186,10 @@ export class ProductsService {
       });
 
       // Assign Categories
-      if (input.categoryIds.length > 0) {
+      const categoryIds = input.categoryIds ?? [];
+      if (categoryIds.length > 0) {
         await tx.productCategory.createMany({
-          data: input.categoryIds.map((categoryId) => ({
+          data: categoryIds.map((categoryId) => ({
             productId: product.id,
             categoryId,
           })),
@@ -196,7 +197,8 @@ export class ProductsService {
       }
 
       // Create Variants & Initial Stock Movement
-      for (const v of input.variants) {
+      const variants = input.variants ?? [];
+      for (const v of variants) {
         const variant = await tx.productVariant.create({
           data: {
             productId: product.id,
@@ -227,10 +229,11 @@ export class ProductsService {
       }
 
       // Create Images
-      if (input.images.length > 0) {
+      const images = input.images ?? [];
+      if (images.length > 0) {
         // Enforce at least one primary image
-        const hasPrimary = input.images.some((img) => img.isPrimary);
-        const imagesToCreate = input.images.map((img, idx) => ({
+        const hasPrimary = images.some((img) => img.isPrimary);
+        const imagesToCreate = images.map((img, idx) => ({
           productId: product.id,
           url: img.url,
           altText: img.altText,

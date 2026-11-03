@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '../AdminAuthContext';
 import { Layers, Plus, Edit2, Trash2, CheckCircle2, XCircle, Search } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export default function AdminCategoriesPage() {
   const { accessToken } = useAdminAuth();

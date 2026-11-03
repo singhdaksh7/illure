@@ -1,10 +1,18 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import { CategoriesController } from './categories.controller.js';
+import { requireAdminAuth } from '../../middleware/auth.middleware.js';
+
+export const publicCategoriesRouter = Router();
+publicCategoriesRouter.get('/public', CategoriesController.list);
+
+export const adminCategoriesRouter = Router();
+adminCategoriesRouter.use(requireAdminAuth);
+adminCategoriesRouter.get('/', CategoriesController.list);
+adminCategoriesRouter.post('/', CategoriesController.create);
+adminCategoriesRouter.get('/:id', CategoriesController.getById);
+adminCategoriesRouter.patch('/:id', CategoriesController.update);
+adminCategoriesRouter.delete('/:id', CategoriesController.delete);
 
 const router = Router();
-
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Categories API module boundary established.' });
-});
-
+router.use('/', publicCategoriesRouter);
 export default router;

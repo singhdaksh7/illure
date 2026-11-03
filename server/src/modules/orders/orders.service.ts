@@ -415,7 +415,7 @@ export class OrdersService {
     
     // In test environment, if signature is mock signature, bypass or generate HMAC
     expectedSignature = crypto
-      .createHmac('sha256', env.RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', env.RAZORPAY_KEY_SECRET || '')
       .update(bodyStr)
       .digest('hex');
 
@@ -599,7 +599,7 @@ export class OrdersService {
   // 5. RAZORPAY WEBHOOK PROCESSING
   static async processWebhook(rawBody: string, signature: string) {
     const expectedSignature = crypto
-      .createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET)
+      .createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET || '')
       .update(rawBody)
       .digest('hex');
 

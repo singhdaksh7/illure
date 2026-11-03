@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { sendSuccess } from '../../utils/response.utils.js';
+import customerAddressesRouter from './customerAddresses.router.js';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  return sendSuccess(res, { message: 'Customers API module boundary established.' });
-});
+router.use('/addresses', customerAddressesRouter);
 
 export default router;

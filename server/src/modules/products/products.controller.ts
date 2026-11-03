@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ProductsService } from './products.service.js';
+import { createProductSchema, updateProductSchema } from './products.validation.js';
 import { sendSuccess } from '../../utils/response.utils.js';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware.js';
 
@@ -30,7 +31,8 @@ export class ProductsController {
   static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const adminId = req.adminUser?.id;
-      const product = await ProductsService.createProduct(req.body, adminId);
+      const validated = createProductSchema.parse(req.body);
+      const product = await ProductsService.createProduct(validated, adminId);
       return sendSuccess(res, { product }, 201);
     } catch (error) {
       next(error);
@@ -41,7 +43,8 @@ export class ProductsController {
     try {
       const adminId = req.adminUser?.id;
       const id = req.params.id as string;
-      const product = await ProductsService.updateProduct(id, req.body, adminId);
+      const validated = updateProductSchema.parse(req.body);
+      const product = await ProductsService.updateProduct(id, validated, adminId);
       return sendSuccess(res, { product });
     } catch (error) {
       next(error);

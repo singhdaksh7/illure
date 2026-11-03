@@ -23,6 +23,18 @@ const envSchema = z.object({
   SEED_ADMIN_EMAIL: z.string().email().default('admin@illurefragrance.com'),
   SEED_ADMIN_PASSWORD: z.string().min(8).default('SuperAdmin@Illure2026!'),
   SEED_ADMIN_NAME: z.string().default('Illure Admin'),
+
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
+
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM_NAME: z.string().default('İLLURÊ FRAGRANCE'),
+  SMTP_FROM_EMAIL: z.string().optional(),
+  ORDER_NOTIFICATION_EMAIL: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

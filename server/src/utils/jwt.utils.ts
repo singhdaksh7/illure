@@ -9,6 +9,13 @@ export interface AdminTokenPayload {
   role: AdminRole;
 }
 
+export interface CustomerTokenPayload {
+  customerId: string;
+  email: string | null;
+  phone: string;
+  name: string;
+}
+
 export function generateAccessToken(payload: AdminTokenPayload): string {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: env.ACCESS_TOKEN_TTL as jwt.SignOptions['expiresIn'],
@@ -17,6 +24,16 @@ export function generateAccessToken(payload: AdminTokenPayload): string {
 
 export function verifyAccessToken(token: string): AdminTokenPayload {
   return jwt.verify(token, env.JWT_ACCESS_SECRET) as AdminTokenPayload;
+}
+
+export function generateCustomerAccessToken(payload: CustomerTokenPayload): string {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+    expiresIn: env.ACCESS_TOKEN_TTL as jwt.SignOptions['expiresIn'],
+  });
+}
+
+export function verifyCustomerAccessToken(token: string): CustomerTokenPayload {
+  return jwt.verify(token, env.JWT_ACCESS_SECRET) as CustomerTokenPayload;
 }
 
 export function generateRefreshTokenString(): string {
