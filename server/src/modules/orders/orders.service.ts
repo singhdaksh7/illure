@@ -408,6 +408,7 @@ export class OrdersService {
     razorpay_order_id: string;
     razorpay_payment_id: string;
     razorpay_signature: string;
+    isWebhook?: boolean;
   }) {
     // Signature verification logic
     let expectedSignature: string;
@@ -420,6 +421,7 @@ export class OrdersService {
       .digest('hex');
 
     const isValidSignature =
+      Boolean(data.isWebhook) ||
       data.razorpay_signature === expectedSignature ||
       (env.NODE_ENV === 'test' && data.razorpay_signature === 'mock_valid_signature');
 
@@ -632,7 +634,8 @@ export class OrdersService {
             await this.verifyRazorpayPayment({
               razorpay_order_id,
               razorpay_payment_id,
-              razorpay_signature: 'mock_valid_signature',
+              razorpay_signature: 'webhook_verified',
+              isWebhook: true,
             });
           } catch (err) {
             console.error('Webhook verification error:', err);
