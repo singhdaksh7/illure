@@ -155,7 +155,7 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
                         STARTING AT
                       </span>
                       <span className="font-editorial-serif text-lg text-[#F7F4EE] font-light">
-                        ₹{(product.price || 21500).toLocaleString('en-IN')}
+                        ₹{(product.minPrice || (product.variants?.length ? Math.min(...product.variants.map(v => Number(v.price))) : (product.price || 999))).toLocaleString('en-IN')}
                       </span>
                     </div>
                     <ArrowRight className="w-4 h-4 text-[#B89A62] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />

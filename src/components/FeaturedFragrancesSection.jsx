@@ -5,53 +5,44 @@ import { useCms } from '../context/CmsContext';
 
 const DEFAULT_FEATURED = [
   {
-    id: "tf-oud-wood",
+    id: "2abf7036-537b-4701-96db-5ef6080eb398",
     brand: "TOM FORD",
-    name: "Oud Wood Extrait",
-    inspiredByName: "Tom Ford Oud Wood",
-    price: 21500,
-    formattedPrice: "₹21,500",
+    name: "Oud Silk Royal",
+    inspiredByName: "Oud Wood",
+    price: 349,
+    minPrice: 349,
+    formattedPrice: "₹349",
     image: "/images/oud_wood.jpg",
     notes: "Smoky Oud · Sandalwood · Cardamom",
     gender: "UNISEX",
     bestseller: true,
   },
   {
-    id: "dior-sauvage-elixir",
-    brand: "DIOR",
-    name: "Sauvage Elixir Absolu",
-    inspiredByName: "Dior Sauvage Elixir",
-    price: 17900,
-    formattedPrice: "₹17,900",
+    id: "2bd9cff7-1ba5-4a81-8d7d-f50677bc7f2d",
+    brand: "GIORGIO ARMANI",
+    name: "Aqua Edge",
+    inspiredByName: "Acqua di Giò",
+    price: 299,
+    minPrice: 299,
+    formattedPrice: "₹299",
     image: "/images/sauvage.jpg",
-    notes: "Spiced Lavender · Liquorice · Sandalwood",
+    notes: "Bergamot · Marine Accord · White Musk",
     gender: "MEN",
     badge: "ICONIC",
   },
   {
-    id: "creed-aventus",
+    id: "6a8c6b87-8a0d-4215-bdd2-8dff37082a7e",
     brand: "CREED",
-    name: "Aventus Sovereign",
-    inspiredByName: "Creed Aventus",
-    price: 32000,
-    formattedPrice: "₹32,000",
+    name: "Imperial Sovereign",
+    inspiredByName: "Aventus",
+    price: 399,
+    minPrice: 399,
+    formattedPrice: "₹399",
     image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=800",
     notes: "Blackcurrant · Italian Bergamot · French Oakmoss",
     gender: "MEN",
     badge: "EXCLUSIVE",
   },
-  {
-    id: "ysl-y-edp",
-    brand: "YVES SAINT LAURENT",
-    name: "Y Extrait Pure",
-    inspiredByName: "YSL Y Eau de Parfum",
-    price: 11500,
-    formattedPrice: "₹11,500",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800",
-    notes: "Crisp Apple · Sage · Tonka Bean",
-    gender: "MEN",
-    newArrival: true,
-  }
 ];
 
 export default function FeaturedFragrancesSection({ 
@@ -168,7 +159,7 @@ export default function FeaturedFragrancesSection({
                       STARTING AT
                     </span>
                     <span className="font-editorial-serif text-2xl md:text-3xl font-light text-[#F7F4EE]">
-                      ₹{(leadProduct.price || 21500).toLocaleString('en-IN')}
+                      ₹{(leadProduct.minPrice || (leadProduct.variants?.length ? Math.min(...leadProduct.variants.map(v => Number(v.price))) : (leadProduct.price || 999))).toLocaleString('en-IN')}
                     </span>
                   </div>
                 </div>

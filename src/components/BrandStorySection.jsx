@@ -38,6 +38,7 @@ export default function BrandStorySection({ onDiscoverStory }) {
               <img 
                 src={image} 
                 alt="İLLURÊ Haute Parfumerie Atelier" 
+                onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
                 className="w-full h-full object-cover filter brightness-[0.8] contrast-[1.08] group-hover:scale-105 transition-transform duration-1000 ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-transparent to-transparent opacity-75" />

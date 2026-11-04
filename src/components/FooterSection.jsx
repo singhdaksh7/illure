@@ -17,6 +17,14 @@ const FacebookIcon = ({ className = 'w-4 h-4' }) => (
   </svg>
 );
 
+const isValidWhatsApp = (number) => {
+  if (!number || typeof number !== 'string') return false;
+  const digits = number.replace(/[^0-9]/g, '');
+  if (digits.length < 10) return false;
+  if (digits.includes('9876543210') || digits.includes('1234567890')) return false;
+  return true;
+};
+
 export default function FooterSection({ onNavigate }) {
   const { footer, brandContacts } = useCms();
 
@@ -156,7 +164,7 @@ export default function FooterSection({ onNavigate }) {
                 <FacebookIcon className="w-4 h-4" />
               </a>
             )}
-            {brandContacts?.whatsapp && (
+            {isValidWhatsApp(brandContacts?.whatsapp) && (
               <a 
                 href={`https://wa.me/${brandContacts.whatsapp.replace(/[^0-9]/g, '')}`} 
                 target="_blank" 

@@ -7,17 +7,21 @@ export default function CartDrawer({
   onClose, 
   cartItems = [], 
   onUpdateQuantity, 
-  onRemoveItem,
-  onNavigateToCheckout
+  onRemoveItem, 
+  onNavigateToCheckout 
 }) {
   const { shipping } = useCms();
 
   if (!isOpen) return null;
 
-  const freeThreshold = Number(shipping?.freeShippingThreshold) || 999;
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const remainingForFreeShipping = Math.max(0, freeThreshold - subtotal);
-  const progressPercent = Math.min(100, (subtotal / freeThreshold) * 100);
+  const hasFreeShipping = shipping?.isEnabled !== false && shipping?.freeShippingThreshold !== null && shipping?.freeShippingThreshold !== undefined;
+  const freeThreshold = hasFreeShipping ? Number(shipping.freeShippingThreshold) : 0;
+  const subtotal = cartItems.reduce((acc, item) => acc + (Number(item.price || 0) * item.quantity), 0);
+  const remainingForFreeShipping = hasFreeShipping ? Math.max(0, freeThreshold - subtotal) : 0;
+  const isFreeShipping = hasFreeShipping ? (subtotal >= freeThreshold) : true;
+  const progressPercent = hasFreeShipping && freeThreshold > 0 
+    ? Math.min(100, (subtotal / freeThreshold) * 100) 
+    : 100;
 
   const handleCheckout = () => {
     onClose();
@@ -59,31 +63,38 @@ export default function CartDrawer({
             </button>
           </div>
 
-          {/* DYNAMIC FREE SHIPPING PROGRESS INDICATOR (REQUIREMENT 19) */}
-          <div className="py-4 border-b border-white/[0.06] space-y-2">
-            <div className="flex items-center justify-between text-xs tracking-wider">
-              {remainingForFreeShipping > 0 ? (
-                <span className="text-[#A1A1AA] text-[11px]">
-                  Add <span className="text-[#B89A62] font-semibold">₹{remainingForFreeShipping.toLocaleString('en-IN')}</span> for complimentary shipping
+          {/* DYNAMIC FREE SHIPPING PROGRESS INDICATOR */}
+          {hasFreeShipping && freeThreshold > 0 ? (
+            <div className="py-4 border-b border-white/[0.06] space-y-2">
+              <div className="flex items-center justify-between text-xs tracking-wider">
+                {remainingForFreeShipping > 0 ? (
+                  <span className="text-[#A1A1AA] text-[11px]">
+                    Add <span className="text-[#B89A62] font-semibold">₹{remainingForFreeShipping.toLocaleString('en-IN')}</span> for complimentary shipping
+                  </span>
+                ) : (
+                  <span className="text-[#B89A62] text-[11px] font-medium flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
+                    <span>Complimentary Shipping Unlocked!</span>
+                  </span>
+                )}
+                <span className="text-[10px] text-[#A1A1AA] font-mono">
+                  {Math.round(progressPercent)}%
                 </span>
-              ) : (
-                <span className="text-[#B89A62] text-[11px] font-medium flex items-center space-x-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
-                  <span>Complimentary Shipping Unlocked!</span>
-                </span>
-              )}
-              <span className="text-[10px] text-[#A1A1AA] font-mono">
-                {Math.round(progressPercent)}%
-              </span>
-            </div>
+              </div>
 
-            <div className="h-1.5 w-full bg-[#18181B] rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#A98B55] to-[#B89A62] transition-all duration-500 rounded-full"
-                style={{ width: `${progressPercent}%` }}
-              />
+              <div className="h-1.5 w-full bg-[#18181B] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#A98B55] to-[#B89A62] transition-all duration-500 rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="py-3 border-b border-white/[0.06] flex items-center space-x-2 text-[11px] text-[#B89A62]">
+              <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
+              <span>Complimentary Luxury Shipping & Packaging Active</span>
+            </div>
+          )}
 
           {/* CART ITEMS LIST */}
           <div className="py-5 space-y-5 max-h-[46vh] overflow-y-auto no-scrollbar">
@@ -101,7 +112,7 @@ export default function CartDrawer({
                   <div className="w-16 h-20 bg-[#121214] border border-white/[0.08] p-2 flex items-center justify-center rounded-xs shrink-0">
                     <img 
                       src={item.image || "/images/oud_wood.jpg"} 
-                      onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }}
+                      onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
                       alt={item.name} 
                       className="max-h-full max-w-full object-contain filter drop-shadow-md"
                     />
@@ -117,48 +128,54 @@ export default function CartDrawer({
                           {item.name}
                         </h5>
                       </div>
-                      <button 
-                        onClick={() => onRemoveItem(item.id, item.selectedSize)}
-                        className="text-[#A1A1AA] hover:text-red-400 transition-colors p-1"
-                        title="Remove item"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
-                      </button>
+                      {onRemoveItem && (
+                        <button 
+                          onClick={() => onRemoveItem(item.id, item.selectedSize)}
+                          className="text-[#A1A1AA] hover:text-red-400 transition-colors p-1"
+                          title="Remove item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                        </button>
+                      )}
                     </div>
 
                     <p className="text-xs text-[#A1A1AA] font-mono">
-                      {item.selectedSize || '100 ML'} · ₹{item.price.toLocaleString('en-IN')}
+                      {item.selectedSize || 'Standard'} · ₹{Number(item.price || 0).toLocaleString('en-IN')}
                     </p>
 
                     {item.giftPackaging && (
                       <span className="inline-flex items-center space-x-1 text-[9px] tracking-wider text-[#B89A62] bg-[#18181B] px-1.5 py-0.5 border border-[#B89A62]/30 rounded-xs">
                         <Gift className="w-2.5 h-2.5" />
-                        <span>Royal Velvet Packaging</span>
+                        <span>Royal Velvet Presentation Included</span>
                       </span>
                     )}
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center border border-white/[0.1] bg-[#121214] text-xs font-mono">
-                        <button 
-                          onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}
-                          className="px-2.5 py-1 text-[#A1A1AA] hover:text-[#F7F4EE]"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="px-2 text-[#F7F4EE] font-semibold">{item.quantity}</span>
-                        <button 
-                          onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}
-                          className="px-2.5 py-1 text-[#A1A1AA] hover:text-[#F7F4EE]"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
+                    {onUpdateQuantity && (
+                      <div className="flex items-center space-x-3 pt-2">
+                        <div className="flex items-center border border-white/[0.1] bg-[#121214] rounded-xs">
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}
+                            className="p-1 hover:text-[#B89A62] transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="font-mono text-xs px-2 text-[#F7F4EE]">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}
+                            className="p-1 hover:text-[#B89A62] transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
 
-                      <span className="text-xs font-semibold text-[#F7F4EE]">
-                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                      </span>
-                    </div>
+                        <span className="font-mono text-xs text-[#F7F4EE] font-medium ml-auto">
+                          ₹{(Number(item.price || 0) * item.quantity).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    )}
 
                   </div>
                 </div>
@@ -179,7 +196,7 @@ export default function CartDrawer({
             <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
               <span>SHIPPING</span>
               <span className="text-[#B89A62] font-mono">
-                {remainingForFreeShipping === 0 ? 'COMPLIMENTARY' : `₹${shipping?.flatRate || 99}`}
+                {isFreeShipping ? 'COMPLIMENTARY' : `₹${shipping?.flatRate || 99}`}
               </span>
             </div>
           </div>

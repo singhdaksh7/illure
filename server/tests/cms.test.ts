@@ -97,4 +97,89 @@ describe('CMS & Visual Customization API', () => {
     const publicRes = await request(app).get('/api/cms');
     expect(publicRes.body.data.settings.announcement.text).toBe('Private Exhibition Live — Complimentary Extrait Sample');
   });
+
+  it('RBAC - INVENTORY_MANAGER should be forbidden from modifying CMS settings (403)', async () => {
+    const invEmail = 'invcms@illurefragrance.com';
+    const invPassword = 'InventoryPassword@2026!';
+    const passwordHash = await hashPassword(invPassword);
+
+    await prisma.adminUser.deleteMany({ where: { email: invEmail } });
+    await prisma.adminUser.create({
+      data: {
+        email: invEmail,
+        passwordHash,
+        name: 'Inventory Staff',
+        role: AdminRole.INVENTORY_MANAGER,
+        isActive: true,
+      },
+    });
+
+    const loginRes = await request(app)
+      .post('/api/admin/auth/login')
+      .send({ email: invEmail, password: invPassword });
+
+    const invToken = loginRes.body.data.accessToken;
+
+    const res = await request(app)
+      .patch('/api/admin/cms/settings/announcement')
+      .set('Authorization', `Bearer ${invToken}`)
+      .send({
+        value: { text: 'Unauthorized CMS override attempt' },
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('VALIDATION - should reject invalid appearance hex color codes (400)', async () => {
+    const res = await request(app)
+      .patch('/api/admin/cms/settings/appearance')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        value: {
+          primaryBg: 'not-a-valid-hex-color',
+        },
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error?.code).toBe('INVALID_HEX_COLOR');
+  });
+
+  it('VALIDATION - should reject invalid borderRadius option (400)', async () => {
+    const res = await request(app)
+      .patch('/api/admin/cms/settings/appearance')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        value: {
+          borderRadius: 'hyper-circular-extreme',
+        },
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error?.code).toBe('INVALID_BORDER_RADIUS');
+  });
+
+  it('VALIDATION - should reject out-of-bounds hero overlay strength (400)', async () => {
+    const listRes = await request(app)
+      .get('/api/admin/cms/sections')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const targetSection = listRes.body.data.sections[0];
+
+    const res = await request(app)
+      .patch(`/api/admin/cms/sections/${targetSection.id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        customData: {
+          overlayStrength: 5.5, // out of 0.1 - 0.95 range
+        },
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error?.code).toBe('INVALID_OVERLAY_STRENGTH');
+  });
 });
+

@@ -42,3 +42,4 @@ export const cmsApi = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }),
 };
+

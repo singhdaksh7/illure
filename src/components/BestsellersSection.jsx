@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export default function BestsellersSection({ 
   onSelectProduct, 
   onAddToCart,
+  products = [],
 }) {
   const { getSection } = useCms();
   const section = getSection('bestsellers');
@@ -21,11 +22,12 @@ export default function BestsellersSection({
   const subtitle = section?.subtitle || 'MOST SOUGHT AFTER';
   const description = section?.description || 'The definitive fragrances chosen repeatedly by our distinguished patrons.';
 
-  const filteredProducts = PRODUCTS.filter(p => {
-    if (activeFilter === 'HIM') return p.gender === 'Him';
-    if (activeFilter === 'HER') return p.gender === 'Her';
-    if (activeFilter === 'UNISEX') return p.gender === 'Unisex';
-    if (activeFilter === 'NICHE') return p.niche === true;
+  const sourceProducts = (products && products.length > 0) ? products : PRODUCTS;
+  const filteredProducts = sourceProducts.filter(p => {
+    if (activeFilter === 'HIM') return p.gender === 'Him' || p.gender === 'MEN';
+    if (activeFilter === 'HER') return p.gender === 'Her' || p.gender === 'WOMEN';
+    if (activeFilter === 'UNISEX') return p.gender === 'Unisex' || p.gender === 'UNISEX';
+    if (activeFilter === 'NICHE') return p.niche === true || p.category === 'niche-editions';
     return true; // ALL
   });
 

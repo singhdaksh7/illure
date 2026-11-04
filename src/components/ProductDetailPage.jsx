@@ -1,87 +1,160 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ShoppingBag, ArrowLeft, Check, Sparkles, ShieldCheck, Gift, Clock, Wind, Flame, Sun, Droplets } from 'lucide-react';
 import IllureCrest from './IllureCrest';
 import ProductCard from './ProductCard';
+import { giftPackagingApi } from '../api/giftPackaging';
 
 export default function ProductDetailPage({ 
-  productId = 'tf-oud-wood', 
+  productId, 
   productsData = [], 
   onBack, 
   onAddToCart, 
   onSelectProduct 
 }) {
-  const product = productsData.find(p => p.id === productId) || productsData[0] || {
-    id: 'tf-oud-wood',
-    name: 'Oud Wood Extrait',
-    brand: 'TOM FORD',
-    inspiredByName: 'Tom Ford Oud Wood',
-    price: 21500,
-    sizes: [
-      { size: '3 ML', price: 950, stock: 24 },
-      { size: '6 ML', price: 1650, stock: 12 },
-      { size: '12 ML', price: 2950, stock: 5 },
-      { size: '50 ML', price: 11500, stock: 8 },
-      { size: '100 ML', price: 21500, stock: 15 },
-    ],
-    image: '/images/oud_wood.jpg',
-    description: 'A masterpiece of smoky resin and rare woods. Exotic rosewood and cardamom introduce an intoxicating blend of precious oud, sandalwood, and vetiver, enriched by warm amber and tonka bean.',
-    topNotes: ['Rosewood', 'Cardamom', 'Chinese Pepper'],
-    heartNotes: ['Rare Oud Wood', 'Sandalwood', 'Vetiver Root'],
-    baseNotes: ['Amber Crystal', 'Tonka Bean', 'Pure Vanilla'],
-    concentration: 'Extrait de Parfum (35% Concentration)',
-    longevity: '14+ Hours',
-    projection: 'Commanding Sillage',
-    gender: 'UNISEX',
-  };
+  const product = useMemo(() => {
+    return productsData.find(p => p.id === productId || p.slug === productId) || productsData[0] || {};
+  }, [productId, productsData]);
 
-  const defaultSizes = product.sizes && product.sizes.length > 0 
-    ? product.sizes 
-    : [
-        { size: '3 ML', price: 950, stock: 20 },
-        { size: '6 ML', price: 1650, stock: 15 },
-        { size: '12 ML', price: 2950, stock: 4 },
-        { size: '50 ML', price: 11500, stock: 10 },
-        { size: '100 ML', price: product.price || 21500, stock: 8 },
-      ];
+  // Derive sizes STRICTLY from live backend variants or product data
+  const availableSizes = useMemo(() => {
+    if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+      return product.variants
+        .filter(v => v.isActive !== false)
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+        .map(v => ({
+          variantId: v.id,
+          size: v.sizeLabel || (v.sizeMl ? `${v.sizeMl} ML` : 'Flacon'),
+          price: Number(v.price),
+          stock: v.stockQuantity ?? 10,
+          inStock: v.inStock ?? (v.stockQuantity > 0),
+          isLowStock: (v.stockQuantity ?? 10) <= (v.lowStockThreshold ?? 5),
+        }));
+    }
+    if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+      return product.sizes.map(s => {
+        if (typeof s === 'string') {
+          return {
+            variantId: product.id,
+            size: s,
+            price: Number(product.price || product.minPrice || 0),
+            stock: 10,
+            inStock: true,
+            isLowStock: false,
+          };
+        }
+        return {
+          variantId: s.id || s.variantId || product.id,
+          size: s.size || (s.sizeMl ? `${s.sizeMl} ML` : (s.sizeLabel || 'Standard')),
+          price: Number(s.price || product.price || product.minPrice || 0),
+          stock: s.stock ?? 10,
+          inStock: (s.stock ?? 10) > 0,
+          isLowStock: (s.stock ?? 10) <= 5,
+        };
+      });
+    }
+    // Single variant representation if no array defined on product
+    const fallbackPrice = Number(product.minPrice || product.price || 0);
+    return [{
+      variantId: product.id || 'default-variant',
+      size: product.size || (product.sizeMl ? `${product.sizeMl} ML` : 'Standard Flacon'),
+      price: fallbackPrice,
+      stock: product.stockQuantity ?? 10,
+      inStock: true,
+      isLowStock: false,
+    }];
+  }, [product]);
 
-  const [selectedSizeObj, setSelectedSizeObj] = useState(defaultSizes[1] || defaultSizes[0]);
+  const [selectedSizeObj, setSelectedSizeObj] = useState(availableSizes[0]);
   const [quantity, setQuantity] = useState(1);
   const [giftBoxSelected, setGiftBoxSelected] = useState(false);
   const [giftMessage, setGiftMessage] = useState('');
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [added, setAdded] = useState(false);
 
-  const productImages = [
-    product.image || "/images/oud_wood.jpg",
-    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1000",
-    "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=1000"
-  ];
+  // Dynamic gift packaging from backend
+  const [giftOption, setGiftOption] = useState({
+    id: null,
+    name: 'Royal Velvet Gift Presentation',
+    price: 499,
+    description: 'Gold-embossed rigid box with satin lining & personal calligraphed card',
+  });
+
+  useEffect(() => {
+    giftPackagingApi.getPublic()
+      .then(res => {
+        const pkgs = res?.data?.giftPackaging;
+        if (pkgs && pkgs.length > 0) {
+          const activePkg = pkgs.find(p => p.isActive) || pkgs[0];
+          setGiftOption({
+            id: activePkg.id,
+            name: activePkg.name,
+            price: Number(activePkg.price) || 499,
+            description: activePkg.description || 'Gold-embossed rigid box with satin lining & personal calligraphed card',
+          });
+        }
+      })
+      .catch(() => {
+        // Safe default state already initialized
+      });
+  }, []);
+
+  // Update selected size when product changes
+  useEffect(() => {
+    if (availableSizes && availableSizes.length > 0) {
+      setSelectedSizeObj(availableSizes[0]);
+    }
+    setActiveImageIdx(0);
+  }, [product, availableSizes]);
+
+  const productImages = useMemo(() => {
+    const list = [];
+    if (product.primaryImage?.url) list.push(product.primaryImage.url);
+    if (product.image && !list.includes(product.image)) list.push(product.image);
+    if (product.images && Array.isArray(product.images)) {
+      product.images.forEach(img => {
+        const u = typeof img === 'string' ? img : img.url;
+        if (u && !list.includes(u)) list.push(u);
+      });
+    }
+    if (list.length === 0) list.push('/images/oud_wood.jpg');
+    return list;
+  }, [product]);
+
+  const currentPrice = selectedSizeObj ? selectedSizeObj.price : Number(product.price || product.minPrice || 0);
+  const giftPackagingPrice = giftBoxSelected ? giftOption.price : 0;
+  const finalUnitPrice = currentPrice + giftPackagingPrice;
+  const totalBatchPrice = finalUnitPrice * quantity;
 
   const handleAdd = () => {
-    if (onAddToCart) {
+    if (onAddToCart && selectedSizeObj) {
       onAddToCart({
         ...product,
+        variantId: selectedSizeObj.variantId,
         selectedSize: selectedSizeObj.size,
         price: selectedSizeObj.price,
         quantity,
-        giftPackaging: giftBoxSelected ? { name: 'Royal Velvet Gift Box', price: 350, message: giftMessage } : null,
+        giftPackagingId: giftBoxSelected ? giftOption.id : null,
+        giftPackaging: giftBoxSelected ? { id: giftOption.id, name: giftOption.name, price: giftOption.price, message: giftMessage } : null,
+        giftMessage: giftBoxSelected ? giftMessage : null,
       });
       setAdded(true);
       setTimeout(() => setAdded(false), 2200);
     }
   };
 
-  const finalUnitPrice = selectedSizeObj.price + (giftBoxSelected ? 350 : 0);
-  const totalBatchPrice = finalUnitPrice * quantity;
-
   // Recommended companions
   const recommended = productsData
-    .filter(p => p.id !== product.id)
+    .filter(p => p.id !== product.id && p.slug !== product.slug)
     .slice(0, 3);
+
+  // Fragrance Notes extraction
+  const topNotes = Array.isArray(product.topNotes) ? product.topNotes : (product.topNotes ? [product.topNotes] : null);
+  const heartNotes = Array.isArray(product.heartNotes) ? product.heartNotes : (product.heartNotes ? [product.heartNotes] : null);
+  const baseNotes = Array.isArray(product.baseNotes) ? product.baseNotes : (product.baseNotes ? [product.baseNotes] : null);
+  const hasPyramidNotes = Boolean(topNotes?.length || heartNotes?.length || baseNotes?.length);
 
   return (
     <div className="min-h-screen bg-[#0B0B0C] pt-28 pb-32 text-[#F7F4EE] select-none">
-      
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         
         {/* Back Navigation Bar */}
@@ -100,9 +173,7 @@ export default function ProductDetailPage({
           </div>
         </div>
 
-        {/* ==================================================
-            DESKTOP MAIN HERO GRID: GALLERY (LEFT) + INFO (RIGHT)
-            ================================================== */}
+        {/* MAIN HERO GRID: GALLERY (LEFT) + INFO (RIGHT) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start pb-20 border-b border-white/[0.06]">
           
           {/* LEFT: GALLERY & IMMERSIVE BOTTLE PRESENTATION */}
@@ -113,9 +184,9 @@ export default function ProductDetailPage({
               <div className="absolute inset-0 bg-radial from-[#B89A62]/12 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none" />
 
               <img 
-                src={productImages[activeImageIdx]} 
-                onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }}
-                alt={product.name} 
+                src={productImages[activeImageIdx] || '/images/oud_wood.jpg'} 
+                onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
+                alt={product.name || 'İLLURÊ Fragrance'} 
                 className="max-h-full max-w-full object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.95)] transition-transform duration-700 group-hover:scale-105"
               />
 
@@ -132,26 +203,28 @@ export default function ProductDetailPage({
             </div>
 
             {/* Thumbnail Navigation */}
-            <div className="flex items-center space-x-4">
-              {productImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIdx(idx)}
-                  className={`w-20 h-20 bg-[#121214] border p-2 rounded-xs overflow-hidden transition-all ${
-                    activeImageIdx === idx 
-                      ? 'border-[#B89A62] shadow-[0_0_15px_rgba(184,154,98,0.2)]' 
-                      : 'border-white/[0.08] opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <img 
-                    src={img} 
-                    onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }} 
-                    alt="" 
-                    className="w-full h-full object-contain" 
-                  />
-                </button>
-              ))}
-            </div>
+            {productImages.length > 1 && (
+              <div className="flex items-center space-x-4">
+                {productImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIdx(idx)}
+                    className={`w-20 h-20 bg-[#121214] border p-2 rounded-xs overflow-hidden transition-all ${
+                      activeImageIdx === idx 
+                        ? 'border-[#B89A62] shadow-[0_0_15px_rgba(184,154,98,0.2)]' 
+                        : 'border-white/[0.08] opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img 
+                      src={img} 
+                      onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }} 
+                      alt="" 
+                      className="w-full h-full object-contain" 
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* RIGHT: EDITORIAL DETAILS, SIZES, GIFTING, BUY */}
@@ -170,62 +243,69 @@ export default function ProductDetailPage({
                 {product.name}
               </h1>
 
-              <p className="typography-body text-xs md:text-sm text-[#A1A1AA]">
-                Inspired by <span className="text-[#E3DCD0] font-normal">{product.inspiredByName || product.brand}</span>
-                {product.referenceBrand && ` · Reference House: ${product.referenceBrand.name}`}
-              </p>
+              {(product.inspiredByName || product.brand || product.referenceBrand) && (
+                <p className="typography-body text-xs md:text-sm text-[#A1A1AA]">
+                  Inspired by <span className="text-[#E3DCD0] font-normal">{product.inspiredByName || product.brand}</span>
+                  {product.referenceBrand && ` · Reference House: ${product.referenceBrand.name || product.referenceBrand}`}
+                </p>
+              )}
             </div>
 
             {/* Dynamic Price Display */}
             <div className="pt-2 flex items-baseline space-x-3 border-y border-white/[0.06] py-4">
               <span className="font-editorial-serif text-3xl md:text-4xl font-light text-[#F7F4EE]">
-                ₹{selectedSizeObj.price.toLocaleString('en-IN')}
+                ₹{currentPrice.toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] tracking-widest text-[#A1A1AA] uppercase">
-                INCL. ALL TAXES & FREE SHIPPING
+                INCL. ALL TAXES
               </span>
             </div>
 
             {/* SIZE SELECTOR: LUXURY EDITORIAL TILES */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs tracking-widest uppercase">
-                <span className="font-medium text-[#F7F4EE]">BOTTLE SIZE</span>
-                <span className="text-[#B89A62] text-[10px]">
-                  {selectedSizeObj.stock <= 5 ? `ONLY ${selectedSizeObj.stock} LEFT` : 'IN STOCK'}
-                </span>
-              </div>
+            {availableSizes.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs tracking-widest uppercase">
+                  <span className="font-medium text-[#F7F4EE]">SELECT BOTTLE SIZE</span>
+                  {selectedSizeObj && (
+                    <span className="text-[#B89A62] text-[10px]">
+                      {selectedSizeObj.isLowStock 
+                        ? `ONLY ${selectedSizeObj.stock} LEFT` 
+                        : (selectedSizeObj.inStock ? 'IN STOCK' : 'PRE-ORDER')}
+                    </span>
+                  )}
+                </div>
 
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
-                {defaultSizes.map((sObj, idx) => {
-                  const isSelected = selectedSizeObj.size === sObj.size;
-                  const isLow = sObj.stock <= 5;
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {availableSizes.map((sObj, idx) => {
+                    const isSelected = selectedSizeObj?.size === sObj.size;
 
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedSizeObj(sObj)}
-                      className={`p-3 text-center border rounded-xs transition-all flex flex-col justify-between items-center ${
-                        isSelected
-                          ? 'border-[#B89A62] bg-[#18181B] text-[#F7F4EE] shadow-[0_0_15px_rgba(184,154,98,0.15)]'
-                          : 'border-white/[0.08] bg-[#121214] text-[#A1A1AA] hover:border-[#B89A62]/40'
-                      }`}
-                    >
-                      <span className="font-interface-sans text-xs font-semibold tracking-wider">
-                        {sObj.size}
-                      </span>
-                      <span className="text-[10px] font-mono mt-1 text-[#B89A62]">
-                        ₹{sObj.price.toLocaleString('en-IN')}
-                      </span>
-                      {isLow && (
-                        <span className="text-[8px] text-amber-400 mt-1 uppercase">
-                          LOW
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedSizeObj(sObj)}
+                        className={`p-3 text-center border rounded-xs transition-all flex flex-col justify-between items-center ${
+                          isSelected
+                            ? 'border-[#B89A62] bg-[#18181B] text-[#F7F4EE] shadow-[0_0_15px_rgba(184,154,98,0.15)] ring-1 ring-[#B89A62]'
+                            : 'border-white/[0.08] bg-[#121214] text-[#A1A1AA] hover:border-[#B89A62]/40'
+                        }`}
+                      >
+                        <span className="font-interface-sans text-xs font-semibold tracking-wider">
+                          {sObj.size}
                         </span>
-                      )}
-                    </button>
-                  );
-                })}
+                        <span className="text-[11px] font-mono mt-1 text-[#B89A62]">
+                          ₹{sObj.price.toLocaleString('en-IN')}
+                        </span>
+                        {sObj.isLowStock && (
+                          <span className="text-[8px] text-amber-400 mt-1 uppercase">
+                            LOW STOCK
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* GIFT PACKAGING PRESENTATION UI */}
             <div className="p-4 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-3">
@@ -234,10 +314,10 @@ export default function ProductDetailPage({
                   <Gift className="w-4 h-4 text-[#B89A62]" />
                   <div>
                     <span className="text-xs font-medium text-[#F7F4EE] block tracking-wider uppercase">
-                      ROYAL VELVET GIFT PRESENTATION
+                      {giftOption.name}
                     </span>
                     <span className="text-[11px] text-[#A1A1AA]">
-                      Gold-embossed rigid box with satin lining & personal calligraphed card (+₹350)
+                      {giftOption.description} (+₹{giftOption.price.toLocaleString('en-IN')})
                     </span>
                   </div>
                 </div>
@@ -254,13 +334,13 @@ export default function ProductDetailPage({
               {giftBoxSelected && (
                 <div className="pt-2 animate-fade-up">
                   <label className="text-[10px] tracking-widest text-[#B89A62] uppercase block mb-1">
-                    PERSONALIZED GIFT MESSAGE
+                    PERSONALIZED CALLIGRAPHED GIFT MESSAGE
                   </label>
                   <textarea
                     rows={2}
                     value={giftMessage}
                     onChange={(e) => setGiftMessage(e.target.value)}
-                    placeholder="Write your personal message to accompany this flacon..."
+                    placeholder="Write your personal note to accompany this flacon..."
                     className="w-full bg-[#0B0B0C] border border-[#B89A62]/30 p-2.5 text-xs text-[#F7F4EE] focus:outline-none focus:border-[#B89A62]"
                   />
                 </div>
@@ -270,50 +350,50 @@ export default function ProductDetailPage({
             {/* QUANTITY & ADD TO BAG */}
             <div className="space-y-4 pt-2">
               <div className="flex items-center space-x-4">
-                {/* Quantity Control */}
-                <div className="flex items-center border border-white/[0.1] bg-[#121214] rounded-xs px-3 py-3 space-x-4 text-xs font-mono">
+                
+                {/* Quantity */}
+                <div className="flex items-center border border-white/[0.1] bg-[#121214] rounded-xs px-3 py-3">
                   <button
-                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                    className="text-[#A1A1AA] hover:text-[#F7F4EE] px-1 text-sm"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="text-[#A1A1AA] hover:text-[#F7F4EE] px-2 text-sm"
                   >
-                    –
+                    -
                   </button>
-                  <span className="text-[#F7F4EE] font-semibold">{quantity}</span>
+                  <span className="font-mono text-xs px-3 text-[#F7F4EE]">
+                    {quantity}
+                  </span>
                   <button
-                    onClick={() => setQuantity(prev => prev + 1)}
-                    className="text-[#A1A1AA] hover:text-[#F7F4EE] px-1 text-sm"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="text-[#A1A1AA] hover:text-[#F7F4EE] px-2 text-sm"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Primary Add to Bag Button */}
+                {/* Add Button */}
                 <button
                   onClick={handleAdd}
-                  className={`flex-1 py-4 px-8 text-xs tracking-[0.28em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-3 rounded-xs ${
+                  className={`flex-1 py-4 px-6 text-xs tracking-[0.25em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-2.5 rounded-xs shadow-[0_10px_30px_rgba(184,154,98,0.2)] ${
                     added
                       ? 'bg-emerald-600 text-white'
-                      : 'bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C] shadow-[0_10px_25px_rgba(184,154,98,0.2)]'
+                      : 'bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C]'
                   }`}
                 >
-                  {added ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>ADDED TO BAG</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>ADD TO BAG · ₹{totalBatchPrice.toLocaleString('en-IN')}</span>
-                    </>
-                  )}
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>{added ? 'ADDED TO BAG' : `ADD TO BAG · ₹${totalBatchPrice.toLocaleString('en-IN')}`}</span>
                 </button>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="pt-2 flex items-center space-x-3 text-[11px] text-[#A1A1AA] font-interface-sans tracking-wider">
-                <ShieldCheck className="w-4 h-4 text-[#B89A62] shrink-0" />
-                <span>Tamper-sealed flacons · Inspected & prepared by hand</span>
+              {/* Guarantees */}
+              <div className="flex items-center justify-between text-[10px] tracking-wider text-[#A1A1AA] uppercase pt-2 border-t border-white/[0.04]">
+                <div className="flex items-center space-x-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
+                  <span>100% Authentic Extrait</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
+                  <span>Handcrafted Formulation</span>
+                </div>
               </div>
             </div>
 
@@ -321,198 +401,149 @@ export default function ProductDetailPage({
 
         </div>
 
-        {/* ==================================================
-            PRODUCT STORY SECTION
-            ================================================== */}
-        <div className="py-20 border-b border-white/[0.06] grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-          <div className="md:col-span-4 space-y-2">
-            <span className="typography-eyebrow text-[#B89A62]">
-              THE STORY & INSPIRATION
-            </span>
-            <h3 className="typography-h2 text-[#F7F4EE]">
-              SCENT PROFILE & EMOTION
-            </h3>
-          </div>
-
-          <div className="md:col-span-8 space-y-4">
-            <p className="typography-body-large text-[#A1A1AA]">
-              {product.description}
-            </p>
-            <p className="typography-body text-[#A1A1AA] text-xs">
-              Every drop is distilled at maximum concentration, allowing base resin molecules to bond intimately with your skin’s natural warmth.
-            </p>
-          </div>
-        </div>
-
-        {/* ==================================================
-            FRAGRANCE NOTES VISUAL (TOP, HEART, BASE COLUMNS)
-            ================================================== */}
-        <div className="py-20 border-b border-white/[0.06] space-y-12">
-          <div className="text-center space-y-2">
-            <span className="typography-eyebrow text-[#B89A62]">
-              OLFACTORY ARCHITECTURE
-            </span>
-            <h3 className="typography-h1 text-[#F7F4EE]">
-              THE FRAGRANCE PYRAMID
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* TOP NOTES */}
-            <div className="p-8 bg-[#121214] border-l-2 border-[#B89A62] space-y-4 rounded-xs">
-              <div className="flex items-center space-x-2 text-[10px] tracking-[0.25em] text-[#B89A62] uppercase font-semibold">
-                <Wind className="w-4 h-4" />
-                <span>TOP NOTES · FIRST 30 MIN</span>
-              </div>
-              <ul className="space-y-2 font-editorial-serif text-2xl text-[#F7F4EE]">
-                {(product.topNotes || ['Rosewood', 'Cardamom', 'Chinese Pepper']).map((note, idx) => (
-                  <li key={idx} className="flex items-center space-x-2">
-                    <span className="text-[#B89A62] text-sm">✦</span>
-                    <span>{note}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[11px] text-[#A1A1AA] font-light">
-                Immediate sensory greeting, crisp and stimulating.
-              </p>
-            </div>
-
-            {/* HEART NOTES */}
-            <div className="p-8 bg-[#121214] border-l-2 border-[#B89A62] space-y-4 rounded-xs">
-              <div className="flex items-center space-x-2 text-[10px] tracking-[0.25em] text-[#B89A62] uppercase font-semibold">
-                <Droplets className="w-4 h-4" />
-                <span>HEART NOTES · 2 TO 6 HOURS</span>
-              </div>
-              <ul className="space-y-2 font-editorial-serif text-2xl text-[#F7F4EE]">
-                {(product.heartNotes || ['Rare Oud Wood', 'Sandalwood', 'Vetiver Root']).map((note, idx) => (
-                  <li key={idx} className="flex items-center space-x-2">
-                    <span className="text-[#B89A62] text-sm">✦</span>
-                    <span>{note}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[11px] text-[#A1A1AA] font-light">
-                The signature character, unfolding depth and intrigue.
-              </p>
-            </div>
-
-            {/* BASE NOTES */}
-            <div className="p-8 bg-[#121214] border-l-2 border-[#B89A62] space-y-4 rounded-xs">
-              <div className="flex items-center space-x-2 text-[10px] tracking-[0.25em] text-[#B89A62] uppercase font-semibold">
-                <Flame className="w-4 h-4" />
-                <span>BASE NOTES · 8 TO 16+ HOURS</span>
-              </div>
-              <ul className="space-y-2 font-editorial-serif text-2xl text-[#F7F4EE]">
-                {(product.baseNotes || ['Amber Crystal', 'Tonka Bean', 'Pure Vanilla']).map((note, idx) => (
-                  <li key={idx} className="flex items-center space-x-2">
-                    <span className="text-[#B89A62] text-sm">✦</span>
-                    <span>{note}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[11px] text-[#A1A1AA] font-light">
-                The sensual trail that anchors into garments and memory.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ==================================================
-            FRAGRANCE PROFILE & PERFORMANCE SPECS
-            ================================================== */}
-        <div className="py-20 border-b border-white/[0.06] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Performance Scales */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="space-y-1">
+        {/* FRAGRANCE PYRAMID (TOP, HEART, BASE) */}
+        {hasPyramidNotes && (
+          <div className="py-20 border-b border-white/[0.06] space-y-12">
+            <div className="text-center space-y-2">
               <span className="typography-eyebrow text-[#B89A62]">
-                INTENSITY MATRIX
+                OLFACTORY ARCHITECTURE
               </span>
-              <h3 className="typography-h2 text-[#F7F4EE]">
+              <h3 className="typography-h1 text-[#F7F4EE]">
+                THE FRAGRANCE PYRAMID
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {topNotes && topNotes.length > 0 && (
+                <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                      STAGE I · FIRST 30 MINUTES
+                    </span>
+                    <Wind className="w-4 h-4 text-[#B89A62]" />
+                  </div>
+                  <h4 className="font-editorial-serif text-2xl text-[#F7F4EE]">
+                    TOP NOTES
+                  </h4>
+                  <ul className="space-y-2 text-xs text-[#A1A1AA] font-light">
+                    {topNotes.map((n, i) => (
+                      <li key={i} className="flex items-center space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B89A62]" />
+                        <span>{n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {heartNotes && heartNotes.length > 0 && (
+                <div className="p-8 bg-[#121214] border border-[#B89A62]/30 rounded-xs space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                  <div className="flex items-center justify-between">
+                    <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                      STAGE II · 2 TO 6 HOURS
+                    </span>
+                    <Droplets className="w-4 h-4 text-[#B89A62]" />
+                  </div>
+                  <h4 className="font-editorial-serif text-2xl text-[#F7F4EE]">
+                    HEART NOTES
+                  </h4>
+                  <ul className="space-y-2 text-xs text-[#A1A1AA] font-light">
+                    {heartNotes.map((n, i) => (
+                      <li key={i} className="flex items-center space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B89A62]" />
+                        <span>{n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {baseNotes && baseNotes.length > 0 && (
+                <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                      STAGE III · 8 TO 14+ HOURS
+                    </span>
+                    <Flame className="w-4 h-4 text-[#B89A62]" />
+                  </div>
+                  <h4 className="font-editorial-serif text-2xl text-[#F7F4EE]">
+                    BASE NOTES
+                  </h4>
+                  <ul className="space-y-2 text-xs text-[#A1A1AA] font-light">
+                    {baseNotes.map((n, i) => (
+                      <li key={i} className="flex items-center space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B89A62]" />
+                        <span>{n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* PERFORMANCE DYNAMICS & OCCASION */}
+        {(product.longevity || product.projection || product.occasion || product.season) && (
+          <div className="py-20 border-b border-white/[0.06] space-y-12">
+            <div className="text-center space-y-2">
+              <span className="typography-eyebrow text-[#B89A62]">
+                PERFORMANCE METRICS
+              </span>
+              <h3 className="typography-h1 text-[#F7F4EE]">
                 SCENT DYNAMICS
               </h3>
             </div>
 
-            <div className="space-y-5 text-xs tracking-wider">
-              {/* Freshness / Warmth */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-[#A1A1AA]">
-                  <span>FRESHNESS</span>
-                  <span className="text-[#B89A62] font-mono">WARMTH (85%)</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {product.longevity && (
+                <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
+                  <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
+                    LONGEVITY ON SKIN
+                  </span>
+                  <p className="font-editorial-serif text-xl text-[#F7F4EE]">
+                    {product.longevity}
+                  </p>
                 </div>
-                <div className="h-1 bg-[#18181B] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#B89A62] rounded-full" style={{ width: '85%' }} />
-                </div>
-              </div>
+              )}
 
-              {/* Sillage / Projection */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-[#A1A1AA]">
-                  <span>INTIMACY</span>
-                  <span className="text-[#B89A62] font-mono">PROJECTION (90%)</span>
+              {product.projection && (
+                <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
+                  <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
+                    SILLAGE & PROJECTION
+                  </span>
+                  <p className="font-editorial-serif text-xl text-[#F7F4EE]">
+                    {product.projection}
+                  </p>
                 </div>
-                <div className="h-1 bg-[#18181B] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#B89A62] rounded-full" style={{ width: '90%' }} />
-                </div>
-              </div>
+              )}
 
-              {/* Longevity */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-[#A1A1AA]">
-                  <span>MODERATE</span>
-                  <span className="text-[#B89A62] font-mono">LONGEVITY (95%)</span>
+              {product.occasion && (
+                <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
+                  <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
+                    RECOMMENDED OCCASION
+                  </span>
+                  <p className="font-editorial-serif text-xl text-[#F7F4EE]">
+                    {product.occasion}
+                  </p>
                 </div>
-                <div className="h-1 bg-[#18181B] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#B89A62] rounded-full" style={{ width: '95%' }} />
+              )}
+
+              {product.season && (
+                <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
+                  <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
+                    OPTIMAL SEASON
+                  </span>
+                  <p className="font-editorial-serif text-xl text-[#F7F4EE]">
+                    {product.season}
+                  </p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
+        )}
 
-          {/* Practical Specifications */}
-          <div className="lg:col-span-6 grid grid-cols-2 gap-4">
-            <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
-              <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
-                CONCENTRATION
-              </span>
-              <p className="font-editorial-serif text-xl text-[#F7F4EE]">
-                {product.concentration || 'Extrait de Parfum'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
-              <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
-                LONGEVITY
-              </span>
-              <p className="font-editorial-serif text-xl text-[#F7F4EE]">
-                {product.longevity || '14+ Hours'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
-              <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
-                IDEAL OCCASION
-              </span>
-              <p className="font-editorial-serif text-xl text-[#F7F4EE]">
-                {product.occasion || 'Evening & Signature'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-[#121214] border border-white/[0.06] rounded-xs space-y-1">
-              <span className="text-[10px] tracking-widest text-[#B89A62] uppercase block">
-                OPTIMAL SEASON
-              </span>
-              <p className="font-editorial-serif text-xl text-[#F7F4EE]">
-                {product.season || 'Autumn, Winter & Nocturne'}
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-        {/* ==================================================
-            COMPANION RECOMMENDATIONS
-            ================================================== */}
+        {/* COMPANION RECOMMENDATIONS */}
         {recommended.length > 0 && (
           <div className="pt-20 space-y-10">
             <div className="text-center space-y-2">
@@ -539,13 +570,11 @@ export default function ProductDetailPage({
 
       </div>
 
-      {/* ==================================================
-          STICKY MOBILE ADD TO BAG BAR (REQUIREMENT 45)
-          ================================================== */}
+      {/* STICKY MOBILE ADD TO BAG BAR */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0C]/95 backdrop-blur-xl border-t border-[#B89A62]/30 p-4 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.9)]">
         <div>
-          <span className="text-[10px] text-[#B89A62] uppercase tracking-wider block font-semibold">
-            {selectedSizeObj.size} · {product.name}
+          <span className="text-[10px] text-[#B89A62] uppercase tracking-wider block font-semibold truncate max-w-[180px]">
+            {selectedSizeObj?.size} · {product.name}
           </span>
           <span className="font-editorial-serif text-xl text-[#F7F4EE]">
             ₹{totalBatchPrice.toLocaleString('en-IN')}

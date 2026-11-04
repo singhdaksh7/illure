@@ -447,6 +447,31 @@ export class CmsService {
       throw { statusCode: 404, code: 'NOT_FOUND', message: 'Homepage section not found.' };
     }
 
+    if (data.title && typeof data.title === 'string' && data.title.length > 255) {
+      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Section title cannot exceed 255 characters.' };
+    }
+    if (data.subtitle && typeof data.subtitle === 'string' && data.subtitle.length > 255) {
+      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Section subtitle cannot exceed 255 characters.' };
+    }
+    if (data.description && typeof data.description === 'string' && data.description.length > 2000) {
+      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Section description cannot exceed 2000 characters.' };
+    }
+    if (data.ctaLabel && typeof data.ctaLabel === 'string' && data.ctaLabel.length > 100) {
+      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'CTA label cannot exceed 100 characters.' };
+    }
+    if (data.ctaUrl && typeof data.ctaUrl === 'string' && data.ctaUrl.length > 500) {
+      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'CTA URL cannot exceed 500 characters.' };
+    }
+
+    if (data.customData && typeof data.customData === 'object') {
+      if (data.customData.overlayStrength !== undefined) {
+        const overlay = Number(data.customData.overlayStrength);
+        if (isNaN(overlay) || overlay < 0.1 || overlay > 0.95) {
+          throw { statusCode: 400, code: 'INVALID_OVERLAY_STRENGTH', message: 'overlayStrength must be a number between 0.1 and 0.95.' };
+        }
+      }
+    }
+
     return prisma.homepageSection.update({
       where: { id },
       data: {
@@ -505,6 +530,72 @@ export class CmsService {
    * Admin: Update site setting by key
    */
   static async updateSetting(key: string, value: any) {
+    if (!key || typeof key !== 'string') {
+      throw { statusCode: 400, code: 'BAD_REQUEST', message: 'Invalid setting key.' };
+    }
+
+    if (key === 'appearance' && value && typeof value === 'object') {
+      const hexColorRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+      const colorKeys = [
+        'primaryBg',
+        'secondaryBg',
+        'surfaceBg',
+        'accentGold',
+        'accentGoldMuted',
+        'textPrimary',
+        'textMuted',
+      ];
+
+      for (const cKey of colorKeys) {
+        if (value[cKey] !== undefined && value[cKey] !== null) {
+          if (typeof value[cKey] !== 'string' || !hexColorRegex.test(value[cKey].trim())) {
+            throw {
+              statusCode: 400,
+              code: 'INVALID_HEX_COLOR',
+              message: `Invalid hex color code for ${cKey}: must be #RGB or #RRGGBB.`,
+            };
+          }
+        }
+      }
+
+      if (value.borderRadius !== undefined && value.borderRadius !== null) {
+        const allowedRadius = ['sharp', 'subtle', 'soft', 'minimal'];
+        if (!allowedRadius.includes(value.borderRadius)) {
+          throw {
+            statusCode: 400,
+            code: 'INVALID_BORDER_RADIUS',
+            message: `borderRadius must be one of: ${allowedRadius.join(', ')}.`,
+          };
+        }
+      }
+
+      if (value.fontScale !== undefined && value.fontScale !== null) {
+        const allowedFontScales = ['compact', 'editorial', 'grand'];
+        if (!allowedFontScales.includes(value.fontScale)) {
+          throw {
+            statusCode: 400,
+            code: 'INVALID_FONT_SCALE',
+            message: `fontScale must be one of: ${allowedFontScales.join(', ')}.`,
+          };
+        }
+      }
+    }
+
+    if (key === 'announcement' && value && typeof value === 'object') {
+      if (value.text && typeof value.text === 'string' && value.text.length > 255) {
+        throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Announcement text cannot exceed 255 characters.' };
+      }
+    }
+
+    if (key === 'brand_contacts' && value && typeof value === 'object') {
+      if (value.email && typeof value.email === 'string' && value.email.length > 255) {
+        throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Contact email cannot exceed 255 characters.' };
+      }
+      if (value.whatsapp && typeof value.whatsapp === 'string' && value.whatsapp.length > 50) {
+        throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'WhatsApp number cannot exceed 50 characters.' };
+      }
+    }
+
     return prisma.siteSetting.upsert({
       where: { key },
       create: { key, value },
@@ -512,3 +603,4 @@ export class CmsService {
     });
   }
 }
+

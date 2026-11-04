@@ -340,3 +340,4 @@ export default function CatalogView({
     </div>
   );
 }
+

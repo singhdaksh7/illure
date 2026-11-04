@@ -93,6 +93,7 @@ export default function NewArrivalSection({ onSelectProduct, onAddToCart }) {
               <img 
                 src={campaignProduct.image} 
                 alt={campaignProduct.name}
+                onError={(e) => { e.currentTarget.src = "/images/sauvage.jpg"; }}
                 className="max-h-72 md:max-h-96 object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-700 ease-out"
               />
               <span className="absolute top-0 left-0 typography-eyebrow text-[9px] px-3 py-1 bg-[#0B0B0C] border border-[#B89A62]/40">

@@ -13,7 +13,7 @@ export default function Header({
   onSelectCategory,
   onSelectGender,
 }) {
-  const { navigation } = useCms();
+  const { navigation, shipping } = useCms();
   const { customer, isAuthenticated } = useCustomerAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -324,6 +324,7 @@ export default function Header({
                   <img
                     src={promo.imageUrl}
                     alt={promo.title}
+                    onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-transparent to-transparent opacity-80" />
@@ -472,7 +473,9 @@ export default function Header({
                 {isAuthenticated ? `PORTAL (${customer?.name?.split(' ')[0] || 'PATRON'})` : 'PATRON SIGN IN'}
               </button>
               <p className="text-[10px] tracking-widest text-center text-[#A1A1AA] uppercase">
-                Complimentary Shipping Above ₹999
+                {shipping?.freeShippingThreshold
+                  ? `Complimentary Shipping Above ₹${shipping.freeShippingThreshold.toLocaleString('en-IN')}`
+                  : 'Complimentary Luxury Packaging'}
               </p>
             </div>
           </div>

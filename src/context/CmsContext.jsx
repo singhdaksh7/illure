@@ -102,7 +102,7 @@ const FALLBACK_FOOTER = {
 const FALLBACK_BRAND_CONTACTS = {
   email: 'concierge@illurefragrance.com',
   phone: '+91 98765 43210',
-  whatsapp: '+91 98765 43210',
+  whatsapp: null, // No placeholder WhatsApp number exposed
   instagram: 'https://instagram.com/illurefragrance',
   facebook: 'https://facebook.com/illurefragrance',
 };
@@ -123,9 +123,12 @@ export function CmsProvider({ children }) {
 
   const fetchCmsData = async () => {
     try {
+      setLoading(true);
       const res = await cmsApi.getPublicCms();
       if (res?.success && res.data) {
-        setSections(res.data.sections || []);
+        if (Array.isArray(res.data.sections)) {
+          setSections(res.data.sections);
+        }
         if (res.data.settings) {
           setSettings((prev) => ({
             ...prev,
@@ -154,39 +157,65 @@ export function CmsProvider({ children }) {
     const appearance = settings.appearance || FALLBACK_APPEARANCE;
     const root = document.documentElement;
 
-    if (appearance.primaryBg) {
-      root.style.setProperty('--color-bg-primary', appearance.primaryBg);
-      root.style.setProperty('--bg-main', appearance.primaryBg);
+    let primaryBg = appearance.primaryBg || appearance.colorBgPrimary || '#0B0B0C';
+    let secondaryBg = appearance.secondaryBg || '#121214';
+    let surfaceBg = appearance.surfaceBg || '#18181B';
+    let accentGold = appearance.accentGold || appearance.colorGold || '#B89A62';
+    let accentGoldMuted = appearance.accentGoldMuted || appearance.colorGoldMuted || '#A98B55';
+    let textPrimary = appearance.textPrimary || '#F7F4EE';
+    let textMuted = appearance.textMuted || '#A1A1AA';
+
+    // Safe contrast handling for Ivory & Dark presets
+    if (appearance.preset === 'ILLURÊ IVORY' || appearance.preset === 'ILLURE_IVORY') {
+      primaryBg = '#F7F4EE';
+      secondaryBg = '#EFECE4';
+      surfaceBg = '#E8E4DA';
+      textPrimary = '#0D1112';
+      textMuted = '#52525B';
+    } else if (appearance.preset === 'CAMPAIGN DARK' || appearance.preset === 'CAMPAIGN_DARK') {
+      primaryBg = '#050708';
+      secondaryBg = '#090D0E';
+      surfaceBg = '#0F1416';
+      textPrimary = '#F7F4EE';
+      textMuted = '#9CA3AF';
     }
-    if (appearance.secondaryBg) {
-      root.style.setProperty('--color-bg-secondary', appearance.secondaryBg);
-      root.style.setProperty('--bg-secondary', appearance.secondaryBg);
-    }
-    if (appearance.surfaceBg) {
-      root.style.setProperty('--color-surface', appearance.surfaceBg);
-      root.style.setProperty('--bg-elevated', appearance.surfaceBg);
-    }
-    if (appearance.accentGold) {
-      root.style.setProperty('--color-gold', appearance.accentGold);
-      root.style.setProperty('--champagne', appearance.accentGold);
-    }
-    if (appearance.accentGoldMuted) {
-      root.style.setProperty('--color-gold-muted', appearance.accentGoldMuted);
-      root.style.setProperty('--champagne-muted', appearance.accentGoldMuted);
-    }
-    if (appearance.textPrimary) {
-      root.style.setProperty('--color-text-primary', appearance.textPrimary);
-      root.style.setProperty('--text-primary', appearance.textPrimary);
-    }
-    if (appearance.textMuted) {
-      root.style.setProperty('--color-text-muted', appearance.textMuted);
-      root.style.setProperty('--text-secondary', appearance.textMuted);
+
+    root.style.setProperty('--color-bg-primary', primaryBg);
+    root.style.setProperty('--bg-main', primaryBg);
+    root.style.setProperty('--color-bg-secondary', secondaryBg);
+    root.style.setProperty('--bg-secondary', secondaryBg);
+    root.style.setProperty('--color-surface', surfaceBg);
+    root.style.setProperty('--bg-elevated', surfaceBg);
+    root.style.setProperty('--color-gold', accentGold);
+    root.style.setProperty('--champagne', accentGold);
+    root.style.setProperty('--color-gold-muted', accentGoldMuted);
+    root.style.setProperty('--champagne-muted', accentGoldMuted);
+    root.style.setProperty('--color-text-primary', textPrimary);
+    root.style.setProperty('--text-primary', textPrimary);
+    root.style.setProperty('--color-text-muted', textMuted);
+    root.style.setProperty('--text-secondary', textMuted);
+
+    // Border radius mode
+    if (appearance.borderRadiusMode === 'sharp') {
+      root.style.setProperty('--radius-xs', '0px');
+      root.style.setProperty('--radius-sm', '2px');
+    } else if (appearance.borderRadiusMode === 'soft') {
+      root.style.setProperty('--radius-xs', '4px');
+      root.style.setProperty('--radius-sm', '6px');
+    } else {
+      root.style.setProperty('--radius-xs', '2px');
+      root.style.setProperty('--radius-sm', '4px');
     }
   }, [settings.appearance]);
 
   // Utility to find section config by key
   const getSection = (key) => {
     return sections.find((s) => s.sectionKey === key) || null;
+  };
+
+  const isSectionVisible = (key) => {
+    const s = getSection(key);
+    return s ? Boolean(s.isEnabled) : true;
   };
 
   return (
@@ -202,6 +231,7 @@ export function CmsProvider({ children }) {
         shipping: settings.shipping || { flatRate: 99, freeShippingThreshold: 999, isEnabled: true },
         loading,
         getSection,
+        isSectionVisible,
         refreshCms: fetchCmsData,
       }}
     >

@@ -10,11 +10,11 @@ export default function ProductCard({
   const [hovered, setHovered] = useState(false);
   const [added, setAdded] = useState(false);
 
-  // Determine starting price from variants if available, or fallback
-  const startingPrice = product.price || 
+  // Determine starting price from variants or product data
+  const startingPrice = product.minPrice || 
     (product.variants && product.variants.length > 0 
       ? Math.min(...product.variants.map(v => Number(v.price)))
-      : 21500);
+      : (product.price || 999));
 
   const formattedPrice = startingPrice.toLocaleString('en-IN');
 
@@ -74,7 +74,7 @@ export default function ProductCard({
               src={product.image}
               alt={product.name}
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.currentTarget.src = '/images/oud_wood.jpg';
               }}
               className="max-h-56 md:max-h-60 w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] filter brightness-[1.04]"
             />
@@ -97,7 +97,7 @@ export default function ProductCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onSelectProduct && onSelectProduct(product.id || product);
+                if (onSelectProduct) onSelectProduct(product.id || product);
               }}
               className="flex-1 py-2 px-3 bg-[#18181B] hover:bg-[#27272A] border border-white/[0.1] text-[#F7F4EE] text-[9px] tracking-[0.25em] uppercase font-medium transition-colors"
             >
@@ -110,50 +110,51 @@ export default function ProductCard({
                   ? 'bg-emerald-600 text-white border-emerald-600'
                   : 'bg-[#B89A62] text-[#0B0B0C] hover:bg-[#C0A46D]'
               }`}
-              title="Quick Add to Bag"
+              title="Add to Bag"
             >
-              {added ? <Check className="w-3 h-3" /> : <ShoppingBag className="w-3 h-3" />}
+              {added ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Bottom Editorial Information */}
-      <div className="space-y-2 pt-2 border-t border-white/[0.04]">
-        <div className="space-y-0.5">
-          <span className="text-[8px] md:text-[9px] tracking-[0.25em] text-[#B89A62] uppercase font-medium block">
-            İLLURÊ COLLECTION
-          </span>
-          <h3 className="font-editorial-serif text-xl md:text-2xl text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors line-clamp-1">
+      <div className="space-y-3 z-10">
+        <div>
+          <div className="flex items-center justify-between text-[10px] text-[#A1A1AA] tracking-wider uppercase mb-1">
+            <span>{referenceHouse}</span>
+            <span className="font-mono text-[#B89A62]">
+              {product.variants?.length ? `${product.variants.length} SIZES` : 'EXTRAIT'}
+            </span>
+          </div>
+
+          <h3 className="font-editorial-serif text-xl md:text-2xl text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors leading-snug">
             {product.name}
           </h3>
-          <p className="text-[11px] text-[#A1A1AA] font-light line-clamp-1">
-            Inspired by <span className="text-[#E3DCD0]">{inspiredBy}</span>
-            {referenceHouse && referenceHouse !== inspiredBy && ` · ${referenceHouse}`}
+
+          <p className="text-[11px] text-[#A1A1AA] font-light line-clamp-1 mt-0.5">
+            Inspired by {inspiredBy}
           </p>
         </div>
 
-        <div className="pt-2 flex items-center justify-between">
-          <div>
-            <span className="text-[9px] tracking-wider text-[#A1A1AA] uppercase block font-mono">
-              FROM
-            </span>
-            <span className="font-interface-sans text-xs md:text-sm font-semibold text-[#F7F4EE]">
+        {/* Price & Action Row */}
+        <div className="pt-2 border-t border-white/[0.04] flex items-baseline justify-between">
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-[9px] tracking-wider text-[#A1A1AA] uppercase">FROM</span>
+            <span className="font-mono text-xs md:text-sm font-semibold text-[#F7F4EE]">
               ₹{formattedPrice}
             </span>
           </div>
 
-          <div className="flex items-center space-x-1 text-[9px] tracking-widest text-[#B89A62] uppercase font-medium opacity-80 group-hover:opacity-100">
-            <span>EXPLORE</span>
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </div>
+          <span className="inline-flex items-center space-x-1 text-[9px] font-semibold tracking-widest text-[#B89A62] uppercase group-hover:translate-x-1 transition-transform">
+            <span>SELECT</span>
+            <ArrowRight className="w-2.5 h-2.5" />
+          </span>
         </div>
       </div>
 
-      {/* Hover Gold Hairline Bottom Accent */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#B89A62] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-      />
+      {/* Active Gold Line Indicator on Card Base */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#B89A62]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </div>
   );
 }

@@ -31,9 +31,10 @@ import NotFoundPage from './pages/NotFoundPage';
 import { CmsProvider, useCms } from './context/CmsContext';
 import { CustomerAuthProvider, useCustomerAuth } from './context/CustomerAuthContext';
 import { CartProvider, useCart } from './context/CartContext';
+import { productsApi } from './api/products';
 import { PRODUCTS } from './data/products';
 
-// Enrich dataset with local high-res imagery for top items
+// Fallback initial dataset enriched with local high-res imagery
 const ENRICHED_PRODUCTS = PRODUCTS.map((p) => {
   if (p.id === 'tf-oud-wood') {
     return { ...p, image: '/images/oud_wood.jpg', price: 21500 };
@@ -56,12 +57,39 @@ function StorefrontApp() {
   const { cart, addToCart, isCartOpen, setIsCartOpen } = useCart();
   const { isAuthenticated } = useCustomerAuth();
 
+  const [productsList, setProductsList] = useState(ENRICHED_PRODUCTS);
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'product' | 'shop' | 'checkout' | 'order-success' | 'login' | 'register' | 'account' | '404'
   const [selectedProductId, setSelectedProductId] = useState('tf-oud-wood');
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [genderFilter, setGenderFilter] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
+
+  // Synchronize dynamic products from live catalog API
+  useEffect(() => {
+    productsApi.list()
+      .then((res) => {
+        if (res?.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
+          const liveItems = res.data.items.map((item) => {
+            const fallback = ENRICHED_PRODUCTS.find((p) => p.id === item.id || p.slug === item.slug);
+            return {
+              ...fallback,
+              ...item,
+              image: item.primaryImage?.url || item.images?.[0]?.url || fallback?.image || '/images/oud_wood.jpg',
+              brand: item.referenceBrand?.name || fallback?.brand || 'İLLURÊ RESERVE',
+              price: item.minPrice || item.variants?.[0]?.price || fallback?.price || 999,
+            };
+          });
+          setProductsList(liveItems);
+          if (liveItems.length > 0 && selectedProductId === 'tf-oud-wood') {
+            setSelectedProductId(liveItems[0].id);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Live catalog load notice, falling back to archive:', err);
+      });
+  }, []);
 
   // Sync route on popstate
   useEffect(() => {
@@ -135,8 +163,8 @@ function StorefrontApp() {
     id: item.variant?.product?.id || item.id,
     name: item.variant?.product?.name || item.name || 'Extrait de Parfum',
     brand: item.variant?.product?.referenceBrand?.name || item.brand || 'İLLURÊ RESERVE',
-    price: item.unitPrice ? Number(item.unitPrice) : (item.price || 21500),
-    selectedSize: item.variant?.sizeMl ? `${item.variant.sizeMl} ML` : (item.selectedSize || '100 ML'),
+    price: item.unitPrice ? Number(item.unitPrice) : (item.price || 999),
+    selectedSize: item.variant?.sizeLabel || (item.variant?.sizeMl ? `${item.variant.sizeMl} ML` : (item.selectedSize || 'Flacon')),
     quantity: item.quantity,
     image: item.variant?.product?.images?.[0] || item.image || '/images/oud_wood.jpg',
     giftPackaging: !!item.giftPackagingId,
@@ -197,6 +225,7 @@ function StorefrontApp() {
           {isSectionVisible('featured_fragrances') && (
             <div id="curated-section">
               <FeaturedFragrancesSection
+                products={productsList}
                 onSelectProduct={handleSelectProduct}
                 onAddToCart={handleAddToCartItem}
               />
@@ -238,6 +267,7 @@ function StorefrontApp() {
           {/* 9. SECTION 9 — BESTSELLERS (SIGNATURE REPERTORY) */}
           {isSectionVisible('bestsellers') && (
             <BestsellersSection
+              products={productsList}
               onSelectProduct={handleSelectProduct}
               onAddToCart={handleAddToCartItem}
             />
@@ -259,7 +289,7 @@ function StorefrontApp() {
       {/* CATALOG / SHOP VIEW */}
       {activeTab === 'shop' && (
         <CatalogView
-          products={ENRICHED_PRODUCTS}
+          products={productsList}
           onSelectProduct={handleSelectProduct}
           onAddToCart={handleAddToCartItem}
           initialGender={genderFilter}
@@ -272,7 +302,7 @@ function StorefrontApp() {
         <main>
           <ProductDetailPage
             productId={selectedProductId}
-            productsData={ENRICHED_PRODUCTS}
+            productsData={productsList}
             onBack={() => setActiveTab('home')}
             onAddToCart={handleAddToCartItem}
             onSelectProduct={handleSelectProduct}
@@ -339,7 +369,7 @@ function StorefrontApp() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        productsData={ENRICHED_PRODUCTS}
+        productsData={productsList}
         onSelectProduct={handleSelectProduct}
       />
     </div>

@@ -41,3 +41,4 @@ export default function NotFoundPage({ onGoHome }) {
     </div>
   );
 }
+

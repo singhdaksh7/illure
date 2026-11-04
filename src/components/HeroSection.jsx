@@ -37,15 +37,15 @@ export default function HeroSection({ onExplore, onProductSelect }) {
   }
 
   // Content extraction with graceful luxury fallbacks
-  const eyebrow = heroConfig?.subtitle || 'THE HOUSE OF İLLURÊ';
-  const heading = heroConfig?.title || 'Fragrance,\nReimagined.';
-  const bodyText = heroConfig?.description || 'Distinctive scent profiles inspired by icons, finished in the language of İLLURÊ.';
-  const primaryCta = heroConfig?.ctaLabel || 'EXPLORE THE COLLECTION';
-  const primaryUrl = heroConfig?.ctaUrl || '#catalog';
+  const eyebrow = (heroConfig?.subtitle && heroConfig.subtitle.trim()) || 'THE HOUSE OF İLLURÊ';
+  const heading = (heroConfig?.title && heroConfig.title.trim()) || 'Fragrance,\nReimagined.';
+  const bodyText = (heroConfig?.description && heroConfig.description.trim()) || 'Distinctive scent profiles inspired by icons, finished in the language of İLLURÊ.';
+  const primaryCta = (heroConfig?.ctaLabel && heroConfig.ctaLabel.trim()) || 'EXPLORE THE COLLECTION';
+  const primaryUrl = (heroConfig?.ctaUrl && heroConfig.ctaUrl.trim()) || '#curated-section';
   const custom = heroConfig?.customData || {};
-  const secondaryCta = custom.secondaryCtaLabel || 'DISCOVER İLLURÊ';
-  const bottleImg = custom.bottleImage || '/images/hero.jpg';
-  const overlayStrength = custom.overlayStrength !== undefined ? custom.overlayStrength : 0.7;
+  const secondaryCta = (custom.secondaryCtaLabel && custom.secondaryCtaLabel.trim()) || 'DISCOVER İLLURÊ';
+  const bottleImg = (custom.bottleImage && custom.bottleImage.trim()) || '/images/hero.jpg';
+  const overlayStrength = typeof custom.overlayStrength === 'number' ? Math.max(0.1, Math.min(0.95, custom.overlayStrength)) : 0.7;
 
   const handlePrimaryClick = () => {
     if (primaryUrl === '#catalog' || primaryUrl === '#curated-section') {
@@ -98,55 +98,35 @@ export default function HeroSection({ onExplore, onProductSelect }) {
 
         {/* Ambient Halo Behind Bottle */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[75vh] max-w-[1300px] max-h-[1000px] bg-[#B89A62]/[0.05] rounded-full blur-[150px]"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[620px] rounded-full pointer-events-none transition-all duration-700 ease-out blur-3xl opacity-50"
           style={{
-            transform: `translate(-50%, -50%) translate(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px)`,
+            background: 'radial-gradient(circle, rgba(184, 154, 98, 0.15) 0%, rgba(184, 154, 98, 0.03) 50%, transparent 75%)',
+            transform: `translate(-50%, -50%) translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`,
           }}
         />
 
-        {/* Starfield Particles */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
-          {[
-            { top: '14%', left: '10%', size: '2px', opacity: 0.65, delay: '0s' },
-            { top: '24%', left: '16%', size: '1.5px', opacity: 0.45, delay: '1s' },
-            { top: '18%', left: '34%', size: '2px', opacity: 0.8, delay: '2s' },
-            { top: '40%', left: '14%', size: '1px', opacity: 0.35, delay: '0.5s' },
-            { top: '68%', left: '9%', size: '2.5px', opacity: 0.7, delay: '1.5s' },
-            { top: '82%', left: '18%', size: '1.5px', opacity: 0.5, delay: '2.5s' },
-            { top: '12%', left: '74%', size: '2px', opacity: 0.75, delay: '0.8s' },
-            { top: '30%', left: '84%', size: '2.5px', opacity: 0.65, delay: '1.8s' },
-            { top: '72%', left: '86%', size: '2px', opacity: 0.8, delay: '2.2s' },
-            { top: '84%', left: '76%', size: '1.5px', opacity: 0.55, delay: '1.2s' },
-          ].map((star, idx) => (
-            <div
-              key={idx}
-              className="absolute rounded-full bg-[#F7F4EE] animate-pulse"
-              style={{
-                top: star.top,
-                left: star.left,
-                width: star.size,
-                height: star.size,
-                opacity: star.opacity,
-                animationDuration: `${3 + (idx % 3)}s`,
-                animationDelay: star.delay,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Controlled Vignette */}
+        {/* Subtle Film Grain Noise Texture */}
         <div 
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#0B0B0C_95%)]"
-          style={{ opacity: overlayStrength }}
+          className="absolute inset-0 opacity-[0.025] mix-blend-overlay pointer-events-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          }}
         />
 
-        {/* Subtle Film Grain */}
-        <div className="absolute inset-0 bg-noise opacity-15" />
+        {/* Cinematic Vignette */}
+        <div 
+          className="absolute inset-0 bg-radial from-transparent via-transparent to-[#0B0B0C] pointer-events-none"
+          style={{ opacity: overlayStrength }}
+        />
+        
+        {/* Top & Bottom Obsidian Fade Hairlines */}
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#0B0B0C] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#0B0B0C] via-[#0B0B0C]/80 to-transparent pointer-events-none" />
       </div>
 
-      {/* 2. LAYER 1 — GIANT FAINT İLLURÊ EDITORIAL TYPOGRAPHY */}
+      {/* 2. LAYER 1 — GIANT FAINT 'İLLURÊ' BACKGROUND TYPOGRAPHY (ROMAN WATERMARK) */}
       <div 
-        className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 overflow-hidden"
         style={{
           transform: `translateY(${scrollY * 0.22}px)`,
           opacity: Math.max(0, 1 - scrollY * 0.0014),
@@ -185,6 +165,9 @@ export default function HeroSection({ onExplore, onProductSelect }) {
             <img 
               src={bottleImg} 
               alt="İLLURÊ Signature Bottle" 
+              onError={(e) => {
+                e.currentTarget.src = '/images/oud_wood.jpg';
+              }}
               className="w-full h-auto object-contain filter brightness-[1.06] contrast-[1.06] animate-float drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
               style={{
                 mixBlendMode: 'screen',
@@ -249,41 +232,44 @@ export default function HeroSection({ onExplore, onProductSelect }) {
                 className="group relative inline-flex items-center space-x-3 px-8 py-4 bg-[#B89A62] text-[#0B0B0C] font-interface-sans text-[11px] tracking-[0.28em] uppercase font-semibold transition-all duration-300 hover:bg-[#C0A46D] shadow-[0_10px_30px_rgba(184,154,98,0.2)]"
               >
                 <span>{primaryCta}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#0B0B0C] group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="w-4 h-4 text-[#0B0B0C] group-hover:translate-x-1.5 transition-transform duration-300" />
               </button>
 
               <button 
                 onClick={handleSecondaryClick}
-                className="group inline-flex items-center space-x-2 px-6 py-4 bg-[#121214]/80 backdrop-blur-md border border-white/[0.12] hover:border-[#B89A62] text-[#F7F4EE] font-interface-sans text-[11px] tracking-[0.25em] uppercase font-medium transition-all duration-300"
+                className="group inline-flex items-center space-x-2 px-6 py-4 border border-white/[0.15] hover:border-[#B89A62] text-[#F7F4EE] hover:text-[#B89A62] font-interface-sans text-[11px] tracking-[0.28em] uppercase transition-all duration-300 backdrop-blur-xs"
               >
                 <span>{secondaryCta}</span>
               </button>
             </div>
           </div>
 
-          {/* Bottom Right: Editorial Tagline & Scroll Indicator */}
-          <div className="md:col-span-5 lg:col-span-6 flex flex-col md:items-end justify-between space-y-5 md:space-y-0 text-left md:text-right pointer-events-auto">
+          {/* Bottom Right: Micro Details & Scroll Pill */}
+          <div className="md:col-span-5 lg:col-span-6 flex flex-col md:items-end justify-between space-y-8 pointer-events-auto">
             
-            <div className="space-y-1">
-              <p className="font-editorial-serif text-2xl sm:text-3xl text-[#F7F4EE]/90 italic">
-                “Perfume is memory.”
-              </p>
-              <p className="typography-eyebrow text-[9px] text-[#A1A1AA]">
-                İLLURÊ PARFUMERIE · PARIS & NEW DELHI
+            {/* Minimal formulation note */}
+            <div className="hidden lg:block text-right space-y-1.5">
+              <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                ATELIER FORMULATION
+              </span>
+              <p className="font-editorial-serif text-sm text-[#F7F4EE] italic">
+                35% Extrait Oil Concentration · Hand-Poured in Small Batches
               </p>
             </div>
 
-            {/* Scroll Indicator */}
-            <div 
+            {/* Vertical Scroll Indicator */}
+            <button 
               onClick={handlePrimaryClick}
-              className="cursor-pointer group flex items-center space-x-3 text-[10px] tracking-[0.25em] text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors pt-6 md:pt-4"
+              className="group flex items-center space-x-3 text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors focus:outline-none"
+              aria-label="Scroll to curated collection"
             >
-              <span className="uppercase font-interface-sans tracking-[0.28em]">SCROLL TO EXPLORE</span>
-              <div className="w-4 h-7 border border-[#B89A62]/40 group-hover:border-[#B89A62] rounded-full flex justify-center p-1 transition-colors">
-                <div className="w-1 h-1.5 bg-[#B89A62] rounded-full animate-bounce" />
+              <div className="w-5 h-8 border border-white/20 group-hover:border-[#B89A62] rounded-full flex items-start justify-center p-1 transition-colors">
+                <div className="w-1 h-2 bg-[#B89A62] rounded-full animate-bounce mt-0.5" />
               </div>
-            </div>
-
+              <span className="font-interface-sans text-[9px] tracking-[0.3em] uppercase">
+                SCROLL TO DISCOVER
+              </span>
+            </button>
           </div>
 
         </div>
