@@ -11,9 +11,9 @@ export default function EditorialIntroSection({ onDiscover }) {
 
   const title = section?.title || 'Perfume is memory.\nİLLURÊ makes it yours.';
   const subtitle = section?.subtitle || 'THE ESSENCE OF QUIET LUXURY';
-  const description = section?.description || 'Crafted with uncompromising extrait-level concentration, each silhouette balances weight, intimacy, and presence.';
+  const description = section?.description || 'Developed with attention to balance and depth, each silhouette expresses enduring presence and intimacy.';
   const custom = section?.customData || {};
-  const callout = custom.calloutNote || 'Hand-blended and matured for enduring projection and seamless day-to-night transitions.';
+  const callout = custom.calloutNote || 'Formulated with attention to harmonic balance and seamless day-to-night transitions.';
 
   return (
     <section 

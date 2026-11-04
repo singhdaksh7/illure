@@ -21,46 +21,55 @@ export default function ProductDetailPage({
       return product.variants
         .filter(v => v.isActive !== false)
         .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-        .map(v => ({
-          variantId: v.id,
-          size: v.sizeLabel || (v.sizeMl ? `${v.sizeMl} ML` : 'Flacon'),
-          price: Number(v.price),
-          stock: v.stockQuantity ?? 10,
-          inStock: v.inStock ?? (v.stockQuantity > 0),
-          isLowStock: (v.stockQuantity ?? 10) <= (v.lowStockThreshold ?? 5),
-        }));
+        .map(v => {
+          const vPrice = Number(v.price);
+          const vStock = v.stockQuantity !== undefined && v.stockQuantity !== null ? Number(v.stockQuantity) : null;
+          return {
+            variantId: v.id,
+            size: v.sizeLabel || (v.sizeMl ? `${v.sizeMl} ML` : 'Flacon'),
+            price: !isNaN(vPrice) && vPrice > 0 ? vPrice : null,
+            stock: vStock,
+            inStock: vStock === null || vStock > 0,
+            isLowStock: vStock !== null && vStock <= (v.lowStockThreshold ?? 5) && vStock > 0,
+          };
+        });
     }
     if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
       return product.sizes.map(s => {
+        const sPrice = Number(s.price || product.minPrice || product.price || 0);
+        const sStock = s.stock !== undefined && s.stock !== null ? Number(s.stock) : null;
         if (typeof s === 'string') {
           return {
             variantId: product.id,
             size: s,
-            price: Number(product.price || product.minPrice || 0),
-            stock: 10,
-            inStock: true,
-            isLowStock: false,
+            price: sPrice > 0 ? sPrice : null,
+            stock: sStock,
+            inStock: sStock === null || sStock > 0,
+            isLowStock: sStock !== null && sStock <= 5 && sStock > 0,
           };
         }
         return {
           variantId: s.id || s.variantId || product.id,
-          size: s.size || (s.sizeMl ? `${s.sizeMl} ML` : (s.sizeLabel || 'Standard')),
-          price: Number(s.price || product.price || product.minPrice || 0),
-          stock: s.stock ?? 10,
-          inStock: (s.stock ?? 10) > 0,
-          isLowStock: (s.stock ?? 10) <= 5,
+          size: s.size || (s.sizeMl ? `${s.sizeMl} ML` : (s.sizeLabel || 'Flacon')),
+          price: sPrice > 0 ? sPrice : null,
+          stock: sStock,
+          inStock: sStock === null || sStock > 0,
+          isLowStock: sStock !== null && sStock <= 5 && sStock > 0,
         };
       });
     }
     // Single variant representation if no array defined on product
-    const fallbackPrice = Number(product.minPrice || product.price || 0);
+    const validRawPrice = (product.minPrice && Number(product.minPrice) > 0) 
+      ? Number(product.minPrice) 
+      : ((product.price && Number(product.price) > 0) ? Number(product.price) : null);
+    const prodStock = product.stockQuantity !== undefined && product.stockQuantity !== null ? Number(product.stockQuantity) : null;
     return [{
       variantId: product.id || 'default-variant',
-      size: product.size || (product.sizeMl ? `${product.sizeMl} ML` : 'Standard Flacon'),
-      price: fallbackPrice,
-      stock: product.stockQuantity ?? 10,
-      inStock: true,
-      isLowStock: false,
+      size: product.size || (product.sizeMl ? `${product.sizeMl} ML` : 'Flacon'),
+      price: validRawPrice,
+      stock: prodStock,
+      inStock: prodStock === null || prodStock > 0,
+      isLowStock: prodStock !== null && prodStock <= 5 && prodStock > 0,
     }];
   }, [product]);
 
@@ -72,29 +81,28 @@ export default function ProductDetailPage({
   const [added, setAdded] = useState(false);
 
   // Dynamic gift packaging from backend
-  const [giftOption, setGiftOption] = useState({
-    id: null,
-    name: 'Royal Velvet Gift Presentation',
-    price: 499,
-    description: 'Gold-embossed rigid box with satin lining & personal calligraphed card',
-  });
+  const [giftOption, setGiftOption] = useState(null);
 
   useEffect(() => {
     giftPackagingApi.getPublic()
       .then(res => {
         const pkgs = res?.data?.giftPackaging;
-        if (pkgs && pkgs.length > 0) {
-          const activePkg = pkgs.find(p => p.isActive) || pkgs[0];
-          setGiftOption({
-            id: activePkg.id,
-            name: activePkg.name,
-            price: Number(activePkg.price) || 499,
-            description: activePkg.description || 'Gold-embossed rigid box with satin lining & personal calligraphed card',
-          });
+        if (pkgs && Array.isArray(pkgs)) {
+          const activePkg = pkgs.find(p => p.isActive === true);
+          if (activePkg) {
+            setGiftOption({
+              id: activePkg.id,
+              name: activePkg.name,
+              price: activePkg.price !== undefined && activePkg.price !== null ? Number(activePkg.price) : 0,
+              description: activePkg.description || 'Luxury gift presentation with signature silk ribbon',
+            });
+          } else {
+            setGiftOption(null);
+          }
         }
       })
       .catch(() => {
-        // Safe default state already initialized
+        setGiftOption(null);
       });
   }, []);
 
@@ -116,14 +124,16 @@ export default function ProductDetailPage({
         if (u && !list.includes(u)) list.push(u);
       });
     }
-    if (list.length === 0) list.push('/images/oud_wood.jpg');
+    if (list.length === 0) list.push('/images/illure-placeholder.svg');
     return list;
   }, [product]);
 
-  const currentPrice = selectedSizeObj ? selectedSizeObj.price : Number(product.price || product.minPrice || 0);
-  const giftPackagingPrice = giftBoxSelected ? giftOption.price : 0;
-  const finalUnitPrice = currentPrice + giftPackagingPrice;
-  const totalBatchPrice = finalUnitPrice * quantity;
+  const hasValidPrice = selectedSizeObj && selectedSizeObj.price !== null && selectedSizeObj.price !== undefined && Number(selectedSizeObj.price) > 0;
+  const currentPrice = hasValidPrice ? Number(selectedSizeObj.price) : 0;
+  const packagingFee = (giftBoxSelected && giftOption) ? Number(giftOption.price || 0) : 0;
+  const finalUnitPrice = hasValidPrice ? (currentPrice + packagingFee) : 0;
+  const totalBatchPrice = hasValidPrice ? (finalUnitPrice * quantity) : null;
+  const isAvailable = selectedSizeObj?.inStock !== false && hasValidPrice;
 
   const handleAdd = () => {
     if (onAddToCart && selectedSizeObj) {
@@ -184,8 +194,8 @@ export default function ProductDetailPage({
               <div className="absolute inset-0 bg-radial from-[#B89A62]/12 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none" />
 
               <img 
-                src={productImages[activeImageIdx] || '/images/oud_wood.jpg'} 
-                onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
+                src={productImages[activeImageIdx] || '/images/illure-placeholder.svg'} 
+                onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                 alt={product.name || 'İLLURÊ Fragrance'} 
                 className="max-h-full max-w-full object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.95)] transition-transform duration-700 group-hover:scale-105"
               />
@@ -193,7 +203,7 @@ export default function ProductDetailPage({
               {/* Formulation Tag */}
               <div className="absolute top-6 left-6 flex items-center space-x-2 bg-[#0B0B0C]/85 backdrop-blur-md border border-[#B89A62]/30 px-3 py-1.5 text-[9px] tracking-[0.25em] text-[#B89A62] uppercase font-medium">
                 <Sparkles className="w-3 h-3 text-[#B89A62]" />
-                <span>EXTRAIT FORMULATION</span>
+                <span>CONCENTRATED PARFUM</span>
               </div>
 
               {/* Watermark Crest */}
@@ -217,7 +227,7 @@ export default function ProductDetailPage({
                   >
                     <img 
                       src={img} 
-                      onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }} 
+                      onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }} 
                       alt="" 
                       className="w-full h-full object-contain" 
                     />
@@ -253,12 +263,20 @@ export default function ProductDetailPage({
 
             {/* Dynamic Price Display */}
             <div className="pt-2 flex items-baseline space-x-3 border-y border-white/[0.06] py-4">
-              <span className="font-editorial-serif text-3xl md:text-4xl font-light text-[#F7F4EE]">
-                ₹{currentPrice.toLocaleString('en-IN')}
-              </span>
-              <span className="text-[10px] tracking-widest text-[#A1A1AA] uppercase">
-                INCL. ALL TAXES
-              </span>
+              {hasValidPrice ? (
+                <>
+                  <span className="font-editorial-serif text-3xl md:text-4xl font-light text-[#F7F4EE]">
+                    ₹{currentPrice.toLocaleString('en-IN')}
+                  </span>
+                  <span className="text-[10px] tracking-widest text-[#A1A1AA] uppercase">
+                    INCL. ALL TAXES
+                  </span>
+                </>
+              ) : (
+                <span className="font-interface-sans text-xs tracking-widest text-[#A1A1AA] uppercase">
+                  PRICE UNAVAILABLE
+                </span>
+              )}
             </div>
 
             {/* SIZE SELECTOR: LUXURY EDITORIAL TILES */}
@@ -270,7 +288,7 @@ export default function ProductDetailPage({
                     <span className="text-[#B89A62] text-[10px]">
                       {selectedSizeObj.isLowStock 
                         ? `ONLY ${selectedSizeObj.stock} LEFT` 
-                        : (selectedSizeObj.inStock ? 'IN STOCK' : 'PRE-ORDER')}
+                        : (selectedSizeObj.inStock ? 'IN STOCK' : 'OUT OF STOCK')}
                     </span>
                   )}
                 </div>
@@ -293,7 +311,7 @@ export default function ProductDetailPage({
                           {sObj.size}
                         </span>
                         <span className="text-[11px] font-mono mt-1 text-[#B89A62]">
-                          ₹{sObj.price.toLocaleString('en-IN')}
+                          {sObj.price ? `₹${sObj.price.toLocaleString('en-IN')}` : '—'}
                         </span>
                         {sObj.isLowStock && (
                           <span className="text-[8px] text-amber-400 mt-1 uppercase">
@@ -308,44 +326,46 @@ export default function ProductDetailPage({
             )}
 
             {/* GIFT PACKAGING PRESENTATION UI */}
-            <div className="p-4 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <Gift className="w-4 h-4 text-[#B89A62]" />
-                  <div>
-                    <span className="text-xs font-medium text-[#F7F4EE] block tracking-wider uppercase">
-                      {giftOption.name}
-                    </span>
-                    <span className="text-[11px] text-[#A1A1AA]">
-                      {giftOption.description} (+₹{giftOption.price.toLocaleString('en-IN')})
-                    </span>
+            {giftOption && giftOption.id && (
+              <div className="p-4 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-2.5">
+                    <Gift className="w-4 h-4 text-[#B89A62]" />
+                    <div>
+                      <span className="text-xs font-medium text-[#F7F4EE] block tracking-wider uppercase">
+                        {giftOption.name}
+                      </span>
+                      <span className="text-[11px] text-[#A1A1AA]">
+                        {giftOption.description} {giftOption.price > 0 ? `(+₹${giftOption.price.toLocaleString('en-IN')})` : '(Complimentary)'}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <input
-                  type="checkbox"
-                  id="giftBoxToggle"
-                  checked={giftBoxSelected}
-                  onChange={(e) => setGiftBoxSelected(e.target.checked)}
-                  className="w-4 h-4 accent-[#B89A62] cursor-pointer mt-1"
-                />
-              </div>
-
-              {giftBoxSelected && (
-                <div className="pt-2 animate-fade-up">
-                  <label className="text-[10px] tracking-widest text-[#B89A62] uppercase block mb-1">
-                    PERSONALIZED CALLIGRAPHED GIFT MESSAGE
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={giftMessage}
-                    onChange={(e) => setGiftMessage(e.target.value)}
-                    placeholder="Write your personal note to accompany this flacon..."
-                    className="w-full bg-[#0B0B0C] border border-[#B89A62]/30 p-2.5 text-xs text-[#F7F4EE] focus:outline-none focus:border-[#B89A62]"
+                  <input
+                    type="checkbox"
+                    id="giftBoxToggle"
+                    checked={giftBoxSelected}
+                    onChange={(e) => setGiftBoxSelected(e.target.checked)}
+                    className="w-4 h-4 accent-[#B89A62] cursor-pointer mt-1"
                   />
                 </div>
-              )}
-            </div>
+
+                {giftBoxSelected && (
+                  <div className="pt-2 animate-fade-up">
+                    <label className="text-[10px] tracking-widest text-[#B89A62] uppercase block mb-1">
+                      PERSONALIZED CALLIGRAPHED GIFT MESSAGE
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={giftMessage}
+                      onChange={(e) => setGiftMessage(e.target.value)}
+                      placeholder="Write your personal note to accompany this flacon..."
+                      className="w-full bg-[#0B0B0C] border border-[#B89A62]/30 p-2.5 text-xs text-[#F7F4EE] focus:outline-none focus:border-[#B89A62]"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* QUANTITY & ADD TO BAG */}
             <div className="space-y-4 pt-2">
@@ -373,14 +393,25 @@ export default function ProductDetailPage({
                 {/* Add Button */}
                 <button
                   onClick={handleAdd}
+                  disabled={!isAvailable}
                   className={`flex-1 py-4 px-6 text-xs tracking-[0.25em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-2.5 rounded-xs shadow-[0_10px_30px_rgba(184,154,98,0.2)] ${
-                    added
+                    !isAvailable
+                      ? 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'
+                      : added
                       ? 'bg-emerald-600 text-white'
                       : 'bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C]'
                   }`}
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  <span>{added ? 'ADDED TO BAG' : `ADD TO BAG · ₹${totalBatchPrice.toLocaleString('en-IN')}`}</span>
+                  <span>
+                    {!hasValidPrice
+                      ? 'PRICE UNAVAILABLE'
+                      : !selectedSizeObj?.inStock
+                      ? 'OUT OF STOCK'
+                      : added
+                      ? 'ADDED TO BAG'
+                      : `ADD TO BAG · ₹${totalBatchPrice.toLocaleString('en-IN')}`}
+                  </span>
                 </button>
               </div>
 
@@ -388,11 +419,11 @@ export default function ProductDetailPage({
               <div className="flex items-center justify-between text-[10px] tracking-wider text-[#A1A1AA] uppercase pt-2 border-t border-white/[0.04]">
                 <div className="flex items-center space-x-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
-                  <span>100% Authentic Extrait</span>
+                  <span>Handcrafted Formulation · House of İLLURÊ</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
-                  <span>Handcrafted Formulation</span>
+                  <span>Tamper-Sealed Dispatch</span>
                 </div>
               </div>
             </div>
@@ -577,19 +608,22 @@ export default function ProductDetailPage({
             {selectedSizeObj?.size} · {product.name}
           </span>
           <span className="font-editorial-serif text-xl text-[#F7F4EE]">
-            ₹{totalBatchPrice.toLocaleString('en-IN')}
+            {hasValidPrice ? `₹${totalBatchPrice.toLocaleString('en-IN')}` : 'Unavailable'}
           </span>
         </div>
 
         <button
           onClick={handleAdd}
+          disabled={!isAvailable}
           className={`px-6 py-3 text-xs tracking-widest font-semibold uppercase rounded-xs transition-colors ${
-            added
+            !isAvailable
+              ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+              : added
               ? 'bg-emerald-600 text-white'
               : 'bg-[#B89A62] text-[#0B0B0C]'
           }`}
         >
-          {added ? 'ADDED' : 'ADD TO BAG'}
+          {!hasValidPrice ? 'UNAVAILABLE' : !selectedSizeObj?.inStock ? 'OUT OF STOCK' : added ? 'ADDED' : 'ADD TO BAG'}
         </button>
       </div>
 

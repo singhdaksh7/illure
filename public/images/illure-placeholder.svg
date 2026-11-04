@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0E1213"/>
+      <stop offset="50%" stop-color="#080B0C"/>
+      <stop offset="100%" stop-color="#050708"/>
+    </linearGradient>
+    <linearGradient id="goldCapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4BA82"/>
+      <stop offset="35%" stop-color="#B89A62"/>
+      <stop offset="70%" stop-color="#8A6E3A"/>
+      <stop offset="100%" stop-color="#C0A46D"/>
+    </linearGradient>
+    <linearGradient id="bottleGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#181D1F" stop-opacity="0.95"/>
+      <stop offset="20%" stop-color="#242B2E" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#141819" stop-opacity="0.9"/>
+      <stop offset="80%" stop-color="#202629" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#101314" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="goldTrim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8A6E3A"/>
+      <stop offset="50%" stop-color="#E0C999"/>
+      <stop offset="100%" stop-color="#9A7C44"/>
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Luxury Backdrop -->
+  <rect width="800" height="1000" fill="url(#bgGrad)"/>
+  <circle cx="400" cy="500" r="280" fill="#B89A62" opacity="0.06" filter="url(#softGlow)"/>
+
+  <!-- Bottle Neck & Atomizer Collar -->
+  <rect x="365" y="270" width="70" height="40" fill="url(#goldCapGrad)" rx="2"/>
+  <line x1="365" y1="290" x2="435" y2="290" stroke="#664F25" stroke-width="1"/>
+
+  <!-- Heavy Architectural Flacon Cap -->
+  <polygon points="340,160 460,160 475,270 325,270" fill="url(#goldCapGrad)" stroke="#E0C999" stroke-width="1.5"/>
+  <line x1="340" y1="160" x2="350" y2="270" stroke="#FFF" stroke-opacity="0.25" stroke-width="1.5"/>
+  <line x1="460" y1="160" x2="450" y2="270" stroke="#000" stroke-opacity="0.3" stroke-width="1.5"/>
+
+  <!-- Flacon Shoulders & Main Body -->
+  <path d="M 260,360 C 260,310 330,305 365,305 L 435,305 C 470,305 540,310 540,360 L 530,760 C 530,785 510,800 480,800 L 320,800 C 290,800 270,785 270,760 Z" fill="url(#bottleGlass)" stroke="url(#goldTrim)" stroke-width="2"/>
+
+  <!-- Heavy Glass Base Plate -->
+  <path d="M 285,760 L 515,760 L 505,785 L 295,785 Z" fill="#2E373A" opacity="0.7"/>
+
+  <!-- Inset Editorial Label -->
+  <rect x="305" y="440" width="190" height="230" fill="#0C0E0F" stroke="url(#goldTrim)" stroke-width="1.5" rx="3"/>
+  <rect x="312" y="447" width="176" height="216" fill="none" stroke="#B89A62" stroke-opacity="0.3" stroke-width="0.75"/>
+
+  <!-- Luxury Crest Silhouette inside label -->
+  <g transform="translate(400, 485) scale(0.65)">
+    <polygon points="0,-25 18,-15 18,10 0,22 -18,10 -18,-15" fill="none" stroke="#B89A62" stroke-width="1.5"/>
+    <text x="0" y="8" font-family="'Cinzel', 'Playfair Display', serif" font-size="18" font-weight="600" fill="#E0C999" text-anchor="middle">İ</text>
+  </g>
+
+  <!-- Brand Typography on Label -->
+  <text x="400" y="555" font-family="'Playfair Display', 'Bodoni Moda', serif" font-size="20" font-weight="700" letter-spacing="6" fill="#F7F4EE" text-anchor="middle">İLLURÊ</text>
+  <text x="400" y="575" font-family="'Inter', sans-serif" font-size="8" font-weight="500" letter-spacing="3" fill="#B89A62" text-anchor="middle">HAUTE PARFUMERIE</text>
+
+  <line x1="360" y1="595" x2="440" y2="595" stroke="#B89A62" stroke-opacity="0.4" stroke-width="0.75"/>
+
+  <text x="400" y="620" font-family="'Inter', sans-serif" font-size="7" font-weight="400" letter-spacing="2" fill="#A1A1AA" text-anchor="middle">EXTRAIT DE PARFUM</text>
+  <text x="400" y="638" font-family="'Inter', sans-serif" font-size="6.5" font-weight="300" letter-spacing="1.5" fill="#71717A" text-anchor="middle">MAISON DE PARFUM</text>
+</svg>

@@ -25,6 +25,24 @@ const isValidWhatsApp = (number) => {
   return true;
 };
 
+const isValidSocialUrl = (url) => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  return trimmed.length > 5 && trimmed !== '#' && (trimmed.startsWith('https://') || trimmed.startsWith('http://'));
+};
+
+const isValidEmail = (email) => {
+  if (!email || typeof email !== 'string') return false;
+  const trimmed = email.trim();
+  return trimmed.length > 3 && trimmed.includes('@') && !trimmed.includes('example.com') && !trimmed.includes('dummy');
+};
+
+const isValidPhone = (phone) => {
+  if (!phone || typeof phone !== 'string') return false;
+  const cleaned = phone.replace(/[^0-9]/g, '');
+  return cleaned.length >= 10 && !['1234567890', '9876543210', '0000000000'].includes(cleaned);
+};
+
 export default function FooterSection({ onNavigate }) {
   const { footer, brandContacts } = useCms();
 
@@ -95,15 +113,15 @@ export default function FooterSection({ onNavigate }) {
             </div>
 
             <p className="font-editorial-serif text-lg text-[#F7F4EE]/90 italic font-light max-w-sm">
-              {footer?.tagline || 'Haute Parfumerie. Hand-blended extracts inspired by icons of perfumery.'}
+              {footer?.tagline || 'Haute Parfumerie. Distinctive fragrance interpretations inspired by icons of perfumery.'}
             </p>
 
             <div className="space-y-1.5 text-xs text-[#A1A1AA] font-interface-sans font-light">
               <div className="flex items-center space-x-2">
                 <span className="text-[#B89A62]">Atelier:</span>
-                <span>Parisian Formulation · Hand-Poured in India</span>
+                <span>The House of İLLURÊ · Bespoke Fragrance Interpretations</span>
               </div>
-              {brandContacts?.phone && (
+              {isValidPhone(brandContacts?.phone) && (
                 <div className="flex items-center space-x-2">
                   <Phone className="w-3.5 h-3.5 text-[#B89A62]" />
                   <span>{brandContacts.phone}</span>
@@ -142,7 +160,7 @@ export default function FooterSection({ onNavigate }) {
           
           {/* Social Channels */}
           <div className="flex items-center space-x-5 text-[#A1A1AA]">
-            {brandContacts?.instagram && (
+            {isValidSocialUrl(brandContacts?.instagram) && (
               <a 
                 href={brandContacts.instagram} 
                 target="_blank" 
@@ -153,7 +171,7 @@ export default function FooterSection({ onNavigate }) {
                 <InstagramIcon className="w-4 h-4" />
               </a>
             )}
-            {brandContacts?.facebook && (
+            {isValidSocialUrl(brandContacts?.facebook) && (
               <a 
                 href={brandContacts.facebook} 
                 target="_blank" 
@@ -175,7 +193,7 @@ export default function FooterSection({ onNavigate }) {
                 <MessageCircle className="w-4 h-4" />
               </a>
             )}
-            {brandContacts?.email && (
+            {isValidEmail(brandContacts?.email) && (
               <a 
                 href={`mailto:${brandContacts.email}`} 
                 className="hover:text-[#B89A62] transition-colors"
@@ -204,6 +222,13 @@ export default function FooterSection({ onNavigate }) {
             {footer?.copyright || '© 2026 İLLURÊ FRAGRANCE. All rights reserved.'}
           </div>
 
+        </div>
+
+        {/* Reference Brand Legal Disclaimer (Requirement 10) */}
+        <div className="pt-8 mt-8 border-t border-white/[0.04] text-center md:text-left">
+          <p className="text-[10px] text-[#71717A] leading-relaxed max-w-4xl font-light">
+            {footer?.disclaimer || 'Reference brand names are used only to describe fragrance inspiration and olfactory reference. İLLURÊ FRAGRANCE is an independent brand and is not affiliated with, endorsed by, or sponsored by the referenced trademark owners.'}
+          </p>
         </div>
 
       </div>

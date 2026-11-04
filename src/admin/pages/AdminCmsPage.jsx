@@ -947,7 +947,7 @@ export default function AdminCmsPage() {
                       rows={3}
                       defaultValue={
                         content.body ||
-                        'We re-interpret the greatest triumphs of olfactory history. Small format flacons, pure oil concentrations, and immaculate craftsmanship — without the heritage markup.'
+                        'We re-interpret iconic triumphs of olfactory history. Compact flacons, concentrated compositions, and meticulous attention to detail.'
                       }
                       className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#B89A62]"
                     />
@@ -1031,7 +1031,7 @@ export default function AdminCmsPage() {
                   rows={2}
                   defaultValue={
                     settings.mega_menu_nav?.featuredSubtitle ||
-                    '35% oil concentration. Hand-blended in small micro-batches for uncompromised sillage.'
+                    'Concentrated fragrance composition crafted with attention to olfactory balance and character.'
                   }
                   className="w-full px-3 py-2 border rounded border-gray-300"
                 />

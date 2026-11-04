@@ -101,12 +101,13 @@ async function main() {
   console.log(`✅ Seeded Optional Paid Packaging: ${giftBox.name}`);
 
   // 5. Seed Initial Fragrance Products
+  // NOTICE: STAGING DEMO FIXTURES ONLY. Production catalog must use verified client-supplied inventory exclusively.
   const seedProducts = [
     {
       name: 'Aqua Edge',
       slug: 'aqua-edge',
       shortDescription: 'Fresh marine citrus with sun-bleached driftwood and rosemary.',
-      description: 'An invigorating oceanic masterpiece inspired by Mediterranean sea spray and sunlit coastal citrus orchards.',
+      description: 'An invigorating oceanic composition inspired by Mediterranean sea spray and sunlit coastal citrus orchards.',
       inspiredByName: 'Acqua di Giò',
       referenceBrandSlug: 'giorgio-armani',
       gender: Gender.MEN,
@@ -114,10 +115,10 @@ async function main() {
       topNotes: ['Bergamot', 'Calabrian Lemon', 'Neroli'],
       heartNotes: ['Marine Accord', 'Rosemary', 'Jasmine'],
       baseNotes: ['White Musk', 'Cedarwood', 'Patchouli'],
-      occasion: 'Daily Luxury / Summer Evenings',
+      occasion: 'Daily Wear / Warm Evenings',
       season: 'Spring / Summer',
-      longevity: '8-10 Hours',
-      projection: 'Moderate to Strong',
+      longevity: 'Long-lasting on skin',
+      projection: 'Moderate and refined',
       featured: true,
       bestseller: true,
       newArrival: false,
@@ -126,10 +127,10 @@ async function main() {
         { sizeLabel: '3 ML Sample', sku: 'AQE-3ML', price: 299, stockQuantity: 100 },
         { sizeLabel: '6 ML Attar', sku: 'AQE-6ML', price: 549, stockQuantity: 80 },
         { sizeLabel: '12 ML Pocket Luxury', sku: 'AQE-12ML', price: 999, stockQuantity: 50 },
-        { sizeLabel: '100 ML Extrait de Parfum', sku: 'AQE-100ML', price: 2499, stockQuantity: 30 },
+        { sizeLabel: '100 ML Concentrated Parfum', sku: 'AQE-100ML', price: 2499, stockQuantity: 30 },
       ],
       images: [
-        { url: '/images/sauvage.jpg', altText: 'Aqua Edge Extrait de Parfum Bottle', isPrimary: true, sortOrder: 0 }
+        { url: '/images/illure-placeholder.svg', altText: 'Aqua Edge Fragrance Bottle', isPrimary: true, sortOrder: 0 }
       ],
       categorySlug: 'fresh-aquatic',
     },
@@ -147,8 +148,8 @@ async function main() {
       baseNotes: ['Tonka Bean', 'Vanilla', 'Amber'],
       occasion: 'Evening Gala / Formal Winter',
       season: 'Fall / Winter',
-      longevity: '12+ Hours',
-      projection: 'Enveloping Aura',
+      longevity: 'Long-lasting on skin',
+      projection: 'Enveloping sillage',
       featured: true,
       bestseller: true,
       newArrival: false,
@@ -157,10 +158,10 @@ async function main() {
         { sizeLabel: '3 ML Sample', sku: 'OSR-3ML', price: 349, stockQuantity: 100 },
         { sizeLabel: '6 ML Attar', sku: 'OSR-6ML', price: 649, stockQuantity: 80 },
         { sizeLabel: '12 ML Pocket Luxury', sku: 'OSR-12ML', price: 1199, stockQuantity: 50 },
-        { sizeLabel: '100 ML Extrait de Parfum', sku: 'OSR-100ML', price: 2999, stockQuantity: 25 },
+        { sizeLabel: '100 ML Concentrated Parfum', sku: 'OSR-100ML', price: 2999, stockQuantity: 25 },
       ],
       images: [
-        { url: '/images/oud_wood.jpg', altText: 'Oud Silk Royal Extrait de Parfum Bottle', isPrimary: true, sortOrder: 0 }
+        { url: '/images/illure-placeholder.svg', altText: 'Oud Silk Royal Fragrance Bottle', isPrimary: true, sortOrder: 0 }
       ],
       categorySlug: 'woody-smoky',
     },
@@ -168,7 +169,7 @@ async function main() {
       name: 'Imperial Sovereign',
       slug: 'imperial-sovereign',
       shortDescription: 'Regal pineapple, smoky birch wood, and crisp French bergamot.',
-      description: 'The epitome of power and prestige. A commanding opening of juicy pineapple transitioning into smoky leather and birch wood.',
+      description: 'A commanding presence opening with crisp pineapple transitioning into birch wood and amber accords.',
       inspiredByName: 'Aventus',
       referenceBrandSlug: 'creed',
       gender: Gender.MEN,
@@ -178,8 +179,8 @@ async function main() {
       baseNotes: ['Oakmoss', 'Ambergris', 'Vanilla'],
       occasion: 'Executive / Special Occasions',
       season: 'All Seasons',
-      longevity: '10-12 Hours',
-      projection: 'Heavy Sillage',
+      longevity: 'Long-lasting on skin',
+      projection: 'Refined presence',
       featured: true,
       bestseller: true,
       newArrival: true,
@@ -188,10 +189,10 @@ async function main() {
         { sizeLabel: '3 ML Sample', sku: 'IMS-3ML', price: 399, stockQuantity: 100 },
         { sizeLabel: '6 ML Attar', sku: 'IMS-6ML', price: 749, stockQuantity: 80 },
         { sizeLabel: '12 ML Pocket Luxury', sku: 'IMS-12ML', price: 1399, stockQuantity: 50 },
-        { sizeLabel: '100 ML Extrait de Parfum', sku: 'IMS-100ML', price: 3499, stockQuantity: 20 },
+        { sizeLabel: '100 ML Concentrated Parfum', sku: 'IMS-100ML', price: 3499, stockQuantity: 20 },
       ],
       images: [
-        { url: '/images/sauvage.jpg', altText: 'Imperial Sovereign Bottle', isPrimary: true, sortOrder: 0 }
+        { url: '/images/illure-placeholder.svg', altText: 'Imperial Sovereign Bottle', isPrimary: true, sortOrder: 0 }
       ],
       categorySlug: 'niche-editions',
     },

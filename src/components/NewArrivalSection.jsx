@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
 import ProductCard from './ProductCard';
 
-export default function NewArrivalSection({ onSelectProduct, onAddToCart }) {
+export default function NewArrivalSection({ products = [], onSelectProduct, onAddToCart }) {
   const { getSection } = useCms();
   const section = getSection('new_arrivals');
 
@@ -12,46 +12,30 @@ export default function NewArrivalSection({ onSelectProduct, onAddToCart }) {
   }
 
   const title = section?.title || 'NEW HORIZONS';
-  const subtitle = section?.subtitle || 'RECENT FORMULATIONS';
+  const subtitle = section?.subtitle || 'RECENT COMPOSITIONS';
   const description = section?.description || 'Fresh additions to the İLLURÊ portfolio, showcasing vanguard accords.';
-  const ctaLabel = section?.ctaLabel || 'DISCOVER NEW DROPS';
+  const ctaLabel = section?.ctaLabel || 'DISCOVER NEW ARRIVALS';
 
-  const campaignProduct = {
-    id: "dior-sauvage-elixir",
-    brand: "DIOR",
-    name: "Sauvage Elixir Absolu",
-    inspiredByName: "Dior Sauvage Elixir",
-    price: 17900,
-    image: "/images/sauvage.jpg",
-    notes: "Spiced Lavender · Liquorice · Sandalwood",
-    gender: "MEN",
-    badge: "NEW DROP",
-  };
+  const campaignProduct = products.find((p) => p.newArrival || p.isNewArrival) || products[0] || null;
+  const supportingItems = products.filter((p) => p.id !== campaignProduct?.id).slice(0, 2);
 
-  const supportingItems = [
-    {
-      id: "ysl-y-edp",
-      brand: "YVES SAINT LAURENT",
-      name: "Y Extrait Pure",
-      inspiredByName: "YSL Y Eau de Parfum",
-      price: 11500,
-      image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800",
-      notes: "Crisp Apple · Sage · Tonka Bean",
-      gender: "MEN",
-      badge: "NEW",
-    },
-    {
-      id: "creed-aventus",
-      brand: "CREED",
-      name: "Aventus Sovereign",
-      inspiredByName: "Creed Aventus",
-      price: 32000,
-      image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=800",
-      notes: "Blackcurrant · Italian Bergamot · Oakmoss",
-      gender: "MEN",
-      badge: "LIMITED",
-    }
-  ];
+  if (!campaignProduct) return null;
+
+  // Derive valid prices strictly from variants or backend product data
+  let validPrices = [];
+  if (campaignProduct.variants && campaignProduct.variants.length > 0) {
+    validPrices = campaignProduct.variants
+      .map((v) => Number(v.price))
+      .filter((p) => !isNaN(p) && p > 0);
+  }
+  if (validPrices.length === 0 && campaignProduct.minPrice && Number(campaignProduct.minPrice) > 0) {
+    validPrices.push(Number(campaignProduct.minPrice));
+  }
+  if (validPrices.length === 0 && campaignProduct.price && Number(campaignProduct.price) > 0) {
+    validPrices.push(Number(campaignProduct.price));
+  }
+
+  const startingPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
 
   return (
     <section 
@@ -91,9 +75,9 @@ export default function NewArrivalSection({ onSelectProduct, onAddToCart }) {
             <div className="lg:col-span-7 flex items-center justify-center relative min-h-[360px] md:min-h-[480px]">
               <div className="absolute inset-0 bg-radial from-[#B89A62]/10 via-transparent to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               <img 
-                src={campaignProduct.image} 
+                src={campaignProduct.image || "/images/illure-placeholder.svg"} 
                 alt={campaignProduct.name}
-                onError={(e) => { e.currentTarget.src = "/images/sauvage.jpg"; }}
+                onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                 className="max-h-72 md:max-h-96 object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-700 ease-out"
               />
               <span className="absolute top-0 left-0 typography-eyebrow text-[9px] px-3 py-1 bg-[#0B0B0C] border border-[#B89A62]/40">
@@ -105,27 +89,27 @@ export default function NewArrivalSection({ onSelectProduct, onAddToCart }) {
             <div className="lg:col-span-5 space-y-6">
               <div className="space-y-1">
                 <span className="typography-eyebrow text-[#A1A1AA]">
-                  {campaignProduct.brand} · PRIVATE BLEND
+                  {campaignProduct.brand || 'İLLURÊ RESERVE'} · PARFUM
                 </span>
                 <h3 className="typography-display text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors">
                   {campaignProduct.name}
                 </h3>
                 <p className="text-xs text-[#A1A1AA] font-light">
-                  Inspired by {campaignProduct.inspiredByName}
+                  Inspired by {campaignProduct.inspiredByName || campaignProduct.brand}
                 </p>
               </div>
 
               <p className="typography-body text-[#A1A1AA]">
-                Intensely concentrated, raw and potent. A nocturnal rush of spiced nutmeg and lavender infused into a liquorice and smoked sandalwood framework.
+                {campaignProduct.description || campaignProduct.shortDescription || 'Distinctive olfactory composition developed with exquisite nuance and lasting character.'}
               </p>
 
               <div className="pt-2 flex items-baseline justify-between border-y border-white/[0.08] py-4">
                 <div>
                   <span className="text-[9px] tracking-widest text-[#A1A1AA] uppercase block font-mono">
-                    EXTRAIT PRICE
+                    STARTING AT
                   </span>
                   <span className="font-editorial-serif text-3xl font-light text-[#F7F4EE]">
-                    ₹{campaignProduct.price.toLocaleString('en-IN')}
+                    {startingPrice ? `₹${startingPrice.toLocaleString('en-IN')}` : 'PRICE UNAVAILABLE'}
                   </span>
                 </div>
                 <span className="text-[10px] tracking-widest text-[#B89A62] uppercase font-mono">

@@ -111,8 +111,8 @@ export default function CartDrawer({
                 >
                   <div className="w-16 h-20 bg-[#121214] border border-white/[0.08] p-2 flex items-center justify-center rounded-xs shrink-0">
                     <img 
-                      src={item.image || "/images/oud_wood.jpg"} 
-                      onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
+                      src={item.image || "/images/illure-placeholder.svg"} 
+                      onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                       alt={item.name} 
                       className="max-h-full max-w-full object-contain filter drop-shadow-md"
                     />
@@ -196,7 +196,7 @@ export default function CartDrawer({
             <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
               <span>SHIPPING</span>
               <span className="text-[#B89A62] font-mono">
-                {isFreeShipping ? 'COMPLIMENTARY' : `₹${shipping?.flatRate || 99}`}
+                {isFreeShipping ? 'COMPLIMENTARY' : (shipping?.flatRate !== undefined && shipping?.flatRate !== null ? `₹${shipping.flatRate}` : 'Calculated at checkout')}
               </span>
             </div>
           </div>

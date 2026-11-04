@@ -33,11 +33,11 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     layoutVariant: 'DEFAULT',
     title: 'Perfume is memory.\nİLLURÊ makes it yours.',
     subtitle: 'THE ESSENCE OF QUIET LUXURY',
-    description: 'Crafted with uncompromising extrait-level concentration, each silhouette balances weight, intimacy, and presence.',
+    description: 'Developed with attention to balance and depth, each silhouette expresses enduring presence and intimacy.',
     ctaLabel: 'OUR PHILOSOPHY',
     ctaUrl: '#brand-story',
     customData: {
-      calloutNote: 'Hand-blended and matured for enduring projection and seamless day-to-night transitions.',
+      calloutNote: 'Formulated with attention to harmonic balance and seamless day-to-night transitions.',
       establishedYear: '2026',
     },
     isPublished: true,
@@ -49,8 +49,8 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     isEnabled: true,
     layoutVariant: 'EDITORIAL', // EDITORIAL | GRID | CAROUSEL
     title: 'FEATURED CREATIONS',
-    subtitle: 'CURATED EXTRAITS',
-    description: 'Rare formulations defined by depth, tension, and lingering warmth.',
+    subtitle: 'CURATED SELECTIONS',
+    description: 'Distinctive scent compositions defined by depth, tension, and lingering warmth.',
     ctaLabel: 'VIEW ALL FRAGRANCES',
     ctaUrl: '#catalog',
     isPublished: true,
@@ -131,13 +131,13 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     layoutVariant: 'IMAGE_LEFT', // IMAGE_LEFT | IMAGE_RIGHT | FULL_BLEED
     title: 'THE ARCHITECTURE OF SCENT',
     subtitle: 'OUR MAISON',
-    description: 'İLLURÊ FRAGRANCE was born from a fundamental belief: extraordinary perfumery should be a daily luxury, not an inaccessible artifact. Inspired by iconic classics yet formulated with our proprietary extrait craftsmanship.',
+    description: 'İLLURÊ FRAGRANCE was founded on the philosophy that distinctive perfumery should be an intimate daily ritual. Inspired by iconic profiles and crafted with singular aesthetic vision.',
     ctaLabel: 'EXPLORE OUR HERITAGE',
     ctaUrl: '#catalog',
     desktopImage: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=1200',
     customData: {
       quote: '“We sculpt memories in liquid form, balancing shadow and illumination in every flacon.”',
-      founderSignature: 'The İLLURÊ Laboratory',
+      founderSignature: 'The İLLURÊ Studio',
     },
     isPublished: true,
   },
@@ -149,7 +149,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     layoutVariant: 'FULL_BLEED',
     title: 'TIME SUSPENDED IN LIQUID GOLD',
     subtitle: 'THE EXPERIENCE',
-    description: 'Each creation transforms as skin breathes warmth into concentrated perfume oils.',
+    description: 'Each creation transforms as skin breathes warmth into nuanced perfume compositions.',
     ctaLabel: 'DISCOVER THE CRAFT',
     ctaUrl: '#catalog',
     desktopImage: 'https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=1920',
@@ -175,7 +175,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     isEnabled: true,
     layoutVariant: 'CAMPAIGN', // CAMPAIGN | GRID
     title: 'NEW HORIZONS',
-    subtitle: 'RECENT FORMULATIONS',
+    subtitle: 'RECENT COMPOSITIONS',
     description: 'Fresh additions to the İLLURÊ portfolio, showcasing vanguard accords.',
     ctaLabel: 'VIEW NEW ARRIVALS',
     ctaUrl: '#catalog',
@@ -183,30 +183,30 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
   },
   {
     sectionKey: 'authenticity',
-    name: 'Authenticity & House Promise',
+    name: 'House Philosophy & Standards',
     sortOrder: 10,
     isEnabled: true,
     layoutVariant: 'FOUR_PILLARS',
-    title: 'THE İLLURÊ PROMISE',
-    subtitle: 'UNCOMPROMISING STANDARDS',
-    description: 'Four tenets govern every single droplet packaged under the seal of İLLURÊ.',
+    title: 'THE İLLURÊ STANDARDS',
+    subtitle: 'CORE TENETS',
+    description: 'Principles guiding each fragrance created under the hallmark of İLLURÊ.',
     customData: {
       pillars: [
         {
           title: 'CRAFTED WITH INTENT',
-          description: 'High perfume oil concentration ensures unmatched longevity and complex sillage development.',
+          description: 'Concentrated fragrance compositions developed with careful attention to olfactory balance and character.',
         },
         {
-          title: 'SMALL FORMAT, FULL CHARACTER',
-          description: 'Travel-friendly flacons designed to preserve freshness and accompany your journey seamlessly.',
+          title: 'REFINED SILHOUETTE',
+          description: 'Compact flacons calibrated for tactile weight and daily accompaniment on your journey.',
         },
         {
           title: 'PACKAGED BY İLLURÊ',
-          description: 'Obsidian presentation boxes lined with velvet touch packaging worthy of royal gifting.',
+          description: 'Obsidian presentation boxes lined with velvet touch packaging worthy of gifting.',
         },
         {
           title: 'DELIVERED WITH CARE',
-          description: 'Inspected by hand, tamper-sealed, and dispatched in custom protective luxury casing.',
+          description: 'Inspected by hand, tamper-sealed, and dispatched in custom protective casing.',
         },
       ],
     },
@@ -241,7 +241,7 @@ export const DEFAULT_SITE_SETTINGS: Record<string, any> = {
   },
   announcement: {
     isEnabled: true,
-    text: 'Complimentary shipping on orders above ₹999 — Handcrafted Extrait Formulations',
+    text: 'Complimentary shipping on qualifying orders — Handcrafted Luxury Formulations',
     linkUrl: '#catalog',
     theme: 'gold_subtle',
   },
@@ -268,12 +268,12 @@ export const DEFAULT_SITE_SETTINGS: Record<string, any> = {
       ],
       editorial: [
         { label: 'Our Story', href: '#brand-story' },
-        { label: 'Craft & Authenticity', href: '#authenticity' },
+        { label: 'Craft & Standards', href: '#authenticity' },
         { label: 'Gifting Experience', href: '#catalog' },
       ],
       featuredPromotion: {
         title: 'ROYAL OUD REIMAGINED',
-        subtitle: 'The Signature Extrait',
+        subtitle: 'The Signature Interpretation',
         imageUrl: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=600',
         ctaText: 'Discover Scent',
         ctaUrl: '#catalog',
@@ -281,8 +281,9 @@ export const DEFAULT_SITE_SETTINGS: Record<string, any> = {
     },
   },
   footer: {
-    tagline: 'Haute perfumery reimagined through quiet luxury, exceptional longevity, and architectural design.',
+    tagline: 'Haute perfumery reimagined through quiet luxury, exceptional presence, and architectural design.',
     copyright: '© 2026 İLLURÊ FRAGRANCE. All rights reserved.',
+    disclaimer: 'Reference brand names are used only to describe fragrance inspiration and olfactory reference. İLLURÊ FRAGRANCE is an independent brand and is not affiliated with, endorsed by, or sponsored by the referenced trademark owners.',
     columns: [
       {
         title: 'SHOP',
@@ -299,7 +300,7 @@ export const DEFAULT_SITE_SETTINGS: Record<string, any> = {
           { label: 'The House of İLLURÊ', href: '#brand-story' },
           { label: 'Fragrance Notes', href: '#collections' },
           { label: 'Shop By Mood', href: '#mood' },
-          { label: 'Authenticity Guarantee', href: '#authenticity' },
+          { label: 'House Standards', href: '#authenticity' },
         ],
       },
       {
@@ -316,17 +317,17 @@ export const DEFAULT_SITE_SETTINGS: Record<string, any> = {
         links: [
           { label: 'Privacy Policy', href: '#privacy' },
           { label: 'Terms of Service', href: '#terms' },
-          { label: 'Authenticity Pledge', href: '#authenticity' },
+          { label: 'House Standards', href: '#authenticity' },
         ],
       },
     ],
   },
   brand_contacts: {
-    email: 'concierge@illurefragrance.com',
-    phone: '+91 98765 43210',
-    whatsapp: '+91 98765 43210',
-    instagram: 'https://instagram.com/illurefragrance',
-    facebook: 'https://facebook.com/illurefragrance',
+    email: null,
+    phone: null,
+    whatsapp: null,
+    instagram: null,
+    facebook: null,
   },
 };
 
@@ -459,8 +460,18 @@ export class CmsService {
     if (data.ctaLabel && typeof data.ctaLabel === 'string' && data.ctaLabel.length > 100) {
       throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'CTA label cannot exceed 100 characters.' };
     }
-    if (data.ctaUrl && typeof data.ctaUrl === 'string' && data.ctaUrl.length > 500) {
-      throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'CTA URL cannot exceed 500 characters.' };
+    if (data.ctaUrl && typeof data.ctaUrl === 'string') {
+      if (data.ctaUrl.length > 500) {
+        throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'CTA URL cannot exceed 500 characters.' };
+      }
+      const lower = data.ctaUrl.trim().toLowerCase();
+      if (
+        lower.startsWith('javascript:') ||
+        lower.startsWith('data:') ||
+        lower.startsWith('vbscript:')
+      ) {
+        throw { statusCode: 400, code: 'INVALID_URL', message: 'Dangerous URL scheme rejected.' };
+      }
     }
 
     if (data.customData && typeof data.customData === 'object') {
@@ -584,6 +595,16 @@ export class CmsService {
     if (key === 'announcement' && value && typeof value === 'object') {
       if (value.text && typeof value.text === 'string' && value.text.length > 255) {
         throw { statusCode: 400, code: 'FIELD_TOO_LONG', message: 'Announcement text cannot exceed 255 characters.' };
+      }
+      if (value.linkUrl && typeof value.linkUrl === 'string') {
+        const lower = value.linkUrl.trim().toLowerCase();
+        if (
+          lower.startsWith('javascript:') ||
+          lower.startsWith('data:') ||
+          lower.startsWith('vbscript:')
+        ) {
+          throw { statusCode: 400, code: 'INVALID_URL', message: 'Dangerous URL scheme rejected.' };
+        }
       }
     }
 

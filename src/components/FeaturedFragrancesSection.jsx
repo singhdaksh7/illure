@@ -45,8 +45,8 @@ const DEFAULT_FEATURED = [
   },
 ];
 
-export default function FeaturedFragrancesSection({ 
-  onSelectProduct, 
+export default function FeaturedFragrancesSection({
+  onSelectProduct,
   onAddToCart,
   products = DEFAULT_FEATURED,
   onViewAll
@@ -70,15 +70,15 @@ export default function FeaturedFragrancesSection({
   const companionProducts = items.slice(1, 4);
 
   return (
-    <section 
-      id="curated-section" 
+    <section
+      id="curated-section"
       className="py-24 md:py-36 bg-[#0B0B0C] relative select-none overflow-hidden border-b border-white/[0.04]"
     >
       {/* Ambient background glow */}
       <div className="absolute top-1/3 left-1/4 w-[60vw] h-[350px] bg-[#B89A62]/[0.025] rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 relative z-10">
-        
+
         {/* Section Header */}
         <div className="mb-16 md:mb-20 space-y-4">
           <div className="flex items-center space-x-3">
@@ -94,7 +94,7 @@ export default function FeaturedFragrancesSection({
                 {title}
               </h2>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <p className="typography-body max-w-sm">
                 {description}
@@ -115,9 +115,9 @@ export default function FeaturedFragrancesSection({
         {/* LAYOUT 1: ASYMMETRIC EDITORIAL (1 Hero Flacon + 2 Companion Tiles) */}
         {layout === 'EDITORIAL' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            
+
             {/* Left Dominant Feature Flacon */}
-            <div 
+            <div
               className="lg:col-span-7 bg-[#121214] border border-[#B89A62]/30 p-8 md:p-12 relative overflow-hidden group cursor-pointer flex flex-col justify-between rounded-xs"
               onClick={() => onSelectProduct && onSelectProduct(leadProduct.id || leadProduct)}
             >
@@ -134,7 +134,8 @@ export default function FeaturedFragrancesSection({
               <div className="relative my-8 md:my-12 flex items-center justify-center">
                 <div className="absolute inset-0 bg-radial from-[#B89A62]/10 to-transparent blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                 <img
-                  src={leadProduct.image || "/images/oud_wood.jpg"}
+                  src={leadProduct.image || "/images/illure-placeholder.svg"}
+                  onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                   alt={leadProduct.name}
                   className="max-h-72 md:max-h-96 object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)] group-hover:scale-105 transition-transform duration-700 ease-out"
                 />
@@ -145,7 +146,7 @@ export default function FeaturedFragrancesSection({
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                   <div>
                     <span className="typography-eyebrow text-[#A1A1AA] text-[10px]">
-                      {leadProduct.brand} · EXTRAIT
+                      {leadProduct.brand || 'İLLURÊ RESERVE'} · PARFUM
                     </span>
                     <h3 className="typography-display text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors">
                       {leadProduct.name}
@@ -155,12 +156,34 @@ export default function FeaturedFragrancesSection({
                     </p>
                   </div>
                   <div>
-                    <span className="text-[9px] tracking-widest text-[#A1A1AA] block uppercase">
-                      STARTING AT
-                    </span>
-                    <span className="font-editorial-serif text-2xl md:text-3xl font-light text-[#F7F4EE]">
-                      ₹{(leadProduct.minPrice || (leadProduct.variants?.length ? Math.min(...leadProduct.variants.map(v => Number(v.price))) : (leadProduct.price || 999))).toLocaleString('en-IN')}
-                    </span>
+                    {(() => {
+                      let prices = [];
+                      if (leadProduct.variants && leadProduct.variants.length > 0) {
+                        prices = leadProduct.variants.map((v) => Number(v.price)).filter((p) => !isNaN(p) && p > 0);
+                      }
+                      if (prices.length === 0 && leadProduct.minPrice && Number(leadProduct.minPrice) > 0) {
+                        prices.push(Number(leadProduct.minPrice));
+                      }
+                      if (prices.length === 0 && leadProduct.price && Number(leadProduct.price) > 0) {
+                        prices.push(Number(leadProduct.price));
+                      }
+                      const leadStartingPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+                      return leadStartingPrice ? (
+                        <>
+                          <span className="text-[9px] tracking-widest text-[#A1A1AA] block uppercase">
+                            STARTING AT
+                          </span>
+                          <span className="font-editorial-serif text-2xl md:text-3xl font-light text-[#F7F4EE]">
+                            ₹{leadStartingPrice.toLocaleString('en-IN')}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs tracking-widest text-[#A1A1AA] uppercase">
+                          PRICE UNAVAILABLE
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
 

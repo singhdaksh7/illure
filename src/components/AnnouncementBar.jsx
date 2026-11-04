@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCms } from '../context/CmsContext';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
+import { isSafeUrl } from '../utils/urlSafety';
 
 export default function AnnouncementBar({ onNavigate }) {
   const { announcement } = useCms();
@@ -11,7 +12,7 @@ export default function AnnouncementBar({ onNavigate }) {
   }
 
   const handleClick = () => {
-    if (announcement.linkUrl) {
+    if (announcement.linkUrl && isSafeUrl(announcement.linkUrl)) {
       if (announcement.linkUrl.startsWith('#') && onNavigate) {
         const target = announcement.linkUrl.replace('#', '');
         onNavigate(target === 'catalog' ? 'shop' : target);

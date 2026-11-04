@@ -75,9 +75,13 @@ function StorefrontApp() {
             return {
               ...fallback,
               ...item,
-              image: item.primaryImage?.url || item.images?.[0]?.url || fallback?.image || '/images/oud_wood.jpg',
+              image: item.primaryImage?.url || item.images?.[0]?.url || fallback?.image || '/images/illure-placeholder.svg',
               brand: item.referenceBrand?.name || fallback?.brand || 'İLLURÊ RESERVE',
-              price: item.minPrice || item.variants?.[0]?.price || fallback?.price || 999,
+              price: item.minPrice && Number(item.minPrice) > 0 
+                ? Number(item.minPrice) 
+                : (item.variants?.[0]?.price && Number(item.variants[0].price) > 0 
+                    ? Number(item.variants[0].price) 
+                    : (fallback?.price || null)),
             };
           });
           setProductsList(liveItems);
@@ -163,10 +167,10 @@ function StorefrontApp() {
     id: item.variant?.product?.id || item.id,
     name: item.variant?.product?.name || item.name || 'Extrait de Parfum',
     brand: item.variant?.product?.referenceBrand?.name || item.brand || 'İLLURÊ RESERVE',
-    price: item.unitPrice ? Number(item.unitPrice) : (item.price || 999),
+    price: item.unitPrice ? Number(item.unitPrice) : (item.price ? Number(item.price) : 0),
     selectedSize: item.variant?.sizeLabel || (item.variant?.sizeMl ? `${item.variant.sizeMl} ML` : (item.selectedSize || 'Flacon')),
     quantity: item.quantity,
-    image: item.variant?.product?.images?.[0] || item.image || '/images/oud_wood.jpg',
+    image: item.variant?.product?.images?.[0] || item.image || '/images/illure-placeholder.svg',
     giftPackaging: !!item.giftPackagingId,
   }));
 
@@ -275,7 +279,11 @@ function StorefrontApp() {
 
           {/* 10. SECTION 10 — NEW ARRIVAL CAMPAIGN */}
           {isSectionVisible('new_arrivals') && (
-            <NewArrivalSection onSelectProduct={handleSelectProduct} />
+            <NewArrivalSection 
+              products={productsList}
+              onSelectProduct={handleSelectProduct}
+              onAddToCart={handleAddToCartItem}
+            />
           )}
 
           {/* 11. SECTION 11 — AUTHENTICITY PILLARS */}

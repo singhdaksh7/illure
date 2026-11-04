@@ -130,15 +130,15 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
                   <div className="flex items-center space-x-4">
                     <div className="w-14 h-16 bg-[#0B0B0C] border border-white/[0.06] p-1.5 flex items-center justify-center rounded-xs shrink-0">
                       <img 
-                        src={product.image || "/images/oud_wood.jpg"} 
-                        onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }}
+                        src={product.image || "/images/illure-placeholder.svg"} 
+                        onError={(e) => { e.target.src = "/images/illure-placeholder.svg"; }}
                         alt="" 
                         className="max-h-full max-w-full object-contain filter drop-shadow-sm"
                       />
                     </div>
                     <div>
                       <span className="text-[9px] tracking-[0.25em] text-[#B89A62] uppercase block">
-                        {product.brand} · EXTRAIT
+                        {product.brand || 'İLLURÊ RESERVE'} · PARFUM
                       </span>
                       <h5 className="font-editorial-serif text-xl text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors leading-snug">
                         {product.name}
@@ -150,14 +150,34 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
                   </div>
 
                   <div className="flex items-center space-x-3 text-right">
-                    <div>
-                      <span className="text-[9px] tracking-wider text-[#A1A1AA] block uppercase font-mono">
-                        STARTING AT
-                      </span>
-                      <span className="font-editorial-serif text-lg text-[#F7F4EE] font-light">
-                        ₹{(product.minPrice || (product.variants?.length ? Math.min(...product.variants.map(v => Number(v.price))) : (product.price || 999))).toLocaleString('en-IN')}
-                      </span>
-                    </div>
+                    {(() => {
+                      let prices = [];
+                      if (product.variants && product.variants.length > 0) {
+                        prices = product.variants.map((v) => Number(v.price)).filter((p) => !isNaN(p) && p > 0);
+                      }
+                      if (prices.length === 0 && product.minPrice && Number(product.minPrice) > 0) {
+                        prices.push(Number(product.minPrice));
+                      }
+                      if (prices.length === 0 && product.price && Number(product.price) > 0) {
+                        prices.push(Number(product.price));
+                      }
+                      const searchPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+                      return searchPrice ? (
+                        <div>
+                          <span className="text-[9px] tracking-wider text-[#A1A1AA] block uppercase font-mono">
+                            STARTING AT
+                          </span>
+                          <span className="font-editorial-serif text-lg text-[#F7F4EE] font-light">
+                            ₹{searchPrice.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs tracking-widest text-[#A1A1AA] uppercase">
+                          INQUIRE
+                        </span>
+                      );
+                    })()}
                     <ArrowRight className="w-4 h-4 text-[#B89A62] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </div>
                 </div>

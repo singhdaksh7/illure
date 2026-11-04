@@ -181,5 +181,24 @@ describe('CMS & Visual Customization API', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.error?.code).toBe('INVALID_OVERLAY_STRENGTH');
   });
+
+  it('VALIDATION - should reject dangerous URL schemes like javascript: (400)', async () => {
+    const listRes = await request(app)
+      .get('/api/admin/cms/sections')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const targetSection = listRes.body.data.sections[0];
+
+    const res = await request(app)
+      .patch(`/api/admin/cms/sections/${targetSection.id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        ctaUrl: 'javascript:alert("exploit")',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error?.code).toBe('INVALID_URL');
+  });
 });
 

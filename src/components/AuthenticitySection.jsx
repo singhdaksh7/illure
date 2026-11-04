@@ -6,22 +6,22 @@ const DEFAULT_PILLARS = [
   {
     number: "I",
     title: "CRAFTED WITH INTENT",
-    description: "Every formulation is aged in controlled vaults to attain maximum extrait oil saturation, resulting in 14+ hours of persistent sillage."
+    description: "Concentrated fragrance compositions developed with careful attention to olfactory balance, structure, and enduring character."
   },
   {
     number: "II",
-    title: "SMALL FORMAT, FULL CHARACTER",
-    description: "Flacons calibrated specifically for intimate tactile weight, air-travel compliance, and daily ritual without dilution."
+    title: "REFINED SILHOUETTE",
+    description: "Compact flacons calibrated for tactile weight, convenience, and seamless accompaniment on your daily journey."
   },
   {
     number: "III",
     title: "PACKAGED BY İLLURÊ",
-    description: "Signature obsidian presentation boxes lined with velvet touch cushioning, sealed by hand under the heraldic crest of the Maison."
+    description: "Signature obsidian presentation boxes lined with velvet touch cushioning, sealed under the hallmark of İLLURÊ."
   },
   {
     number: "IV",
     title: "DELIVERED WITH CARE",
-    description: "Complimentary climate-controlled white-glove transit across India, guaranteed tamper-proof and fully insured."
+    description: "Carefully inspected, tamper-sealed, and dispatched in protective casing to ensure pristine arrival."
   }
 ];
 

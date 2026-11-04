@@ -16,7 +16,7 @@ const FALLBACK_APPEARANCE = {
 
 const FALLBACK_ANNOUNCEMENT = {
   isEnabled: true,
-  text: 'Complimentary shipping on orders above ₹999 — Handcrafted Extrait Formulations',
+  text: 'Complimentary shipping on qualifying orders — Handcrafted Luxury Formulations',
   linkUrl: '#catalog',
   theme: 'gold_subtle',
 };
@@ -58,8 +58,9 @@ const FALLBACK_NAVIGATION = {
 };
 
 const FALLBACK_FOOTER = {
-  tagline: 'Haute perfumery reimagined through quiet luxury, exceptional longevity, and architectural design.',
+  tagline: 'Haute perfumery reimagined through quiet luxury, exceptional presence, and architectural design.',
   copyright: '© 2026 İLLURÊ FRAGRANCE. All rights reserved.',
+  disclaimer: 'Reference brand names are used only to describe fragrance inspiration and olfactory reference. İLLURÊ FRAGRANCE is an independent brand and is not affiliated with, endorsed by, or sponsored by the referenced trademark owners.',
   columns: [
     {
       title: 'SHOP',
@@ -76,7 +77,7 @@ const FALLBACK_FOOTER = {
         { label: 'The House of İLLURÊ', href: '#brand-story' },
         { label: 'Fragrance Notes', href: '#collections' },
         { label: 'Shop By Mood', href: '#mood' },
-        { label: 'Authenticity Guarantee', href: '#authenticity' },
+        { label: 'House Standards', href: '#authenticity' },
       ],
     },
     {
@@ -93,18 +94,18 @@ const FALLBACK_FOOTER = {
       links: [
         { label: 'Privacy Policy', href: '#privacy' },
         { label: 'Terms of Service', href: '#terms' },
-        { label: 'Authenticity Pledge', href: '#authenticity' },
+        { label: 'House Standards', href: '#authenticity' },
       ],
     },
   ],
 };
 
 const FALLBACK_BRAND_CONTACTS = {
-  email: 'concierge@illurefragrance.com',
-  phone: '+91 98765 43210',
-  whatsapp: null, // No placeholder WhatsApp number exposed
-  instagram: 'https://instagram.com/illurefragrance',
-  facebook: 'https://facebook.com/illurefragrance',
+  email: null,
+  phone: null,
+  whatsapp: null,
+  instagram: null,
+  facebook: null,
 };
 
 const CmsContext = createContext(null);

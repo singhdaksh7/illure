@@ -37,8 +37,8 @@ export default function BrandStorySection({ onDiscoverStory }) {
             <div className="relative h-[480px] sm:h-[600px] w-full rounded-xs overflow-hidden border border-[#B89A62]/25 group">
               <img 
                 src={image} 
-                alt="İLLURÊ Haute Parfumerie Atelier" 
-                onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
+                alt="İLLURÊ Atelier" 
+                onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                 className="w-full h-full object-cover filter brightness-[0.8] contrast-[1.08] group-hover:scale-105 transition-transform duration-1000 ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-transparent to-transparent opacity-75" />
@@ -48,7 +48,7 @@ export default function BrandStorySection({ onDiscoverStory }) {
                 <div className="flex items-center space-x-2">
                   <IllureCrest size={18} className="text-[#B89A62]" />
                   <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                    ATELIER FORMULATION · EXTRACT DE PARFUM
+                    HOUSE OF İLLURÊ · BESPOKE COMPOSITIONS
                   </span>
                 </div>
                 <p className="font-editorial-serif text-base text-[#F7F4EE] italic">

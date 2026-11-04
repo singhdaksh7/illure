@@ -324,7 +324,7 @@ export default function Header({
                   <img
                     src={promo.imageUrl}
                     alt={promo.title}
-                    onError={(e) => { e.currentTarget.src = "/images/oud_wood.jpg"; }}
+                    onError={(e) => { e.currentTarget.src = "/images/illure-placeholder.svg"; }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-transparent to-transparent opacity-80" />

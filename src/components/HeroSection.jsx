@@ -166,7 +166,7 @@ export default function HeroSection({ onExplore, onProductSelect }) {
               src={bottleImg} 
               alt="İLLURÊ Signature Bottle" 
               onError={(e) => {
-                e.currentTarget.src = '/images/oud_wood.jpg';
+                e.currentTarget.src = '/images/hero_bottle_clean.png';
               }}
               className="w-full h-auto object-contain filter brightness-[1.06] contrast-[1.06] animate-float drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
               style={{
@@ -253,7 +253,7 @@ export default function HeroSection({ onExplore, onProductSelect }) {
                 ATELIER FORMULATION
               </span>
               <p className="font-editorial-serif text-sm text-[#F7F4EE] italic">
-                35% Extrait Oil Concentration · Hand-Poured in Small Batches
+                {custom.formulationNote || 'Concentrated Fragrance Interpretation · House of İLLURÊ'}
               </p>
             </div>
 
