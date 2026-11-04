@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
+import AdminCmsPage from './pages/AdminCmsPage';
 import {
   ShieldCheck,
   CheckCircle,
@@ -57,6 +58,10 @@ export default function AdminDashboard({ activeTab }) {
     }
     fetchAdminUsers();
   }, [activeTab, accessToken]);
+
+  if (activeTab === 'cms') {
+    return <AdminCmsPage />;
+  }
 
   if (activeTab === 'admins') {
     return (
@@ -207,9 +212,10 @@ export default function AdminDashboard({ activeTab }) {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           {[
+            { title: 'Storefront CMS & Studio', status: 'Implemented', detail: 'Real-time section reordering, theme presets, hero customizer' },
             { title: 'Admin Auth & Security', status: 'Implemented', detail: 'Login, Refresh Rotation, Logout, /me' },
             { title: 'Admin Roles', status: 'Implemented', detail: 'SUPER_ADMIN, ADMIN, ORDER/INVENTORY_MANAGER' },
-            { title: 'PostgreSQL Database', status: 'Implemented', detail: '15 normalized models with Prisma migrations' },
+            { title: 'PostgreSQL Database', status: 'Implemented', detail: '17 normalized models with Prisma migrations' },
             { title: 'Products & Variants', status: 'Schema Ready', detail: 'Product, ProductVariant (Decimal prices, unique SKUs)' },
             { title: 'Reference Brands', status: 'Schema Ready', detail: 'Inspiration brand separation (e.g. Tom Ford, Armani)' },
             { title: 'Inventory Movements', status: 'Schema Ready', detail: 'PURCHASE, SALE, RETURN, ADJUSTMENT' },

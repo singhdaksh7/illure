@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function HeroSection({ onExplore, onProductSelect }) {
+  const { getSection } = useCms();
+  const heroConfig = getSection('hero');
+
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [loaded, setLoaded] = useState(false);
@@ -13,10 +17,9 @@ export default function HeroSection({ onExplore, onProductSelect }) {
     };
     const handleMouseMove = (e) => {
       const { innerWidth, innerHeight } = window;
-      // Restrained, subtle cursor damping for high-end luxury feel
       setMousePos({
-        x: (e.clientX / innerWidth - 0.5) * 18,
-        y: (e.clientY / innerHeight - 0.5) * 18,
+        x: (e.clientX / innerWidth - 0.5) * 16,
+        y: (e.clientY / innerHeight - 0.5) * 16,
       });
     };
 
@@ -29,74 +32,95 @@ export default function HeroSection({ onExplore, onProductSelect }) {
     };
   }, []);
 
+  if (heroConfig && !heroConfig.isEnabled) {
+    return null;
+  }
+
+  // Content extraction with graceful luxury fallbacks
+  const eyebrow = heroConfig?.subtitle || 'THE HOUSE OF İLLURÊ';
+  const heading = heroConfig?.title || 'Fragrance,\nReimagined.';
+  const bodyText = heroConfig?.description || 'Distinctive scent profiles inspired by icons, finished in the language of İLLURÊ.';
+  const primaryCta = heroConfig?.ctaLabel || 'EXPLORE THE COLLECTION';
+  const primaryUrl = heroConfig?.ctaUrl || '#catalog';
+  const custom = heroConfig?.customData || {};
+  const secondaryCta = custom.secondaryCtaLabel || 'DISCOVER İLLURÊ';
+  const bottleImg = custom.bottleImage || '/images/hero.jpg';
+  const overlayStrength = custom.overlayStrength !== undefined ? custom.overlayStrength : 0.7;
+
+  const handlePrimaryClick = () => {
+    if (primaryUrl === '#catalog' || primaryUrl === '#curated-section') {
+      if (onExplore) onExplore();
+      else {
+        const el = document.getElementById('curated-section') || document.getElementById('catalog');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (primaryUrl.startsWith('#')) {
+      const el = document.querySelector(primaryUrl);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = primaryUrl;
+    }
+  };
+
+  const handleSecondaryClick = () => {
+    const el = document.getElementById('brand-story-section') || document.getElementById('editorial-intro-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else if (onExplore) onExplore();
+  };
+
   return (
-    <section className="relative min-h-screen h-[100vh] w-full bg-[#080C0D] overflow-hidden flex flex-col justify-between pt-28 pb-10 select-none">
+    <section className="relative min-h-screen h-[100vh] w-full bg-[#0B0B0C] overflow-hidden flex flex-col justify-between pt-24 pb-8 select-none">
       
       {/* 1. LAYER 0 — FULL-BLEED COSMIC & ATMOSPHERIC HERO BANNER BACKGROUND */}
       <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
         
         {/* Full-screen Obsidian Base */}
-        <div className="absolute inset-0 bg-[#080C0D]" />
+        <div className="absolute inset-0 bg-[#0B0B0C]" />
 
-        {/* Dynamic Full-Width Cosmic Nebula Radial Gradient Canvas */}
+        {/* Dynamic Nebula Radial Gradient Canvas */}
         <div 
           className="absolute inset-0 w-full h-full transition-transform duration-1000 ease-out"
           style={{
             background: `
-              radial-gradient(ellipse 90% 70% at ${50 + mousePos.x * 0.15}% ${50 + mousePos.y * 0.15}%, rgba(198, 174, 130, 0.1) 0%, rgba(35, 45, 55, 0.14) 35%, rgba(14, 19, 20, 0.8) 70%, rgba(8, 12, 13, 0.99) 100%),
-              radial-gradient(ellipse 120% 50% at 50% 50%, rgba(180, 140, 80, 0.06) 0%, rgba(15, 25, 35, 0.08) 50%, transparent 100%)
+              radial-gradient(ellipse 90% 70% at ${50 + mousePos.x * 0.15}% ${50 + mousePos.y * 0.15}%, rgba(184, 154, 98, 0.12) 0%, rgba(24, 24, 27, 0.4) 35%, rgba(18, 18, 20, 0.85) 70%, rgba(11, 11, 12, 0.99) 100%),
+              radial-gradient(ellipse 120% 50% at 50% 50%, rgba(169, 139, 85, 0.08) 0%, rgba(15, 15, 18, 0.3) 50%, transparent 100%)
             `,
           }}
         />
 
-        {/* Full-Bleed Horizontal Atmospheric Glow Beam (Campaign Banner Feel) */}
+        {/* Horizontal Gold Ambient Ray */}
         <div 
-          className="absolute top-1/2 left-0 w-full h-[60vh] -translate-y-1/2 pointer-events-none opacity-80"
+          className="absolute top-1/2 left-0 w-full h-[60vh] -translate-y-1/2 pointer-events-none opacity-70"
           style={{
-            background: `radial-gradient(ellipse 100% 45% at 50% 50%, rgba(198, 174, 130, 0.09) 0%, rgba(40, 55, 65, 0.05) 50%, transparent 85%)`,
+            background: `radial-gradient(ellipse 100% 45% at 50% 50%, rgba(184, 154, 98, 0.09) 0%, rgba(30, 30, 35, 0.05) 50%, transparent 85%)`,
           }}
         />
 
-        {/* Wide Champagne Ambient Cosmic Halo (Centered behind bottle, expanding full width) */}
+        {/* Ambient Halo Behind Bottle */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh] max-w-[1400px] max-h-[1100px] bg-[#C6AE82]/[0.05] rounded-full blur-[160px]"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[75vh] max-w-[1300px] max-h-[1000px] bg-[#B89A62]/[0.05] rounded-full blur-[150px]"
           style={{
             transform: `translate(-50%, -50%) translate(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px)`,
           }}
         />
 
-        {/* Central Bottle Backlight Aura */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[45vw] h-[45vw] max-w-[650px] max-h-[650px] bg-[#DFCDA4]/[0.045] rounded-full blur-[100px]"
-          style={{
-            transform: `translate(-50%, -50%) translate(${mousePos.x * 0.15}px, ${mousePos.y * 0.15}px)`,
-          }}
-        />
-
-        {/* FULL-BLEED COSMIC STARFIELD LAYER (Spans Left 0% to Right 100%) */}
+        {/* Starfield Particles */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           {[
-            { top: '12%', left: '8%', size: '2px', opacity: 0.75, delay: '0s' },
-            { top: '22%', left: '18%', size: '1.5px', opacity: 0.5, delay: '1s' },
-            { top: '15%', left: '32%', size: '2px', opacity: 0.9, delay: '2s' },
-            { top: '38%', left: '12%', size: '1px', opacity: 0.4, delay: '0.5s' },
-            { top: '65%', left: '7%', size: '2.5px', opacity: 0.8, delay: '1.5s' },
-            { top: '80%', left: '15%', size: '1.5px', opacity: 0.6, delay: '2.5s' },
-            { top: '10%', left: '72%', size: '2px', opacity: 0.85, delay: '0.8s' },
-            { top: '28%', left: '85%', size: '2.5px', opacity: 0.7, delay: '1.8s' },
-            { top: '45%', left: '92%', size: '1px', opacity: 0.5, delay: '0.2s' },
-            { top: '70%', left: '88%', size: '2px', opacity: 0.9, delay: '2.2s' },
-            { top: '85%', left: '78%', size: '1.5px', opacity: 0.6, delay: '1.2s' },
-            { top: '18%', left: '50%', size: '2px', opacity: 0.65, delay: '3s' },
-            { top: '75%', left: '48%', size: '1.5px', opacity: 0.55, delay: '0.4s' },
-            { top: '30%', left: '25%', size: '1px', opacity: 0.45, delay: '1.7s' },
-            { top: '60%', left: '75%', size: '1.5px', opacity: 0.5, delay: '2.7s' },
-            { top: '42%', left: '6%', size: '2px', opacity: 0.7, delay: '0.9s' },
-            { top: '52%', left: '94%', size: '2px', opacity: 0.75, delay: '1.9s' },
+            { top: '14%', left: '10%', size: '2px', opacity: 0.65, delay: '0s' },
+            { top: '24%', left: '16%', size: '1.5px', opacity: 0.45, delay: '1s' },
+            { top: '18%', left: '34%', size: '2px', opacity: 0.8, delay: '2s' },
+            { top: '40%', left: '14%', size: '1px', opacity: 0.35, delay: '0.5s' },
+            { top: '68%', left: '9%', size: '2.5px', opacity: 0.7, delay: '1.5s' },
+            { top: '82%', left: '18%', size: '1.5px', opacity: 0.5, delay: '2.5s' },
+            { top: '12%', left: '74%', size: '2px', opacity: 0.75, delay: '0.8s' },
+            { top: '30%', left: '84%', size: '2.5px', opacity: 0.65, delay: '1.8s' },
+            { top: '72%', left: '86%', size: '2px', opacity: 0.8, delay: '2.2s' },
+            { top: '84%', left: '76%', size: '1.5px', opacity: 0.55, delay: '1.2s' },
           ].map((star, idx) => (
             <div
               key={idx}
-              className="absolute rounded-full bg-[#F4F1EA] animate-pulse"
+              className="absolute rounded-full bg-[#F7F4EE] animate-pulse"
               style={{
                 top: star.top,
                 left: star.left,
@@ -105,151 +129,158 @@ export default function HeroSection({ onExplore, onProductSelect }) {
                 opacity: star.opacity,
                 animationDuration: `${3 + (idx % 3)}s`,
                 animationDelay: star.delay,
-                boxShadow: star.opacity > 0.7 ? '0 0 6px 1px rgba(244, 241, 234, 0.6)' : 'none',
               }}
             />
           ))}
         </div>
 
-        {/* Full Viewport Vignette Edge Shadow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#080C0D_95%)] opacity-90" />
+        {/* Controlled Vignette */}
+        <div 
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#0B0B0C_95%)]"
+          style={{ opacity: overlayStrength }}
+        />
 
-        {/* Subtle Luxury Film Grain Overlay */}
-        <div className="absolute inset-0 bg-noise opacity-20" />
-
+        {/* Subtle Film Grain */}
+        <div className="absolute inset-0 bg-noise opacity-15" />
       </div>
 
-      {/* 3. LAYER 2 — GIANT FADED "İLLURÊ" TYPOGRAPHY LAYER */}
+      {/* 2. LAYER 1 — GIANT FAINT İLLURÊ EDITORIAL TYPOGRAPHY */}
       <div 
         className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10"
         style={{
-          transform: `translateY(${scrollY * 0.25}px)`,
-          opacity: Math.max(0, 1 - scrollY * 0.0012),
+          transform: `translateY(${scrollY * 0.22}px)`,
+          opacity: Math.max(0, 1 - scrollY * 0.0014),
         }}
       >
         <h1 
-          className={`font-bodoni text-[28vw] sm:text-[27vw] lg:text-[29vw] xl:text-[30vw] font-light text-[#F2EFE8]/[0.035] tracking-[0.14em] leading-none uppercase transition-all duration-1000 ease-out select-none ${
+          className={`font-bodoni text-[28vw] sm:text-[27vw] lg:text-[29vw] xl:text-[30vw] font-light text-[#F7F4EE]/[0.032] tracking-[0.14em] leading-none uppercase transition-all duration-1000 ease-out select-none ${
             loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
           style={{
-            transform: `translate(${mousePos.x * 0.2}px, ${mousePos.y * 0.2}px)`,
-            textShadow: '0 0 120px rgba(0,0,0,0.98)',
+            transform: `translate(${mousePos.x * 0.18}px, ${mousePos.y * 0.18}px)`,
+            textShadow: '0 0 100px rgba(0,0,0,0.95)',
           }}
         >
           İLLURÊ
         </h1>
       </div>
 
-      {/* 4. LAYER 3 — FLOATING PERFUME BOTTLE CENTERPIECE (NO BOXED IMAGE FRAME) */}
+      {/* 3. LAYER 2 — FLOATING PERFUME BOTTLE CENTERPIECE */}
       <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
         <div 
           className={`relative transition-all duration-1000 ease-out cursor-pointer pointer-events-auto ${
             loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
           style={{
-            transform: `translateY(${scrollY * -0.1 + mousePos.y * 0.45}px) translateX(${mousePos.x * 0.45}px) rotate(${mousePos.x * 0.03}deg)`,
+            transform: `translateY(${scrollY * -0.08 + mousePos.y * 0.35}px) translateX(${mousePos.x * 0.35}px) rotate(${mousePos.x * 0.02}deg)`,
           }}
           onClick={() => onProductSelect && onProductSelect('tf-oud-wood')}
         >
-          {/* Restrained Bottle Floor Drop Shadow */}
-          <div className="absolute bottom-[-35px] left-1/2 -translate-x-1/2 w-64 h-10 bg-[#000000]/95 rounded-full blur-xl pointer-events-none" />
-          <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 w-40 h-6 bg-[#B89A62]/[0.08] rounded-full blur-lg pointer-events-none" />
+          {/* Subtle Bottle Floor Drop Shadow */}
+          <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 w-64 h-9 bg-[#000000]/95 rounded-full blur-xl pointer-events-none" />
+          <div className="absolute bottom-[-12px] left-1/2 -translate-x-1/2 w-36 h-5 bg-[#B89A62]/[0.08] rounded-full blur-md pointer-events-none" />
 
-          {/* Floating Perfume Bottle - Screen blended & radially masked so background flows edge-to-edge */}
-          <div className="relative group w-[270px] sm:w-[350px] md:w-[430px] lg:w-[470px] xl:w-[500px] transition-transform duration-700">
+          {/* Floating Perfume Bottle */}
+          <div className="relative group w-[260px] sm:w-[330px] md:w-[410px] lg:w-[450px] xl:w-[480px] transition-transform duration-700">
             <img 
-              src="/images/hero.jpg" 
-              alt="İLLURÊ FRAGRANCE Signature Bottle" 
-              className="w-full h-auto object-contain filter brightness-[1.08] contrast-[1.08] animate-float"
+              src={bottleImg} 
+              alt="İLLURÊ Signature Bottle" 
+              className="w-full h-auto object-contain filter brightness-[1.06] contrast-[1.06] animate-float drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
               style={{
                 mixBlendMode: 'screen',
-                WebkitMaskImage: 'radial-gradient(ellipse 68% 75% at 50% 50%, black 40%, rgba(0,0,0,0.85) 65%, transparent 95%)',
-                maskImage: 'radial-gradient(ellipse 68% 75% at 50% 50%, black 40%, rgba(0,0,0,0.85) 65%, transparent 95%)',
+                WebkitMaskImage: 'radial-gradient(ellipse 70% 78% at 50% 50%, black 42%, rgba(0,0,0,0.85) 68%, transparent 96%)',
+                maskImage: 'radial-gradient(ellipse 70% 78% at 50% 50%, black 42%, rgba(0,0,0,0.85) 68%, transparent 96%)',
               }}
             />
 
-            {/* Subtle Interactive Label Tag on Hover */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#101617]/95 backdrop-blur-md border border-[#B89A62]/25 px-5 py-2.5 rounded-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none text-center whitespace-nowrap shadow-2xl">
+            {/* Hover Badge */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#121214]/95 backdrop-blur-md border border-[#B89A62]/30 px-5 py-2.5 rounded-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none text-center whitespace-nowrap shadow-2xl">
               <span className="font-interface-sans text-[9px] tracking-[0.28em] text-[#B89A62] uppercase block font-semibold">
-                EXPLORE SIGNATURE
+                EXTRAIT DE PARFUM
               </span>
-              <span className="font-editorial-serif text-sm text-[#F2EFE8]">
-                Tom Ford Oud Wood · Eau de Parfum
+              <span className="font-editorial-serif text-sm text-[#F7F4EE]">
+                Royal Oud Wood · Masterpiece Flacon
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 5. LAYER 4 — SPARSE EDITORIAL COPY & OVERLAY CTAs */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full h-full flex flex-col justify-between relative z-30 pointer-events-none">
+      {/* 4. LAYER 3 — EDITORIAL COPY & CALLS TO ACTION */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full h-full flex flex-col justify-between relative z-30 pointer-events-none">
         
         {/* Top Spacer */}
-        <div className="h-12 md:h-20" />
+        <div className="h-10 md:h-16" />
 
-        {/* Bottom Editorial Layout */}
+        {/* Bottom Editorial Composition */}
         <div 
-          className={`grid grid-cols-1 md:grid-cols-12 gap-8 items-end transition-all duration-1000 delay-300 pb-2 md:pb-6 ${
+          className={`grid grid-cols-1 md:grid-cols-12 gap-8 items-end transition-all duration-1000 delay-300 pb-4 md:pb-8 ${
             loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{
             transform: `translateY(${scrollY * -0.03}px)`,
           }}
         >
-          {/* Bottom Left: Headline, Subtext & CTA */}
+          {/* Bottom Left: Eyebrow, Editorial Headline & Primary CTA */}
           <div className="md:col-span-7 lg:col-span-6 space-y-6 pointer-events-auto">
             
-            {/* Small Establishment Label */}
+            {/* Eyebrow */}
             <div className="flex items-center space-x-3">
               <span className="w-8 h-[1px] bg-[#B89A62]" />
-              <span className="font-interface-sans text-[10px] tracking-[0.3em] text-[#B89A62] uppercase font-medium">
-                HAUTE PARFUMERIE · EST. 2026
+              <span className="typography-eyebrow">
+                {eyebrow}
               </span>
             </div>
 
-            {/* Main Editorial Headline */}
-            <h2 className="font-editorial-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-[#F2EFE8] leading-[1.04] tracking-tight">
-              A NEW LANGUAGE <br />
-              <span className="italic font-normal text-[#B89A62]">OF FRAGRANCE</span>
+            {/* Editorial Headline */}
+            <h2 className="typography-display-xl text-[#F7F4EE] whitespace-pre-line">
+              {heading}
             </h2>
 
-            {/* Subtext */}
-            <p className="font-interface-sans text-xs sm:text-sm text-[#8F9897] max-w-md leading-relaxed tracking-wide font-light">
-              Distinctive fragrances, curated for those who leave an impression.
+            {/* Body Description */}
+            <p className="typography-body-large max-w-md">
+              {bodyText}
             </p>
 
-            {/* CTA Button */}
-            <div className="pt-2">
+            {/* CTAs */}
+            <div className="pt-2 flex flex-wrap items-center gap-4">
               <button 
-                onClick={onExplore}
-                className="group relative inline-flex items-center space-x-4 px-8 py-4 bg-[#101617]/90 backdrop-blur-md border border-white/[0.14] hover:border-[#B89A62] text-[#F2EFE8] font-interface-sans text-[11px] tracking-[0.28em] uppercase transition-all duration-300 hover:bg-[#161C1D] shadow-2xl"
+                onClick={handlePrimaryClick}
+                className="group relative inline-flex items-center space-x-3 px-8 py-4 bg-[#B89A62] text-[#0B0B0C] font-interface-sans text-[11px] tracking-[0.28em] uppercase font-semibold transition-all duration-300 hover:bg-[#C0A46D] shadow-[0_10px_30px_rgba(184,154,98,0.2)]"
               >
-                <span>DISCOVER İLLURÊ</span>
-                <ArrowRight className="w-4 h-4 text-[#B89A62] group-hover:translate-x-1 transition-transform duration-300" />
+                <span>{primaryCta}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#0B0B0C] group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
+
+              <button 
+                onClick={handleSecondaryClick}
+                className="group inline-flex items-center space-x-2 px-6 py-4 bg-[#121214]/80 backdrop-blur-md border border-white/[0.12] hover:border-[#B89A62] text-[#F7F4EE] font-interface-sans text-[11px] tracking-[0.25em] uppercase font-medium transition-all duration-300"
+              >
+                <span>{secondaryCta}</span>
               </button>
             </div>
           </div>
 
-          {/* Bottom Right: Tagline & Scroll Indicator */}
+          {/* Bottom Right: Editorial Tagline & Scroll Indicator */}
           <div className="md:col-span-5 lg:col-span-6 flex flex-col md:items-end justify-between space-y-5 md:space-y-0 text-left md:text-right pointer-events-auto">
             
             <div className="space-y-1">
-              <p className="font-editorial-serif text-xl sm:text-2xl text-[#F2EFE8]/85 italic">
-                “Leave an impression.”
+              <p className="font-editorial-serif text-2xl sm:text-3xl text-[#F7F4EE]/90 italic">
+                “Perfume is memory.”
               </p>
-              <p className="font-interface-sans text-[9px] tracking-[0.3em] text-[#8F9897] uppercase">
-                İLLURÊ PARFUMERIE
+              <p className="typography-eyebrow text-[9px] text-[#A1A1AA]">
+                İLLURÊ PARFUMERIE · PARIS & NEW DELHI
               </p>
             </div>
 
             {/* Scroll Indicator */}
             <div 
-              onClick={onExplore}
-              className="cursor-pointer group flex items-center space-x-3 text-[10px] tracking-[0.25em] text-[#8F9897] hover:text-[#F2EFE8] transition-colors pt-4 md:pt-0"
+              onClick={handlePrimaryClick}
+              className="cursor-pointer group flex items-center space-x-3 text-[10px] tracking-[0.25em] text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors pt-6 md:pt-4"
             >
-              <span className="uppercase">SCROLL TO EXPLORE</span>
-              <div className="w-4 h-8 border border-white/[0.18] group-hover:border-[#B89A62] rounded-full flex justify-center p-1 transition-colors">
-                <div className="w-1 h-2 bg-[#B89A62] rounded-full animate-bounce" />
+              <span className="uppercase font-interface-sans tracking-[0.28em]">SCROLL TO EXPLORE</span>
+              <div className="w-4 h-7 border border-[#B89A62]/40 group-hover:border-[#B89A62] rounded-full flex justify-center p-1 transition-colors">
+                <div className="w-1 h-1.5 bg-[#B89A62] rounded-full animate-bounce" />
               </div>
             </div>
 
@@ -262,4 +293,3 @@ export default function HeroSection({ onExplore, onProductSelect }) {
     </section>
   );
 }
-

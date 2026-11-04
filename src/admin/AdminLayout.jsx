@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import {
   LayoutDashboard,
+  Sparkles,
   Package,
   Layers,
   Award,
@@ -19,6 +20,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'cms', label: 'Storefront CMS', icon: Sparkles },
     { id: 'products', label: 'Products', icon: Package, badge: 'Future' },
     { id: 'categories', label: 'Categories', icon: Layers, badge: 'Future' },
     { id: 'referenceBrands', label: 'Reference Brands', icon: Award, badge: 'Future' },
@@ -118,7 +120,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
         </aside>
 
         {/* Main Content Area (Warm Ivory) */}
-        <main className="flex-1 overflow-y-auto p-8 bg-[#F9F8F6]">
+        <main className="flex-1 overflow-y-auto bg-[#F9F8F6] p-8">
           {children}
         </main>
       </div>

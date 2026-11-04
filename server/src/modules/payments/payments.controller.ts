@@ -38,7 +38,7 @@ export class PaymentsController {
       const rawBody = (req as any).rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
 
       const result = await OrdersService.processWebhook(rawBody, signature || '');
-      return sendSuccess(res, result, 'Webhook processed successfully.');
+      return res.status(200).json(result);
     } catch (error) {
       next(error);
     }

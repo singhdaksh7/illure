@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import React from 'react';
+import { X, Trash2, Plus, Minus, ShieldCheck, ArrowRight, Sparkles, Gift } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
-export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRemoveItem }) {
-  const [selectedSample, setSelectedSample] = useState('Creed Aventus (2ML Sample)');
-  const [checkoutStep, setCheckoutStep] = useState(false);
+export default function CartDrawer({ 
+  isOpen, 
+  onClose, 
+  cartItems = [], 
+  onUpdateQuantity, 
+  onRemoveItem,
+  onNavigateToCheckout
+}) {
+  const { shipping } = useCms();
 
   if (!isOpen) return null;
 
+  const freeThreshold = Number(shipping?.freeShippingThreshold) || 999;
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const remainingForFreeShipping = Math.max(0, freeThreshold - subtotal);
+  const progressPercent = Math.min(100, (subtotal / freeThreshold) * 100);
 
-  const handleCheckoutDemo = () => {
-    setCheckoutStep(true);
-    setTimeout(() => {
-      setCheckoutStep(false);
-      onClose();
-    }, 4000);
+  const handleCheckout = () => {
+    onClose();
+    if (onNavigateToCheckout) {
+      onNavigateToCheckout();
+    }
   };
 
   return (
@@ -22,100 +31,135 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
       
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-[#080C0D]/80 backdrop-blur-md transition-opacity" 
+        className="fixed inset-0 bg-[#0B0B0C]/85 backdrop-blur-md transition-opacity" 
         onClick={onClose}
       />
 
-      {/* Slide-over Drawer Panel */}
-      <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-[#101617] border-l border-white/[0.08] p-6 sm:p-8 flex flex-col justify-between z-10 animate-in slide-in-from-right duration-300 shadow-2xl text-[#F2EFE8]">
+      {/* Drawer Panel */}
+      <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-[#0B0B0C] border-l border-[#B89A62]/20 p-6 sm:p-8 flex flex-col justify-between z-10 shadow-[0_0_60px_rgba(0,0,0,0.95)] text-[#F7F4EE] animate-fade-up">
         
-        {/* DRAWER HEADER */}
+        {/* Top: Header & Shipping Progress */}
         <div>
-          <div className="flex items-center justify-between pb-6 border-b border-white/[0.08]">
+          <div className="flex items-center justify-between pb-5 border-b border-white/[0.08]">
             <div className="flex items-center space-x-3">
-              <span className="font-bodoni text-2xl tracking-[0.2em] text-[#F2EFE8]">
+              <span className="font-bodoni text-2xl tracking-[0.2em] text-[#F7F4EE] uppercase">
                 YOUR BAG
               </span>
               <span className="font-interface-sans text-xs text-[#B89A62] uppercase tracking-widest font-medium">
-                ({cartItems.reduce((a, b) => a + b.quantity, 0)} ITEMS)
+                ({cartItems.reduce((a, b) => a + b.quantity, 0)})
               </span>
             </div>
 
             <button 
               onClick={onClose}
-              className="p-2 text-[#8F9897] hover:text-[#F2EFE8] transition-colors"
+              className="p-1.5 text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors"
+              aria-label="Close Bag"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 stroke-[1.5]" />
             </button>
           </div>
 
-          {/* CHECKOUT PROTOTYPE CONFIRMATION BANNER */}
-          {checkoutStep && (
-            <div className="my-6 p-4 bg-[#161C1D] border border-[#B89A62]/50 text-center space-y-2 animate-in fade-in">
-              <Sparkles className="w-6 h-6 text-[#B89A62] mx-auto" />
-              <h4 className="font-editorial-serif text-xl text-[#F2EFE8]">PROTOTYPE DEMO ORDER</h4>
-              <p className="font-interface-sans text-xs text-[#8F9897]">
-                This completes the prototype client demonstration loop! Real payments are disabled for this preview.
-              </p>
+          {/* DYNAMIC FREE SHIPPING PROGRESS INDICATOR (REQUIREMENT 19) */}
+          <div className="py-4 border-b border-white/[0.06] space-y-2">
+            <div className="flex items-center justify-between text-xs tracking-wider">
+              {remainingForFreeShipping > 0 ? (
+                <span className="text-[#A1A1AA] text-[11px]">
+                  Add <span className="text-[#B89A62] font-semibold">₹{remainingForFreeShipping.toLocaleString('en-IN')}</span> for complimentary shipping
+                </span>
+              ) : (
+                <span className="text-[#B89A62] text-[11px] font-medium flex items-center space-x-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
+                  <span>Complimentary Shipping Unlocked!</span>
+                </span>
+              )}
+              <span className="text-[10px] text-[#A1A1AA] font-mono">
+                {Math.round(progressPercent)}%
+              </span>
             </div>
-          )}
+
+            <div className="h-1.5 w-full bg-[#18181B] rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#A98B55] to-[#B89A62] transition-all duration-500 rounded-full"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
 
           {/* CART ITEMS LIST */}
-          <div className="py-6 space-y-6 max-h-[45vh] overflow-y-auto no-scrollbar">
+          <div className="py-5 space-y-5 max-h-[46vh] overflow-y-auto no-scrollbar">
             {cartItems.length === 0 ? (
-              <div className="text-center py-16 space-y-4 text-[#8F9897]">
-                <p className="font-editorial-serif text-2xl">Your shopping bag is empty.</p>
-                <p className="font-interface-sans text-xs font-light">Explore our curated fragrances to begin.</p>
+              <div className="text-center py-16 space-y-3 text-[#A1A1AA]">
+                <p className="font-editorial-serif text-2xl text-[#F7F4EE]">Your bag is empty.</p>
+                <p className="font-interface-sans text-xs font-light">Explore our curated extraits to begin your collection.</p>
               </div>
             ) : (
               cartItems.map((item) => (
                 <div 
                   key={`${item.id}-${item.selectedSize}`}
-                  className="flex items-center space-x-4 pb-6 border-b border-white/[0.04]"
+                  className="flex items-center space-x-4 pb-5 border-b border-white/[0.04] group"
                 >
-                  <img 
-                    src={item.image || "/images/oud_wood.jpg"} 
-                    onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }}
-                    alt={item.name} 
-                    className="w-16 h-20 object-contain bg-[#080C0D] p-2 border border-white/[0.06]"
-                  />
+                  <div className="w-16 h-20 bg-[#121214] border border-white/[0.08] p-2 flex items-center justify-center rounded-xs shrink-0">
+                    <img 
+                      src={item.image || "/images/oud_wood.jpg"} 
+                      onError={(e) => { e.target.src = "/images/oud_wood.jpg"; }}
+                      alt={item.name} 
+                      className="max-h-full max-w-full object-contain filter drop-shadow-md"
+                    />
+                  </div>
 
                   <div className="flex-1 space-y-1">
-                    <span className="font-interface-sans text-[9px] tracking-[0.25em] text-[#8F9897] uppercase">
-                      {item.brand}
-                    </span>
-                    <h5 className="font-editorial-serif text-lg text-[#F2EFE8]">
-                      {item.name}
-                    </h5>
-                    <p className="font-interface-sans text-[11px] text-[#B89A62]">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <span className="text-[9px] tracking-[0.25em] text-[#B89A62] uppercase block">
+                          {item.brand}
+                        </span>
+                        <h5 className="font-editorial-serif text-lg text-[#F7F4EE] leading-tight">
+                          {item.name}
+                        </h5>
+                      </div>
+                      <button 
+                        onClick={() => onRemoveItem(item.id, item.selectedSize)}
+                        className="text-[#A1A1AA] hover:text-red-400 transition-colors p-1"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-[#A1A1AA] font-mono">
                       {item.selectedSize || '100 ML'} · ₹{item.price.toLocaleString('en-IN')}
                     </p>
 
-                    {/* QUANTITY CONTROLS */}
-                    <div className="flex items-center space-x-3 pt-2">
-                      <div className="flex items-center border border-white/[0.1] text-xs">
+                    {item.giftPackaging && (
+                      <span className="inline-flex items-center space-x-1 text-[9px] tracking-wider text-[#B89A62] bg-[#18181B] px-1.5 py-0.5 border border-[#B89A62]/30 rounded-xs">
+                        <Gift className="w-2.5 h-2.5" />
+                        <span>Royal Velvet Packaging</span>
+                      </span>
+                    )}
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center border border-white/[0.1] bg-[#121214] text-xs font-mono">
                         <button 
                           onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}
-                          className="p-1 hover:text-[#B89A62]"
+                          className="px-2.5 py-1 text-[#A1A1AA] hover:text-[#F7F4EE]"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="px-3 font-interface-sans font-medium">{item.quantity}</span>
+                        <span className="px-2 text-[#F7F4EE] font-semibold">{item.quantity}</span>
                         <button 
                           onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}
-                          className="p-1 hover:text-[#B89A62]"
+                          className="px-2.5 py-1 text-[#A1A1AA] hover:text-[#F7F4EE]"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
-                      <button 
-                        onClick={() => onRemoveItem(item.id, item.selectedSize)}
-                        className="text-[#8F9897] hover:text-red-400 p-1"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <span className="text-xs font-semibold text-[#F7F4EE]">
+                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                      </span>
                     </div>
+
                   </div>
                 </div>
               ))
@@ -123,57 +167,37 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
           </div>
         </div>
 
-        {/* DRAWER FOOTER / CHECKOUT */}
-        {cartItems.length > 0 && (
-          <div className="pt-6 border-t border-white/[0.08] space-y-6">
-            
-            {/* COMPLIMENTARY SAMPLE SELECTOR */}
-            <div className="p-3 bg-[#161C1D] border border-white/[0.06] rounded-xs space-y-2">
-              <div className="flex items-center space-x-2 text-[10px] tracking-[0.25em] text-[#B89A62] uppercase">
-                <Sparkles className="w-3 h-3" />
-                <span>COMPLIMENTARY LUXURY SAMPLE</span>
-              </div>
-              
-              <select 
-                value={selectedSample}
-                onChange={(e) => setSelectedSample(e.target.value)}
-                className="w-full bg-[#101617] border border-white/[0.1] text-xs font-interface-sans text-[#F2EFE8] p-2 focus:outline-none focus:border-[#B89A62]"
-              >
-                <option value="Creed Aventus (2ML Sample)">Creed Aventus — 2ml Discovery Vial</option>
-                <option value="MFK Baccarat Rouge 540 (2ML Sample)">MFK Baccarat Rouge 540 — 2ml Extrait</option>
-                <option value="Tom Ford Tobacco Vanille (2ML Sample)">Tom Ford Tobacco Vanille — 2ml Eau de Parfum</option>
-              </select>
+        {/* Bottom Checkout Actions */}
+        <div className="pt-6 border-t border-white/[0.08] space-y-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
+              <span>SUBTOTAL</span>
+              <span className="text-[#F7F4EE] font-mono text-sm font-semibold">
+                ₹{subtotal.toLocaleString('en-IN')}
+              </span>
             </div>
-
-            {/* SUBTOTAL & SHIPPING */}
-            <div className="space-y-2 font-interface-sans text-xs">
-              <div className="flex justify-between text-[#8F9897]">
-                <span>SUBTOTAL</span>
-                <span className="text-[#F2EFE8] font-semibold text-sm">₹{subtotal.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between text-[#8F9897]">
-                <span>WHITE-GLOVE SHIPPING</span>
-                <span className="text-[#B89A62]">COMPLIMENTARY</span>
-              </div>
+            <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
+              <span>SHIPPING</span>
+              <span className="text-[#B89A62] font-mono">
+                {remainingForFreeShipping === 0 ? 'COMPLIMENTARY' : `₹${shipping?.flatRate || 99}`}
+              </span>
             </div>
-
-            {/* CHECKOUT BUTTON */}
-            <button 
-              onClick={handleCheckoutDemo}
-              disabled={checkoutStep}
-              className="w-full py-4 bg-[#B89A62] hover:bg-[#C0A46D] text-[#080C0D] font-interface-sans text-xs font-bold tracking-[0.25em] uppercase transition-all flex items-center justify-center space-x-3"
-            >
-              <span>{checkoutStep ? 'PROCESSING PROTOTYPE...' : 'PROCEED TO CHECKOUT'}</span>
-              {!checkoutStep && <ArrowRight className="w-4 h-4" />}
-            </button>
-
-            <div className="flex items-center justify-center space-x-2 text-[10px] text-[#8F9897] tracking-widest uppercase">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
-              <span>PROTOTYPE CLIENT DEMO VIEW</span>
-            </div>
-
           </div>
-        )}
+
+          <button 
+            disabled={cartItems.length === 0}
+            onClick={handleCheckout}
+            className="w-full py-4 px-6 bg-[#B89A62] hover:bg-[#C0A46D] disabled:opacity-30 disabled:cursor-not-allowed text-[#0B0B0C] font-interface-sans text-xs tracking-[0.28em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-3 rounded-xs shadow-[0_10px_25px_rgba(184,154,98,0.2)]"
+          >
+            <span>PROCEED TO CHECKOUT</span>
+            <ArrowRight className="w-4 h-4 text-[#0B0B0C]" />
+          </button>
+
+          <div className="flex items-center justify-center space-x-2 text-[10px] tracking-wider text-[#A1A1AA] uppercase">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
+            <span>Secure Checkout · Dispatched in Luxury Obsidian Casing</span>
+          </div>
+        </div>
 
       </div>
 

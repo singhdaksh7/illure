@@ -495,3 +495,40 @@ model Coupon {
 
   @@map("coupons")
 }
+
+// ==========================================
+// CMS & SITE SETTINGS
+// ==========================================
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model HomepageSection {
+  id            String   @id @default(uuid())
+  sectionKey    String   @unique
+  name          String
+  isEnabled     Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  layoutVariant String   @default("DEFAULT")
+  title         String?
+  subtitle      String?
+  description   String?
+  ctaLabel      String?
+  ctaUrl        String?
+  desktopImage  String?
+  mobileImage   String?
+  customData    Json?
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([isEnabled])
+  @@map("homepage_sections")
+}
