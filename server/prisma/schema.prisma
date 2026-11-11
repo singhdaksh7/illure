@@ -532,3 +532,97 @@ model HomepageSection {
   @@index([isEnabled])
   @@map("homepage_sections")
 }
+
+// ==========================================
+// COMMERCE FEATURES ARCHITECTURE (PHASE 1)
+// ==========================================
+
+enum FeatureGroup {
+  DISCOVERY
+  CONVERSION
+  GIFTING
+  RETENTION
+  LOYALTY
+  ORDERS
+  DELIVERY
+  MARKETING
+  ANALYTICS
+  CUSTOMER_EXPERIENCE
+}
+
+enum FeatureStatus {
+  DISABLED
+  DRAFT
+  ACTIVE
+  SCHEDULED
+  CONFIGURATION_REQUIRED
+}
+
+model CommerceFeature {
+  id                  String        @id @default(uuid())
+  key                 String        @unique
+  name                String
+  description         String
+  group               FeatureGroup
+  isEnabled           Boolean       @default(false)
+  status              FeatureStatus @default(DISABLED)
+  showInNavigation    Boolean       @default(false)
+  navigationLabel     String?
+  navigationPath      String?
+  showOnHomepage      Boolean       @default(false)
+  homepageSortOrder   Int           @default(0)
+  config              Json          @default("{}")
+  minimumOrderValue   Decimal?      @db.Decimal(10, 2)
+  maximumOrderValue   Decimal?      @db.Decimal(10, 2)
+  startAt             DateTime?
+  endAt               DateTime?
+  sortOrder           Int           @default(0)
+  updatedBy           String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  auditLogs           CommerceAuditLog[]
+
+  @@index([group])
+  @@index([isEnabled])
+  @@index([status])
+  @@map("commerce_features")
+}
+
+model CommerceAuditLog {
+  id          String           @id @default(uuid())
+  featureId   String?
+  featureKey  String?
+  actorId     String?
+  actorName   String?
+  actorRole   String?
+  action      String           // e.g. "TOGGLE_ENABLED", "UPDATE_CONFIG", "CHANGE_STATUS"
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime         @default(now())
+
+  feature     CommerceFeature? @relation(fields: [featureId], references: [id], onDelete: SetNull)
+
+  @@index([featureKey])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("commerce_audit_logs")
+}
+
+model CommerceEventLog {
+  id          String   @id @default(uuid())
+  eventType   String   // e.g. "SCENT_FINDER_STARTED", "WISHLIST_ADDED"
+  featureKey  String?
+  customerId  String?
+  sessionId   String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([featureKey])
+  @@index([customerId])
+  @@index([createdAt])
+  @@map("commerce_event_logs")
+}

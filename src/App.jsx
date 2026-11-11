@@ -31,6 +31,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import { CmsProvider, useCms } from './context/CmsContext';
 import { CustomerAuthProvider, useCustomerAuth } from './context/CustomerAuthContext';
 import { CartProvider, useCart } from './context/CartContext';
+import { FeaturesProvider } from './context/FeaturesContext';
 import { productsApi } from './api/products';
 import { PRODUCTS } from './data/products';
 
@@ -386,12 +387,14 @@ function StorefrontApp() {
 
 export default function App() {
   return (
-    <CmsProvider>
-      <CustomerAuthProvider>
-        <CartProvider>
-          <StorefrontApp />
-        </CartProvider>
-      </CustomerAuthProvider>
-    </CmsProvider>
+    <FeaturesProvider>
+      <CmsProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <StorefrontApp />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </CmsProvider>
+    </FeaturesProvider>
   );
 }

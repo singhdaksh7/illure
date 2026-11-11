@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import AdminCmsPage from './pages/AdminCmsPage';
+import AdminFeaturesPage from './pages/AdminFeaturesPage';
 import {
   ShieldCheck,
   CheckCircle,
@@ -58,6 +59,10 @@ export default function AdminDashboard({ activeTab }) {
     }
     fetchAdminUsers();
   }, [activeTab, accessToken]);
+
+  if (activeTab === 'features') {
+    return <AdminFeaturesPage />;
+  }
 
   if (activeTab === 'cms') {
     return <AdminCmsPage />;

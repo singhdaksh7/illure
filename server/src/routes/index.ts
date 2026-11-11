@@ -16,6 +16,7 @@ import paymentsRouter from '../modules/payments/payments.router.js';
 import couponsRouter from '../modules/coupons/coupons.router.js';
 import settingsRouter from '../modules/settings/settings.router.js';
 import { publicCmsRouter, adminCmsRouter } from '../modules/cms/cms.router.js';
+import { publicFeaturesRouter, adminFeaturesRouter } from '../modules/features/features.router.js';
 
 const apiRouter = Router();
 
@@ -37,8 +38,10 @@ apiRouter.use('/admin/gift-packaging', adminGiftPackagingRouter);
 apiRouter.use('/admin/inventory', adminInventoryRouter);
 apiRouter.use('/admin/orders', adminOrdersRouter);
 apiRouter.use('/admin/cms', adminCmsRouter);
+apiRouter.use('/admin/features', adminFeaturesRouter);
 
 // Customer & Public Module Endpoints
+apiRouter.use('/features', publicFeaturesRouter);
 apiRouter.use('/products', publicProductsRouter);
 apiRouter.use('/categories', categoriesRouter);
 apiRouter.use('/reference-brands', referenceBrandsRouter);

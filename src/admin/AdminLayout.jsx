@@ -3,6 +3,7 @@ import { useAdminAuth } from './AdminAuthContext';
 import {
   LayoutDashboard,
   Sparkles,
+  SlidersHorizontal,
   Package,
   Layers,
   Award,
@@ -20,6 +21,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'features', label: 'Commerce Features', icon: SlidersHorizontal },
     { id: 'cms', label: 'Storefront CMS', icon: Sparkles },
     { id: 'products', label: 'Products', icon: Package, badge: 'Future' },
     { id: 'categories', label: 'Categories', icon: Layers, badge: 'Future' },
