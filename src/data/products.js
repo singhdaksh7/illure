@@ -6,7 +6,7 @@ export const BRANDS = [
     name: "Tom Ford",
     origin: "New York, USA",
     founded: "2005",
-    description: "Provocative, opulent, and uncompromisingly modern luxury fragrances crafted with rare ingredients.",
+    description: "Provocative, dark, and uncompromisingly modern fragrances built with rich character.",
     heroImage: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1200",
     featured: true
   },
@@ -24,7 +24,7 @@ export const BRANDS = [
     name: "Maison Francis Kurkdjian",
     origin: "Paris, France",
     founded: "2009",
-    description: "Contemporary French olfactory art defined by precision, luminosity, and poetic elegance.",
+    description: "Contemporary French perfumery defined by precision, luminosity, and sharp elegance.",
     heroImage: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=1200",
     featured: true
   },
@@ -33,7 +33,7 @@ export const BRANDS = [
     name: "Dior Private Collection",
     origin: "Paris, France",
     founded: "1946",
-    description: "The pinnacle of French haute parfumerie featuring intense extraits and noble floral extractions.",
+    description: "Intense extraits and concentrated floral and resin extractions.",
     heroImage: "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&q=80&w=1200",
     featured: true
   },
@@ -97,7 +97,7 @@ export const FRAGRANCE_FAMILIES = [
   {
     id: "amber",
     name: "AMBER",
-    tagline: "Sensual · Golden · Opulent",
+    tagline: "Sensual · Warm · Addictive",
     description: "Rich resins, sweet tonka bean, Madagascar vanilla, and benzoin creating an addictive golden aura.",
     accentColor: "#D4AF37",
     bgGradient: "from-[#332200] to-[#0C1113]",
@@ -535,8 +535,8 @@ export const PRODUCTS = [
     compareAtPrice: 27000,
     rating: 4.9,
     reviewCount: 260,
-    shortDescription: "Opulent, warm, and iconic. Tom Ford’s affection for London inspired this fragrance, reminiscent of an English gentlemen’s club.",
-    description: "Opulent, warm and iconic, Tom Ford Tobacco Vanille is a sumptuous oriental spice scent featuring rich accords of tobacco leaf and spicy notes. Heart notes unfold into creamy tonka bean, vanilla, cocoa, dry fruit accords and sweet wood sap.",
+    shortDescription: "Warm, sweet, and bold. Rich tobacco leaf, warm spices, and creamy vanilla.",
+    description: "Tom Ford Tobacco Vanille reinterpreted: rich accords of tobacco leaf, spicy notes, tonka bean, and sweet vanilla wood sap. Built for after dark.",
     bestseller: true,
     featured: false,
     newArrival: false,
@@ -561,7 +561,7 @@ export const PRODUCTS = [
       season: "Autumn / Winter",
       occasion: "Formal Black Tie / Club",
       longevity: "12+ Hours",
-      projection: "Opulent & Enveloping"
+      projection: "Moderate to Bold"
     },
     images: [
       "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1000",
@@ -718,7 +718,7 @@ export const GIFT_SETS = [
   {
     id: "the-royal-trio",
     title: "The Royal Oud Trio",
-    brand: "Curated by İLLURÊ",
+    brand: "İLLURÊ",
     price: 45000,
     originalPrice: 52000,
     includes: ["Tom Ford Oud Wood 50ml", "Maison Francis Kurkdjian Baccarat Rouge 35ml", "Kilian Angels' Share 50ml"],
@@ -728,7 +728,7 @@ export const GIFT_SETS = [
   {
     id: "his-signature-vault",
     title: "His Signature Vault",
-    brand: "Curated by İLLURÊ",
+    brand: "İLLURÊ",
     price: 39500,
     originalPrice: 46000,
     includes: ["Creed Aventus 100ml", "Dior Sauvage Elixir 60ml", "Travel Atomizer in Gold Plated Finish"],

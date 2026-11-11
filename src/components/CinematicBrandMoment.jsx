@@ -66,7 +66,7 @@ export default function CinematicBrandMoment() {
             İLLURÊ
           </span>
           <span className="typography-eyebrow text-[9px] text-[#A1A1AA]">
-            HAUTE PARFUMERIE · PARIS & NEW DELHI
+            CONTEMPORARY FRAGRANCE LABEL · NEW DELHI
           </span>
         </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import IllureCrest from './IllureCrest';
 import { useCms } from '../context/CmsContext';
 
@@ -11,13 +11,13 @@ export default function BrandStorySection({ onDiscoverStory }) {
     return null;
   }
 
-  const title = section?.title || 'THE ARCHITECTURE OF SCENT';
-  const subtitle = section?.subtitle || 'OUR MAISON';
-  const description = section?.description || 'İLLURÊ FRAGRANCE was born from a fundamental belief: extraordinary perfumery should be a daily luxury, not an inaccessible artifact. Inspired by iconic classics yet formulated with our proprietary extrait craftsmanship.';
-  const ctaLabel = section?.ctaLabel || 'EXPLORE OUR HERITAGE';
+  const title = section?.title || 'SCENT, WITHOUT THE NOISE';
+  const subtitle = section?.subtitle || 'THE İLLURÊ STORY';
+  const description = section?.description || 'We started İLLURÊ for one simple reason: good fragrance shouldn’t feel complicated. We take scent profiles people already love and reinterpret them in our own way. Easy to try. Easy to carry. Easy to make yours.';
+  const ctaLabel = section?.ctaLabel || 'EXPLORE FRAGRANCES';
   const custom = section?.customData || {};
-  const quote = custom.quote || '“We sculpt memories in liquid form, balancing shadow and illumination in every flacon.”';
-  const signature = custom.founderSignature || 'The İLLURÊ Laboratory';
+  const quote = custom.quote || '“Familiar inspiration. Our own point of view.”';
+  const signature = custom.founderSignature || 'The İLLURÊ Team';
   const image = section?.desktopImage || 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=1200';
   const layout = section?.layoutVariant || 'IMAGE_LEFT';
 
@@ -48,7 +48,7 @@ export default function BrandStorySection({ onDiscoverStory }) {
                 <div className="flex items-center space-x-2">
                   <IllureCrest size={18} className="text-[#B89A62]" />
                   <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                    HOUSE OF İLLURÊ · BESPOKE COMPOSITIONS
+                    İLLURÊ FRAGRANCE · NEW DELHI
                   </span>
                 </div>
                 <p className="font-editorial-serif text-base text-[#F7F4EE] italic">

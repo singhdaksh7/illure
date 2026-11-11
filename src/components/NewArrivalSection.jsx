@@ -11,10 +11,10 @@ export default function NewArrivalSection({ products = [], onSelectProduct, onAd
     return null;
   }
 
-  const title = section?.title || 'NEW HORIZONS';
-  const subtitle = section?.subtitle || 'RECENT COMPOSITIONS';
-  const description = section?.description || 'Fresh additions to the İLLURÊ portfolio, showcasing vanguard accords.';
-  const ctaLabel = section?.ctaLabel || 'DISCOVER NEW ARRIVALS';
+  const title = section?.title || 'NEW DROPS';
+  const subtitle = section?.subtitle || 'RECENT ADDITIONS';
+  const description = section?.description || 'Fresh additions to the lineup. High character, zero noise.';
+  const ctaLabel = section?.ctaLabel || 'DISCOVER';
 
   const campaignProduct = products.find((p) => p.newArrival || p.isNewArrival) || products[0] || null;
   const supportingItems = products.filter((p) => p.id !== campaignProduct?.id).slice(0, 2);
@@ -89,7 +89,7 @@ export default function NewArrivalSection({ products = [], onSelectProduct, onAd
             <div className="lg:col-span-5 space-y-6">
               <div className="space-y-1">
                 <span className="typography-eyebrow text-[#A1A1AA]">
-                  {campaignProduct.brand || 'İLLURÊ RESERVE'} · PARFUM
+                  {campaignProduct.brand || 'İLLURÊ'} · EXTRAIT
                 </span>
                 <h3 className="typography-display text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors">
                   {campaignProduct.name}
@@ -100,7 +100,7 @@ export default function NewArrivalSection({ products = [], onSelectProduct, onAd
               </div>
 
               <p className="typography-body text-[#A1A1AA]">
-                {campaignProduct.description || campaignProduct.shortDescription || 'Distinctive olfactory composition developed with exquisite nuance and lasting character.'}
+                {campaignProduct.description || campaignProduct.shortDescription || 'Warm woods, amber and smoke. Made for evenings that run late.'}
               </p>
 
               <div className="pt-2 flex items-baseline justify-between border-y border-white/[0.08] py-4">

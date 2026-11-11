@@ -174,12 +174,12 @@ export default function ProductDetailPage({
             className="group inline-flex items-center space-x-2 text-xs font-interface-sans tracking-[0.25em] text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors uppercase"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1.5 transition-transform" />
-            <span>RETURN TO COLLECTION</span>
+            <span>ALL FRAGRANCES</span>
           </button>
 
           <div className="flex items-center space-x-2 text-[10px] tracking-widest text-[#B89A62] uppercase font-mono hidden sm:flex">
             <IllureCrest size={14} className="text-[#B89A62]" />
-            <span>İLLURÊ MAISON ARCHIVE</span>
+            <span>İLLURÊ FRAGRANCE</span>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function ProductDetailPage({
               {/* Formulation Tag */}
               <div className="absolute top-6 left-6 flex items-center space-x-2 bg-[#0B0B0C]/85 backdrop-blur-md border border-[#B89A62]/30 px-3 py-1.5 text-[9px] tracking-[0.25em] text-[#B89A62] uppercase font-medium">
                 <Sparkles className="w-3 h-3 text-[#B89A62]" />
-                <span>CONCENTRATED PARFUM</span>
+                <span>EXTRAIT DE PARFUM</span>
               </div>
 
               {/* Watermark Crest */}
@@ -245,7 +245,7 @@ export default function ProductDetailPage({
               <div className="flex items-center space-x-3">
                 <span className="w-6 h-[1px] bg-[#B89A62]" />
                 <span className="typography-eyebrow text-[#B89A62]">
-                  {product.gender || 'UNISEX'} · HAUTE PARFUMERIE
+                  {product.gender || 'UNISEX'} · EXTRAIT DE PARFUM
                 </span>
               </div>
 
@@ -419,7 +419,7 @@ export default function ProductDetailPage({
               <div className="flex items-center justify-between text-[10px] tracking-wider text-[#A1A1AA] uppercase pt-2 border-t border-white/[0.04]">
                 <div className="flex items-center space-x-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
-                  <span>Handcrafted Formulation · House of İLLURÊ</span>
+                  <span>Concentrated Extrait · İLLURÊ</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
@@ -437,10 +437,10 @@ export default function ProductDetailPage({
           <div className="py-20 border-b border-white/[0.06] space-y-12">
             <div className="text-center space-y-2">
               <span className="typography-eyebrow text-[#B89A62]">
-                OLFACTORY ARCHITECTURE
+                THE NOTES
               </span>
               <h3 className="typography-h1 text-[#F7F4EE]">
-                THE FRAGRANCE PYRAMID
+                FRAGRANCE PYRAMID
               </h3>
             </div>
 
@@ -519,10 +519,10 @@ export default function ProductDetailPage({
           <div className="py-20 border-b border-white/[0.06] space-y-12">
             <div className="text-center space-y-2">
               <span className="typography-eyebrow text-[#B89A62]">
-                PERFORMANCE METRICS
+                PERFORMANCE & WEAR
               </span>
               <h3 className="typography-h1 text-[#F7F4EE]">
-                SCENT DYNAMICS
+                HOW IT WEARS
               </h3>
             </div>
 
@@ -579,10 +579,10 @@ export default function ProductDetailPage({
           <div className="pt-20 space-y-10">
             <div className="text-center space-y-2">
               <span className="typography-eyebrow text-[#B89A62]">
-                CURATED COMPANIONS
+                MORE TO WEAR
               </span>
               <h3 className="typography-h1 text-[#F7F4EE]">
-                YOU MAY ALSO APPRECIATE
+                YOU MIGHT ALSO LIKE
               </h3>
             </div>
 

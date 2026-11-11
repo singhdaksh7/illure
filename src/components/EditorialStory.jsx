@@ -49,7 +49,7 @@ export default function EditorialStory({ onOpenPhilosophy }) {
                 A fragrance is more than something you wear. It becomes an extension of your spirit, an invisible signature that lingers long after you leave the room. It becomes part of how people remember you.
               </p>
               <p>
-                At <strong className="text-[#F2EFE8] font-medium">İLLURÊ FRAGRANCE</strong>, every fragrance is selected for its craftsmanship, character, noble origin, and ability to leave an indelible, lasting impression. We honor the heritage of haute parfumerie while curating for the discerning modern palette.
+                At <strong className="text-[#F2EFE8] font-medium">İLLURÊ FRAGRANCE</strong>, we take scent profiles people already love and reinterpret them in our own way. Familiar notes. Distinctive presence. Made to be worn every day.
               </p>
             </div>
 

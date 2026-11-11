@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import IllureCrest from '../components/IllureCrest';
 
 export default function NotFoundPage({ onGoHome }) {
@@ -14,16 +14,16 @@ export default function NotFoundPage({ onGoHome }) {
         <div className="flex flex-col items-center space-y-3">
           <IllureCrest size={48} className="text-[#B89A62] opacity-80" />
           <span className="typography-eyebrow text-[10px]">
-            ARCHIVE 404
+            404
           </span>
         </div>
 
         <div className="space-y-3">
           <h1 className="typography-display-xl text-[#F7F4EE]">
-            THE SCENT HAS FADED.
+            NOTHING HERE.
           </h1>
           <p className="typography-body text-[#A1A1AA] max-w-sm mx-auto text-xs sm:text-sm">
-            The formulation or archive destination you sought is no longer present in our private inventory.
+            The scent trail ends here. Let’s get you back to the collection.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export default function NotFoundPage({ onGoHome }) {
             className="group inline-flex items-center space-x-3 px-8 py-4 bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C] font-semibold text-xs tracking-[0.28em] uppercase transition-all duration-300 rounded-xs shadow-[0_10px_25px_rgba(184,154,98,0.2)]"
           >
             <ArrowLeft className="w-4 h-4 text-[#0B0B0C] group-hover:-translate-x-1 transition-transform" />
-            <span>RETURN TO COLLECTION</span>
+            <span>BACK TO İLLURÊ</span>
           </button>
         </div>
 

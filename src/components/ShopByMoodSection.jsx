@@ -6,40 +6,40 @@ const DEFAULT_MOODS = [
   {
     id: "after-dark",
     name: "AFTER DARK",
-    tagline: "Smoky Amber & Intoxicating Woods",
-    description: "Deep, sensual, designed for midnight shadows and velvet candlelight.",
+    tagline: "Smoky Amber & Cedar",
+    description: "Deep, warm, made for evenings that run late.",
     image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=900",
     filter: "evening",
   },
   {
-    id: "first-light",
-    name: "FIRST LIGHT",
-    tagline: "Solar Citrus & White Florals",
-    description: "Luminous, crystalline, opening with vibrant freshness.",
+    id: "first-impression",
+    name: "FIRST IMPRESSION",
+    tagline: "Bergamot & Crisp Pepper",
+    description: "Sharp, clean opening that commands attention.",
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=900",
     filter: "day",
   },
   {
-    id: "quiet-confidence",
-    name: "QUIET CONFIDENCE",
-    tagline: "Precious Iris & Cedar Architecture",
-    description: "Subtle elegance that whispers rather than shouts.",
+    id: "everyday",
+    name: "EVERYDAY",
+    tagline: "Iris & Dry Woods",
+    description: "Low-key presence. You don’t need an occasion.",
     image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=900",
     filter: "signature",
   },
   {
-    id: "the-statement",
-    name: "THE STATEMENT",
-    tagline: "Oud Royal & Spiced Saffron",
-    description: "Commanding presence that fills spaces with regal authority.",
+    id: "date-night",
+    name: "DATE NIGHT",
+    tagline: "Warm Vanilla & Spiced Tobacco",
+    description: "Intimate and close. Best on skin.",
     image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=900",
     filter: "bestsellers",
   },
   {
-    id: "weekend-escape",
-    name: "WEEKEND ESCAPE",
-    tagline: "Aquatic Breeze & Sea Salt Drift",
-    description: "Effortless freedom, coastal vitality, and open skies.",
+    id: "the-weekend",
+    name: "THE WEEKEND",
+    tagline: "Mineral Musk & Sea Salt",
+    description: "Clean with an edge. Easy to wear anywhere.",
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=900",
     filter: "fresh",
   },
@@ -54,9 +54,9 @@ export default function ShopByMoodSection({ onSelectMood }) {
     return null;
   }
 
-  const title = section?.title || 'AURA & INTENT';
-  const subtitle = section?.subtitle || 'SELECT YOUR LANDSCAPE';
-  const description = section?.description || 'Choose fragrances attuned to the atmosphere you wish to inhabit.';
+  const title = section?.title || 'SHOP BY MOOD';
+  const subtitle = section?.subtitle || 'WHEN TO WEAR';
+  const description = section?.description || 'Pick the mood. Make it yours.';
   const moods = section?.customData?.moods || DEFAULT_MOODS;
 
   return (

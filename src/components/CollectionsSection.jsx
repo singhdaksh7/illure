@@ -5,29 +5,29 @@ import { useCms } from '../context/CmsContext';
 const DEFAULT_COLLECTIONS = [
   {
     id: "him",
-    title: "FOR HIM",
-    subtitle: "COMMAND & INTENSITY",
-    descriptors: ["Smoky Woods", "Italian Citrus", "Rich Amber"],
+    title: "AFTER DARK",
+    subtitle: "SMOKE & AMBER",
+    descriptors: ["Smoky Woods", "Birch", "Rich Amber"],
     image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=1000",
-    genderFilter: "Him",
+    genderFilter: "MEN",
     categoryFilter: null
   },
   {
     id: "her",
-    title: "FOR HER",
-    subtitle: "SENSUAL & LUMINOUS",
-    descriptors: ["Velvet Rose", "Sunlit Jasmine", "White Amber"],
+    title: "WARM & SENSUAL",
+    subtitle: "FLORAL & RESIN",
+    descriptors: ["Damask Rose", "Sunlit Jasmine", "Cashmere Amber"],
     image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=1000",
-    genderFilter: "Her",
+    genderFilter: "WOMEN",
     categoryFilter: null
   },
   {
     id: "niche",
-    title: "NICHE & UNISEX",
-    subtitle: "RARE ARTISANAL BLENDS",
-    descriptors: ["Smoky Agarwood", "Rare Iris Concrete", "Balsam"],
+    title: "CLEAN WITH AN EDGE",
+    subtitle: "EVERYDAY SIGNATURES",
+    descriptors: ["Bergamot", "Cedar", "Mineral Musk"],
     image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=1000",
-    genderFilter: "Unisex",
+    genderFilter: "UNISEX",
     categoryFilter: "niche"
   }
 ];
@@ -43,8 +43,8 @@ export default function CollectionsSection({ onSelectCollection }) {
   }
 
   const title = section?.title || 'THE EDITIONS';
-  const subtitle = section?.subtitle || 'STRUCTURED HARMONIES';
-  const description = section?.description || 'Organized by olfactory architecture, from solar woods to velvet resins.';
+  const subtitle = section?.subtitle || 'FRAGRANCE DIRECTIONS';
+  const description = section?.description || 'Pick your profile. From heavy ambers to crisp woods.';
   const collections = DEFAULT_COLLECTIONS;
 
   return (

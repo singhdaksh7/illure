@@ -89,7 +89,7 @@ export default function ProductCard({
           </span>
         ) : (
           <span className="text-[8px] tracking-[0.25em] text-[#A1A1AA]/70 uppercase">
-            CONCENTRATED PARFUM
+            EXTRAIT DE PARFUM
           </span>
         )}
         <span className="text-[9px] tracking-[0.2em] text-[#A1A1AA]/50 font-mono">
@@ -142,7 +142,7 @@ export default function ProductCard({
               }}
               className="flex-1 py-2 px-3 bg-[#18181B] hover:bg-[#27272A] border border-white/[0.1] text-[#F7F4EE] text-[9px] tracking-[0.25em] uppercase font-medium transition-colors"
             >
-              VIEW COMPOSITION
+              VIEW FRAGRANCE
             </button>
             <button
               onClick={handleQuickAdd}
@@ -158,7 +158,7 @@ export default function ProductCard({
                 isSoldOut
                   ? 'Out of Stock'
                   : hasMultipleVariants
-                  ? 'Select Volume & Concentration'
+                  ? 'Select Size'
                   : 'Add to Bag'
               }
             >
@@ -180,9 +180,9 @@ export default function ProductCard({
       <div className="space-y-3 z-10">
         <div>
           <div className="flex items-center justify-between text-[10px] text-[#A1A1AA] tracking-wider uppercase mb-1">
-            <span>{referenceHouse || 'İLLURÊ RESERVE'}</span>
+            <span>{referenceHouse || 'İLLURÊ'}</span>
             <span className="font-mono text-[#B89A62]">
-              {product?.variants?.length ? `${product.variants.length} SIZES` : 'PARFUM'}
+              {product?.variants?.length ? `${product.variants.length} SIZES` : 'EXTRAIT'}
             </span>
           </div>
 

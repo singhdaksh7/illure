@@ -36,14 +36,14 @@ export default function HeroSection({ onExplore, onProductSelect }) {
     return null;
   }
 
-  // Content extraction with graceful luxury fallbacks
-  const eyebrow = (heroConfig?.subtitle && heroConfig.subtitle.trim()) || 'THE HOUSE OF İLLURÊ';
-  const heading = (heroConfig?.title && heroConfig.title.trim()) || 'Fragrance,\nReimagined.';
-  const bodyText = (heroConfig?.description && heroConfig.description.trim()) || 'Distinctive scent profiles inspired by icons, finished in the language of İLLURÊ.';
-  const primaryCta = (heroConfig?.ctaLabel && heroConfig.ctaLabel.trim()) || 'EXPLORE THE COLLECTION';
+  // Content extraction with graceful brand fallbacks
+  const eyebrow = (heroConfig?.subtitle && heroConfig.subtitle.trim()) || 'İLLURÊ · NEW DELHI';
+  const heading = (heroConfig?.title && heroConfig.title.trim()) || 'WEAR SOMETHING\nTHEY REMEMBER.';
+  const bodyText = (heroConfig?.description && heroConfig.description.trim()) || 'Inspired fragrance. Made the İLLURÊ way.';
+  const primaryCta = (heroConfig?.ctaLabel && heroConfig.ctaLabel.trim()) || 'SHOP FRAGRANCES';
   const primaryUrl = (heroConfig?.ctaUrl && heroConfig.ctaUrl.trim()) || '#curated-section';
   const custom = heroConfig?.customData || {};
-  const secondaryCta = (custom.secondaryCtaLabel && custom.secondaryCtaLabel.trim()) || 'DISCOVER İLLURÊ';
+  const secondaryCta = (custom.secondaryCtaLabel && custom.secondaryCtaLabel.trim()) || 'OUR STORY';
   const bottleImg = (custom.bottleImage && custom.bottleImage.trim()) || '/images/hero.jpg';
   const overlayStrength = typeof custom.overlayStrength === 'number' ? Math.max(0.1, Math.min(0.95, custom.overlayStrength)) : 0.7;
 
@@ -182,7 +182,7 @@ export default function HeroSection({ onExplore, onProductSelect }) {
                 EXTRAIT DE PARFUM
               </span>
               <span className="font-editorial-serif text-sm text-[#F7F4EE]">
-                Royal Oud Wood · Masterpiece Flacon
+                Royal Oud Wood · 50 ML Flacon
               </span>
             </div>
           </div>
@@ -250,10 +250,10 @@ export default function HeroSection({ onExplore, onProductSelect }) {
             {/* Minimal formulation note */}
             <div className="hidden lg:block text-right space-y-1.5">
               <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                ATELIER FORMULATION
+                CONCENTRATED EXTRAIT
               </span>
               <p className="font-editorial-serif text-sm text-[#F7F4EE] italic">
-                {custom.formulationNote || 'Concentrated Fragrance Interpretation · House of İLLURÊ'}
+                {custom.formulationNote || 'High-character formulation · Made to be worn'}
               </p>
             </div>
 
@@ -261,13 +261,13 @@ export default function HeroSection({ onExplore, onProductSelect }) {
             <button 
               onClick={handlePrimaryClick}
               className="group flex items-center space-x-3 text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors focus:outline-none"
-              aria-label="Scroll to curated collection"
+              aria-label="Scroll to collection"
             >
               <div className="w-5 h-8 border border-white/20 group-hover:border-[#B89A62] rounded-full flex items-start justify-center p-1 transition-colors">
                 <div className="w-1 h-2 bg-[#B89A62] rounded-full animate-bounce mt-0.5" />
               </div>
               <span className="font-interface-sans text-[9px] tracking-[0.3em] uppercase">
-                SCROLL TO DISCOVER
+                SCROLL
               </span>
             </button>
           </div>

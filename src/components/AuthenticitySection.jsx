@@ -4,24 +4,24 @@ import { useCms } from '../context/CmsContext';
 
 const DEFAULT_PILLARS = [
   {
-    number: "I",
-    title: "CRAFTED WITH INTENT",
-    description: "Concentrated fragrance compositions developed with careful attention to olfactory balance, structure, and enduring character."
+    number: "01",
+    title: "YOUR SIZE",
+    description: "Choose what works for you. From pocket-friendly flacons to full bottles."
   },
   {
-    number: "II",
-    title: "REFINED SILHOUETTE",
-    description: "Compact flacons calibrated for tactile weight, convenience, and seamless accompaniment on your daily journey."
+    number: "02",
+    title: "YOUR SCENT",
+    description: "Inspired fragrance profiles with an İLLURÊ identity. Straightforward character."
   },
   {
-    number: "III",
-    title: "PACKAGED BY İLLURÊ",
-    description: "Signature obsidian presentation boxes lined with velvet touch cushioning, sealed under the hallmark of İLLURÊ."
+    number: "03",
+    title: "YOUR WAY",
+    description: "Wear it wherever you want. You don’t need a black-tie invitation."
   },
   {
-    number: "IV",
-    title: "DELIVERED WITH CARE",
-    description: "Carefully inspected, tamper-sealed, and dispatched in protective casing to ensure pristine arrival."
+    number: "04",
+    title: "PACKED PROPERLY",
+    description: "Designed to feel good in the hand before you even spray it."
   }
 ];
 
@@ -33,8 +33,8 @@ export default function AuthenticitySection() {
     return null;
   }
 
-  const title = section?.title || 'THE İLLURÊ PROMISE';
-  const subtitle = section?.subtitle || 'UNCOMPROMISING STANDARDS';
+  const title = section?.title || 'WHY İLLURÊ';
+  const subtitle = section?.subtitle || 'THE FOUR PRINCIPLES';
   const custom = section?.customData || {};
   const pillars = custom.pillars || DEFAULT_PILLARS;
 

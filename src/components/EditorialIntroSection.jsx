@@ -9,11 +9,11 @@ export default function EditorialIntroSection({ onDiscover }) {
     return null;
   }
 
-  const title = section?.title || 'Perfume is memory.\nİLLURÊ makes it yours.';
-  const subtitle = section?.subtitle || 'THE ESSENCE OF QUIET LUXURY';
-  const description = section?.description || 'Developed with attention to balance and depth, each silhouette expresses enduring presence and intimacy.';
+  const title = section?.title || 'Your scent should say something\nbefore you do.';
+  const subtitle = section?.subtitle || 'THE İLLURÊ POINT OF VIEW';
+  const description = section?.description || 'Familiar inspiration. A different identity. We formulate with high concentration so your scent holds its ground without shouting.';
   const custom = section?.customData || {};
-  const callout = custom.calloutNote || 'Formulated with attention to harmonic balance and seamless day-to-night transitions.';
+  const callout = custom.calloutNote || 'Good fragrance doesn’t need a long explanation.';
 
   return (
     <section 
@@ -61,7 +61,7 @@ export default function EditorialIntroSection({ onDiscover }) {
                 className="group inline-flex items-center space-x-2 text-xs tracking-[0.25em] uppercase text-[#B89A62] hover:text-[#F7F4EE] transition-colors"
               >
                 <span className="border-b border-[#B89A62]/40 group-hover:border-[#F7F4EE] pb-0.5">
-                  OUR PHILOSOPHY & INGREDIENTS
+                  EXPLORE THE LINEUP
                 </span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </button>

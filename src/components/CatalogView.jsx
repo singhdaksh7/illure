@@ -76,18 +76,18 @@ export default function CatalogView({
         <div className="flex items-center space-x-3">
           <span className="w-8 h-[1px] bg-[#B89A62]" />
           <span className="typography-eyebrow">
-            THE PERFUMERY COMPENDIUM
+            THE CATALOG
           </span>
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="typography-display text-[#F7F4EE]">
-              SHOP İLLURÊ
+              ALL FRAGRANCES
             </h1>
           </div>
           <p className="typography-body max-w-md text-xs md:text-sm">
-            Extrait formulations organized by reference architecture, olfactive character, and noble intensity. Handcrafted in limited batches.
+            Familiar profiles. Distinct character. Concentrated extrait formulations designed to be worn anywhere.
           </p>
         </div>
       </div>
@@ -108,27 +108,37 @@ export default function CatalogView({
                 : 'border-white/[0.08] text-[#A1A1AA] hover:border-white/20'
             }`}
           >
-            ALL GENDERS
+            ALL
           </button>
           <button
-            onClick={() => setGenderFilter(genderFilter === 'Him' ? null : 'Him')}
+            onClick={() => setGenderFilter(genderFilter === 'Him' || genderFilter === 'MEN' ? null : 'MEN')}
             className={`px-3.5 py-1.5 text-xs font-interface-sans tracking-widest uppercase border rounded-xs transition-all ${
-              genderFilter === 'Him' 
+              genderFilter === 'Him' || genderFilter === 'MEN'
                 ? 'border-[#B89A62] bg-[#18181B] text-[#F7F4EE] shadow-[0_0_10px_rgba(184,154,98,0.15)]' 
                 : 'border-white/[0.08] text-[#A1A1AA] hover:border-white/20'
             }`}
           >
-            FOR HIM
+            MEN
           </button>
           <button
-            onClick={() => setGenderFilter(genderFilter === 'Her' ? null : 'Her')}
+            onClick={() => setGenderFilter(genderFilter === 'Her' || genderFilter === 'WOMEN' ? null : 'WOMEN')}
             className={`px-3.5 py-1.5 text-xs font-interface-sans tracking-widest uppercase border rounded-xs transition-all ${
-              genderFilter === 'Her' 
+              genderFilter === 'Her' || genderFilter === 'WOMEN'
                 ? 'border-[#B89A62] bg-[#18181B] text-[#F7F4EE] shadow-[0_0_10px_rgba(184,154,98,0.15)]' 
                 : 'border-white/[0.08] text-[#A1A1AA] hover:border-white/20'
             }`}
           >
-            FOR HER
+            WOMEN
+          </button>
+          <button
+            onClick={() => setGenderFilter(genderFilter === 'Unisex' || genderFilter === 'UNISEX' ? null : 'UNISEX')}
+            className={`px-3.5 py-1.5 text-xs font-interface-sans tracking-widest uppercase border rounded-xs transition-all ${
+              genderFilter === 'Unisex' || genderFilter === 'UNISEX'
+                ? 'border-[#B89A62] bg-[#18181B] text-[#F7F4EE] shadow-[0_0_10px_rgba(184,154,98,0.15)]' 
+                : 'border-white/[0.08] text-[#A1A1AA] hover:border-white/20'
+            }`}
+          >
+            UNISEX
           </button>
 
           <span className="w-4 h-[1px] bg-white/[0.1] mx-1" />

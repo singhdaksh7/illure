@@ -12,9 +12,9 @@ export default function NewsletterSection() {
     return null;
   }
 
-  const title = section?.title || 'PRIVATE NOTES FROM İLLURÊ';
-  const subtitle = section?.subtitle || 'MEMBERS PRIVILEGE';
-  const description = section?.description || 'Receive confidential releases, private drop alerts, and bespoke formulation previews directly to your inbox.';
+  const title = section?.title || 'STAY IN THE LOOP';
+  const subtitle = section?.subtitle || 'DROPS & RESTOCKS';
+  const description = section?.description || 'New releases. Restocks. Offers worth opening.';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,7 +56,7 @@ export default function NewsletterSection() {
             <div className="flex items-center justify-center space-x-2.5 p-4 border border-[#B89A62] bg-[#121214] text-[#B89A62] rounded-xs animate-fade-up">
               <CheckCircle2 className="w-4 h-4 text-[#B89A62]" />
               <span className="text-xs tracking-widest uppercase font-medium">
-                INSCRIBED INTO THE İLLURÊ DISPATCH
+                YOU’RE ON THE LIST.
               </span>
             </div>
           ) : (
@@ -66,7 +66,7 @@ export default function NewsletterSection() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="YOUR EMAIL ADDRESS" 
+                placeholder="YOUR EMAIL" 
                 className="flex-1 bg-[#121214] border border-white/[0.1] px-5 py-3.5 text-xs font-interface-sans tracking-widest text-[#F7F4EE] placeholder-[#A1A1AA]/50 focus:outline-none focus:border-[#B89A62] transition-colors rounded-xs"
               />
               
@@ -74,7 +74,7 @@ export default function NewsletterSection() {
                 type="submit"
                 className="px-7 py-3.5 bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C] font-interface-sans text-xs tracking-[0.25em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-2 whitespace-nowrap rounded-xs shadow-[0_5px_15px_rgba(184,154,98,0.15)]"
               >
-                <span>INSCRIBE</span>
+                <span>JOIN</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#0B0B0C]" />
               </button>
             </form>
@@ -82,7 +82,7 @@ export default function NewsletterSection() {
         </div>
 
         <p className="text-[10px] text-[#A1A1AA]/60 tracking-wider">
-          We honor discretion. No spam, ever. Unsubscribe with a single click.
+          No spam, ever. Unsubscribe anytime.
         </p>
 
       </div>

@@ -62,7 +62,7 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
         {/* Cinematic Oversized Search Input */}
         <div className="space-y-2">
           <label className="text-[10px] tracking-[0.25em] text-[#B89A62] uppercase block font-medium">
-            DISCOVER YOUR SILHOUETTE
+            SEARCH İLLURÊ
           </label>
           <div className="flex items-center space-x-4 border-b-2 border-[#B89A62]/50 pb-3 focus-within:border-[#B89A62] transition-colors">
             <Search className="w-6 h-6 text-[#B89A62] shrink-0" />
@@ -71,7 +71,7 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="What are you looking for? (e.g. Oud, Creed, Smoky, Amber)..."
+              placeholder="Search fragrances, notes, moods..."
               className="w-full bg-transparent border-none font-editorial-serif text-2xl md:text-3xl tracking-wide text-[#F7F4EE] placeholder-[#A1A1AA]/40 focus:outline-none"
             />
           </div>
@@ -82,7 +82,7 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
           {query.trim() === '' ? (
             <div className="py-4 space-y-4">
               <span className="text-[10px] tracking-[0.25em] text-[#A1A1AA] uppercase block font-semibold">
-                CURATED SEARCH REPERTORY
+                POPULAR SEARCHES
               </span>
               <div className="flex flex-wrap gap-2.5 text-xs text-[#A1A1AA]">
                 {[
@@ -107,16 +107,16 @@ export default function SearchModal({ isOpen, onClose, productsData = [], onSele
           ) : results.length === 0 ? (
             <div className="py-16 text-center space-y-2 text-[#A1A1AA]">
               <p className="font-editorial-serif text-2xl text-[#F7F4EE]">
-                No fragrances found for “{query}”
+                No matches for “{query}”
               </p>
               <p className="text-xs">
-                Try searching by note (e.g. Sandalwood, Cardamom) or house inspiration.
+                Try another scent, note, or collection.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <span className="text-[10px] tracking-[0.25em] text-[#B89A62] uppercase block font-semibold">
-                MATCHING FLACONS ({results.length})
+                RESULTS ({results.length})
               </span>
               {results.map((product) => (
                 <div 

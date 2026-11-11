@@ -54,15 +54,15 @@ export default function CustomerAccountPage({ onNavigate }) {
       <div className="min-h-screen bg-[#0B0B0C] pt-32 pb-24 text-[#F7F4EE] flex items-center justify-center px-6">
         <div className="text-center space-y-4 max-w-md">
           <IllureCrest size={40} className="text-[#B89A62] mx-auto opacity-80" />
-          <h2 className="typography-h2 text-[#F7F4EE]">Patron Portal</h2>
+          <h2 className="typography-h2 text-[#F7F4EE]">YOUR ACCOUNT</h2>
           <p className="typography-body text-xs text-[#A1A1AA]">
-            Please sign in to access your confidential orders, addresses, and private concierge privileges.
+            Please sign in to view your orders, saved addresses, and profile details.
           </p>
           <button
             onClick={() => onNavigate && onNavigate('login')}
             className="px-8 py-3.5 bg-[#B89A62] text-[#0B0B0C] font-semibold text-xs uppercase tracking-[0.28em] rounded-xs"
           >
-            SIGN IN TO PORTAL
+            SIGN IN
           </button>
         </div>
       </div>
@@ -271,11 +271,11 @@ export default function CustomerAccountPage({ onNavigate }) {
                   <div className="flex items-center space-x-2">
                     <ShieldCheck className="w-4 h-4 text-[#B89A62]" />
                     <span className="text-xs uppercase tracking-widest text-[#F7F4EE] font-semibold">
-                      AUTHENTICITY & PRIVATE RESERVATION PLEDGE
+                      AUTHENTICITY & STANDARDS
                     </span>
                   </div>
                   <p className="text-xs text-[#A1A1AA] font-light leading-relaxed">
-                    All formulations dispatched under your account undergo rigorous lot inspection. Every flacon is tamper-sealed and traceable back to our Master Atelier vaults.
+                    All formulations dispatched under your account undergo rigorous quality checks. Every flacon is tamper-sealed and protected in signature packaging.
                   </p>
                 </div>
               </div>
@@ -291,8 +291,8 @@ export default function CustomerAccountPage({ onNavigate }) {
               <div className="space-y-6 animate-fade-up">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="typography-h2 text-[#F7F4EE]">Delivery Addresses</h3>
-                    <p className="typography-body text-xs text-[#A1A1AA]">Manage destination addresses for swift checkout and white-glove courier dispatch.</p>
+                    <h3 className="typography-h2 text-[#F7F4EE]">Saved Addresses</h3>
+                    <p className="typography-body text-xs text-[#A1A1AA]">Manage destination addresses for fast, seamless checkout.</p>
                   </div>
 
                   <button

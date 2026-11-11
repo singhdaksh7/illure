@@ -18,9 +18,9 @@ export default function BestsellersSection({
     return null;
   }
 
-  const title = section?.title || 'THE SIGNATURE REPERTORY';
-  const subtitle = section?.subtitle || 'MOST SOUGHT AFTER';
-  const description = section?.description || 'The definitive fragrances chosen repeatedly by our distinguished patrons.';
+  const title = section?.title || 'BESTSELLERS';
+  const subtitle = section?.subtitle || 'MOST WORN';
+  const description = section?.description || 'The scents people reorder most.';
 
   const sourceProducts = (products && products.length > 0) ? products : PRODUCTS;
   const filteredProducts = sourceProducts.filter(p => {

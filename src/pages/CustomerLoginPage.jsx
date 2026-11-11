@@ -34,7 +34,7 @@ export default function CustomerLoginPage({ onNavigate }) {
           className="group inline-flex items-center space-x-2 text-xs font-interface-sans tracking-[0.25em] text-[#A1A1AA] hover:text-[#F7F4EE] uppercase transition-colors"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>RETURN TO MAISON</span>
+          <span>BACK TO İLLURÊ</span>
         </button>
 
         <div className="flex items-center space-x-2">
@@ -60,13 +60,13 @@ export default function CustomerLoginPage({ onNavigate }) {
 
             <div className="absolute bottom-10 left-10 right-10 space-y-3">
               <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                PATRON CLIENT ARCHIVE
+                CUSTOMER PORTAL
               </span>
               <blockquote className="font-editorial-serif text-3xl text-[#F7F4EE] leading-tight italic">
-                “A signature fragrance does not simply accompany; it announces and lingers.”
+                “Your scent should say something before you do.”
               </blockquote>
               <p className="text-xs text-[#A1A1AA] tracking-wider uppercase font-mono">
-                İLLURÊ HAUTE PARFUMERIE
+                İLLURÊ FRAGRANCE
               </p>
             </div>
           </div>

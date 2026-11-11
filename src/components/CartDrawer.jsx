@@ -69,12 +69,12 @@ export default function CartDrawer({
               <div className="flex items-center justify-between text-xs tracking-wider">
                 {remainingForFreeShipping > 0 ? (
                   <span className="text-[#A1A1AA] text-[11px]">
-                    Add <span className="text-[#B89A62] font-semibold">₹{remainingForFreeShipping.toLocaleString('en-IN')}</span> for complimentary shipping
+                    <span className="text-[#B89A62] font-semibold">₹{remainingForFreeShipping.toLocaleString('en-IN')}</span> away from free shipping
                   </span>
                 ) : (
                   <span className="text-[#B89A62] text-[11px] font-medium flex items-center space-x-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
-                    <span>Complimentary Shipping Unlocked!</span>
+                    <span>Free shipping unlocked</span>
                   </span>
                 )}
                 <span className="text-[10px] text-[#A1A1AA] font-mono">
@@ -92,7 +92,7 @@ export default function CartDrawer({
           ) : (
             <div className="py-3 border-b border-white/[0.06] flex items-center space-x-2 text-[11px] text-[#B89A62]">
               <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
-              <span>Complimentary Luxury Shipping & Packaging Active</span>
+              <span>Free shipping & gift presentation active</span>
             </div>
           )}
 
@@ -100,8 +100,8 @@ export default function CartDrawer({
           <div className="py-5 space-y-5 max-h-[46vh] overflow-y-auto no-scrollbar">
             {cartItems.length === 0 ? (
               <div className="text-center py-16 space-y-3 text-[#A1A1AA]">
-                <p className="font-editorial-serif text-2xl text-[#F7F4EE]">Your bag is empty.</p>
-                <p className="font-interface-sans text-xs font-light">Explore our curated extraits to begin your collection.</p>
+                <p className="font-editorial-serif text-2xl text-[#F7F4EE]">YOUR BAG IS EMPTY.</p>
+                <p className="font-interface-sans text-xs font-light">Find something worth adding.</p>
               </div>
             ) : (
               cartItems.map((item) => (
@@ -146,7 +146,7 @@ export default function CartDrawer({
                     {item.giftPackaging && (
                       <span className="inline-flex items-center space-x-1 text-[9px] tracking-wider text-[#B89A62] bg-[#18181B] px-1.5 py-0.5 border border-[#B89A62]/30 rounded-xs">
                         <Gift className="w-2.5 h-2.5" />
-                        <span>Royal Velvet Presentation Included</span>
+                        <span>Gift Box Included</span>
                       </span>
                     )}
 
@@ -206,13 +206,13 @@ export default function CartDrawer({
             onClick={handleCheckout}
             className="w-full py-4 px-6 bg-[#B89A62] hover:bg-[#C0A46D] disabled:opacity-30 disabled:cursor-not-allowed text-[#0B0B0C] font-interface-sans text-xs tracking-[0.28em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-3 rounded-xs shadow-[0_10px_25px_rgba(184,154,98,0.2)]"
           >
-            <span>PROCEED TO CHECKOUT</span>
+            <span>CHECKOUT</span>
             <ArrowRight className="w-4 h-4 text-[#0B0B0C]" />
           </button>
 
           <div className="flex items-center justify-center space-x-2 text-[10px] tracking-wider text-[#A1A1AA] uppercase">
             <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
-            <span>Secure Checkout · Dispatched in Luxury Obsidian Casing</span>
+            <span>Secure Checkout · Protected Packaging</span>
           </div>
         </div>
 

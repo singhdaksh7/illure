@@ -11,7 +11,7 @@ export default function BrandDiscovery({ onSelectBrand, onViewAllBrands }) {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 space-y-4 sm:space-y-0">
           <div>
             <span className="font-sans-clean text-xs font-semibold tracking-[0.3em] text-[#D4AF37] uppercase block mb-1">
-              THE HOUSES OF PARFUMERIE
+              INSPIRATION HOUSES
             </span>
             <h2 className="font-serif-luxury text-3xl sm:text-5xl text-[#F4F1EA] font-light">
               EXPLORE BY HOUSE

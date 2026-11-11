@@ -268,7 +268,40 @@
 
 .editorial-tile:hover {
   border-color: var(--color-border-gold);
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.7), 0 0 24px rgba(184, 154, 98, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Skiper Link Hover Patterns (Micro-interactions) */
+.skiper-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--duration-fast) ease;
+}
+
+.skiper-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-gold);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--duration-normal) var(--ease-luxury);
+}
+
+.skiper-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Focus States for Accessibility */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 1.5px solid var(--color-gold);
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbar */

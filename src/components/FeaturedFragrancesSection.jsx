@@ -60,9 +60,9 @@ export default function FeaturedFragrancesSection({
     return null;
   }
 
-  const title = section?.title || 'FEATURED CREATIONS';
-  const subtitle = section?.subtitle || 'CURATED EXTRAITS';
-  const description = section?.description || 'Rare formulations defined by depth, tension, and lingering warmth.';
+  const title = section?.title || 'FEATURED LINEUP';
+  const subtitle = section?.subtitle || 'SELECTED SCENTS';
+  const description = section?.description || 'Dark, warm, and built with distinct character.';
   const layout = section?.layoutVariant || 'EDITORIAL'; // EDITORIAL | GRID | CAROUSEL
 
   const items = products.length > 0 ? products : DEFAULT_FEATURED;
@@ -123,7 +123,7 @@ export default function FeaturedFragrancesSection({
             >
               <div className="flex items-center justify-between z-10">
                 <span className="typography-eyebrow text-[9px] px-3 py-1 bg-[#0B0B0C] border border-[#B89A62]/40">
-                  FLAGSHIP SILHOUETTE
+                  FLAGSHIP
                 </span>
                 <span className="text-[10px] tracking-widest text-[#B89A62] uppercase font-mono">
                   {leadProduct.gender || 'UNISEX'}
@@ -146,7 +146,7 @@ export default function FeaturedFragrancesSection({
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                   <div>
                     <span className="typography-eyebrow text-[#A1A1AA] text-[10px]">
-                      {leadProduct.brand || 'İLLURÊ RESERVE'} · PARFUM
+                      {leadProduct.brand || 'İLLURÊ'} · EXTRAIT
                     </span>
                     <h3 className="typography-display text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors">
                       {leadProduct.name}

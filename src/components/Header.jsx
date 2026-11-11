@@ -283,13 +283,13 @@ export default function Header({
               {/* SECTION: EDITORIAL */}
               <div className="col-span-3 space-y-4 border-r border-white/[0.06] pr-6">
                 <h4 className="typography-eyebrow text-[#B89A62]">
-                  THE MAISON
+                  ABOUT İLLURÊ
                 </h4>
                 <ul className="space-y-2.5 text-xs font-light tracking-wider">
                   {(megaData.editorial || [
-                    { label: 'Our Story & Philosophy', href: '#brand-story' },
-                    { label: 'Craft & Authenticity', href: '#authenticity' },
-                    { label: 'Royal Velvet Gifting', href: '#catalog' },
+                    { label: 'The İLLURÊ Story', href: '#brand-story' },
+                    { label: 'Why İLLURÊ', href: '#authenticity' },
+                    { label: 'Gift Packaging', href: '#catalog' },
                   ]).map((item, idx) => (
                     <li key={idx}>
                       <button
@@ -396,14 +396,14 @@ export default function Header({
                       <button onClick={() => handleNavClick('shop')} className="block hover:text-[#B89A62]">
                         All Fragrances
                       </button>
-                      <button onClick={() => handleNavClick('shop', 'Him')} className="block hover:text-[#B89A62]">
-                        For Him
+                      <button onClick={() => handleNavClick('shop', 'MEN')} className="block hover:text-[#B89A62]">
+                        Men
                       </button>
-                      <button onClick={() => handleNavClick('shop', 'Her')} className="block hover:text-[#B89A62]">
-                        For Her
+                      <button onClick={() => handleNavClick('shop', 'WOMEN')} className="block hover:text-[#B89A62]">
+                        Women
                       </button>
-                      <button onClick={() => handleNavClick('shop', 'Unisex')} className="block hover:text-[#B89A62]">
-                        Unisex Extraits
+                      <button onClick={() => handleNavClick('shop', 'UNISEX')} className="block hover:text-[#B89A62]">
+                        Unisex
                       </button>
                     </div>
                   )}
@@ -425,7 +425,7 @@ export default function Header({
                         if (el) el.scrollIntoView({ behavior: 'smooth' });
                         setMobileMenuOpen(false);
                       }} className="block hover:text-[#B89A62]">
-                        Inspired Collections
+                        Fragrance Editions
                       </button>
                       <button onClick={() => {
                         const el = document.getElementById('shop-by-mood-section');

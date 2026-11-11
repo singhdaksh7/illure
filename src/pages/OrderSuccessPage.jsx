@@ -39,13 +39,13 @@ export default function OrderSuccessPage({ orderNumber, onNavigate }) {
 
         <div className="space-y-2">
           <span className="font-interface-sans text-[10px] tracking-[0.3em] text-[#B89A62] uppercase">
-            HAUTE PARFUMERIE ORDER CONFIRMED
+            ORDER CONFIRMED
           </span>
           <h1 className="font-editorial-serif text-3xl md:text-5xl font-light text-[#F2EFE8]">
-            THANK YOU FOR YOUR <span className="italic text-[#B89A62]">ORDER</span>
+            IT’S <span className="italic text-[#B89A62]">YOURS.</span>
           </h1>
           <p className="text-sm font-interface-sans text-[#8F9897] max-w-md mx-auto">
-            Your fragrance selection has been placed into artisan preparation. An order confirmation email has been dispatched.
+            We’re getting your order ready. A confirmation email has been dispatched with tracking details.
           </p>
         </div>
 

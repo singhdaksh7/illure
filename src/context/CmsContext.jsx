@@ -16,7 +16,7 @@ const FALLBACK_APPEARANCE = {
 
 const FALLBACK_ANNOUNCEMENT = {
   isEnabled: true,
-  text: 'Complimentary shipping on qualifying orders — Handcrafted Luxury Formulations',
+  text: 'Free shipping on orders over ₹999 · Scent, without the noise',
   linkUrl: '#catalog',
   theme: 'gold_subtle',
 };
@@ -35,30 +35,30 @@ const FALLBACK_NAVIGATION = {
       { label: 'Women', filter: 'WOMEN' },
       { label: 'Unisex', filter: 'UNISEX' },
       { label: 'Bestsellers', filter: 'bestsellers' },
-      { label: 'New Arrivals', filter: 'new' },
+      { label: 'New Drops', filter: 'new' },
     ],
     discover: [
-      { label: 'Inspired Collections', href: '#collections' },
-      { label: 'Fragrance Families', href: '#catalog' },
+      { label: 'Fragrance Editions', href: '#collections' },
+      { label: 'Scent Families', href: '#catalog' },
       { label: 'Shop by Mood', href: '#mood' },
     ],
     editorial: [
       { label: 'Our Story', href: '#brand-story' },
-      { label: 'Craft & Authenticity', href: '#authenticity' },
-      { label: 'Gifting Experience', href: '#catalog' },
+      { label: 'Why İLLURÊ', href: '#authenticity' },
+      { label: 'Gift Packaging', href: '#catalog' },
     ],
     featuredPromotion: {
-      title: 'ROYAL OUD REIMAGINED',
-      subtitle: 'The Signature Extrait',
+      title: 'DARK. WARM. ADDICTIVE.',
+      subtitle: 'Built for after dark',
       imageUrl: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=600',
-      ctaText: 'Discover Scent',
+      ctaText: 'Explore Scent',
       ctaUrl: '#catalog',
     },
   },
 };
 
 const FALLBACK_FOOTER = {
-  tagline: 'Haute perfumery reimagined through quiet luxury, exceptional presence, and architectural design.',
+  tagline: 'Scent, without the noise. Familiar notes with our own point of view.',
   copyright: '© 2026 İLLURÊ FRAGRANCE. All rights reserved.',
   disclaimer: 'Reference brand names are used only to describe fragrance inspiration and olfactory reference. İLLURÊ FRAGRANCE is an independent brand and is not affiliated with, endorsed by, or sponsored by the referenced trademark owners.',
   columns: [
@@ -67,17 +67,17 @@ const FALLBACK_FOOTER = {
       links: [
         { label: 'All Fragrances', href: '#catalog' },
         { label: 'Bestsellers', href: '#bestsellers' },
-        { label: 'New Arrivals', href: '#new-arrivals' },
+        { label: 'New Drops', href: '#new-arrivals' },
         { label: 'Gift Packaging', href: '#catalog' },
       ],
     },
     {
       title: 'DISCOVER',
       links: [
-        { label: 'The House of İLLURÊ', href: '#brand-story' },
+        { label: 'The İLLURÊ Story', href: '#brand-story' },
         { label: 'Fragrance Notes', href: '#collections' },
         { label: 'Shop By Mood', href: '#mood' },
-        { label: 'House Standards', href: '#authenticity' },
+        { label: 'Why İLLURÊ', href: '#authenticity' },
       ],
     },
     {
@@ -86,7 +86,7 @@ const FALLBACK_FOOTER = {
         { label: 'Order Tracking', href: '#orders' },
         { label: 'Shipping & Delivery', href: '#shipping' },
         { label: 'FAQ & Sizing', href: '#faq' },
-        { label: 'Concierge Support', href: 'mailto:concierge@illurefragrance.com' },
+        { label: 'Contact', href: 'mailto:concierge@illurefragrance.com' },
       ],
     },
     {
@@ -94,7 +94,7 @@ const FALLBACK_FOOTER = {
       links: [
         { label: 'Privacy Policy', href: '#privacy' },
         { label: 'Terms of Service', href: '#terms' },
-        { label: 'House Standards', href: '#authenticity' },
+        { label: 'Why İLLURÊ', href: '#authenticity' },
       ],
     },
   ],

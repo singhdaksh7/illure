@@ -71,10 +71,10 @@ export default function FooterSection({ onNavigate }) {
     {
       title: 'DISCOVER',
       links: [
-        { label: 'The House of İLLURÊ', href: '#brand-story' },
+        { label: 'The İLLURÊ Story', href: '#brand-story' },
         { label: 'Fragrance Notes', href: '#collections' },
         { label: 'Shop By Mood', href: '#mood' },
-        { label: 'Authenticity Guarantee', href: '#authenticity' }
+        { label: 'Why İLLURÊ', href: '#authenticity' }
       ]
     },
     {
@@ -83,7 +83,7 @@ export default function FooterSection({ onNavigate }) {
         { label: 'Order Tracking', href: '#orders' },
         { label: 'Shipping & Delivery', href: '#shipping' },
         { label: 'FAQ & Sizing', href: '#faq' },
-        { label: 'Concierge Support', href: `mailto:${brandContacts?.email || 'concierge@illurefragrance.com'}` }
+        { label: 'Concierge', href: `mailto:${brandContacts?.email || 'concierge@illurefragrance.com'}` }
       ]
     },
     {
@@ -92,7 +92,7 @@ export default function FooterSection({ onNavigate }) {
         { label: 'Privacy Policy', href: '#privacy' },
         { label: 'Terms of Service', href: '#terms' },
         { label: 'Refund Policy', href: '#refunds' },
-        { label: 'Authenticity Pledge', href: '#authenticity' }
+        { label: 'Why İLLURÊ', href: '#authenticity' }
       ]
     }
   ];
@@ -113,13 +113,13 @@ export default function FooterSection({ onNavigate }) {
             </div>
 
             <p className="font-editorial-serif text-lg text-[#F7F4EE]/90 italic font-light max-w-sm">
-              {footer?.tagline || 'Haute Parfumerie. Distinctive fragrance interpretations inspired by icons of perfumery.'}
+              {footer?.tagline || 'Scent, without the noise. Familiar inspiration, our own identity.'}
             </p>
 
             <div className="space-y-1.5 text-xs text-[#A1A1AA] font-interface-sans font-light">
               <div className="flex items-center space-x-2">
-                <span className="text-[#B89A62]">Atelier:</span>
-                <span>The House of İLLURÊ · Bespoke Fragrance Interpretations</span>
+                <span className="text-[#B89A62]">İLLURÊ:</span>
+                <span>Contemporary Fragrance Label · New Delhi</span>
               </div>
               {isValidPhone(brandContacts?.phone) && (
                 <div className="flex items-center space-x-2">
