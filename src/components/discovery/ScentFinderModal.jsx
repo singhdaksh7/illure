@@ -1,165 +1,199 @@
-import React, { useState } from 'react';
-import { X, Sparkles, ArrowRight, RotateCcw, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ArrowRight, RotateCcw } from 'lucide-react';
 import IllureCrest from '../IllureCrest';
 import { useFeatures } from '../../context/FeaturesContext';
+
+const DEFAULT_QUESTIONS = [
+  {
+    id: 'mood',
+    prompt: 'What are you in the mood for?',
+    options: [
+      { label: 'FRESH', value: 'fresh', explanation: 'clean citrus and mountain air' },
+      { label: 'WARM', value: 'warm', explanation: 'golden amber and rich vanilla' },
+      { label: 'WOODY', value: 'woody', explanation: 'smoky cedar and aged woods' },
+      { label: 'SWEET', value: 'sweet', explanation: 'tonka bean and caramelized honey' },
+      { label: 'CLEAN', value: 'clean', explanation: 'soft iris and velvet florals' },
+    ],
+  },
+  {
+    id: 'occasion',
+    prompt: 'When will you wear it?',
+    options: [
+      { label: 'EVERYDAY', value: 'everyday' },
+      { label: 'OFFICE', value: 'office' },
+      { label: 'DATE NIGHT', value: 'date_night' },
+      { label: 'EVENING', value: 'evening' },
+      { label: 'WEEKEND', value: 'weekend' },
+    ],
+  },
+  {
+    id: 'intensity',
+    prompt: 'How do you like your fragrance?',
+    options: [
+      { label: 'SUBTLE', value: 'subtle' },
+      { label: 'BALANCED', value: 'balanced' },
+      { label: 'BOLD', value: 'bold' },
+    ],
+  },
+];
 
 export default function ScentFinderModal({ isOpen, onClose, onSelectProduct, products = [] }) {
   const { isFeatureEnabled, getFeatureConfig, trackFeatureEvent } = useFeatures();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState({
-    vibe: null,
-    occasion: null,
-    intensity: null,
-    familyPreference: null,
-  });
+  const [answers, setAnswers] = useState({});
   const [matchResult, setMatchResult] = useState(null);
+  const [matchReason, setMatchReason] = useState('');
+
+  // Track modal open
+  useEffect(() => {
+    if (isOpen && isFeatureEnabled('scent_finder')) {
+      trackFeatureEvent('SCENT_FINDER_STARTED', 'scent_finder');
+    }
+  }, [isOpen]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !isFeatureEnabled('scent_finder')) return null;
 
-  const featureConfig = getFeatureConfig('scent_finder') || {};
-  const quizTitle = featureConfig.title || 'DISCOVER YOUR SIGNATURE SCENT';
-  const quizSubtitle = featureConfig.subtitle || 'AN ARCHIVAL OLFACTORY CONSULTATION';
+  const config = getFeatureConfig('scent_finder') || {};
+  const quizTitle = config.title || 'FIND YOUR SCENT';
+  const ctaText = config.ctaText || 'VIEW FRAGRANCE';
+  const questions = config.questions && Array.isArray(config.questions) && config.questions.length > 0 
+    ? config.questions 
+    : DEFAULT_QUESTIONS;
 
-  const questions = [
-    {
-      id: 'vibe',
-      title: 'WHAT AURA DO YOU WISH TO PROJECT?',
-      subtitle: 'Select the mood that best captures your presence.',
-      options: [
-        { label: 'Dark, Enigmatic & Sensual', value: 'dark', hint: 'Smoky woods, deep resin, late nights' },
-        { label: 'Sharp, Clean & Commanding', value: 'fresh', hint: 'Crisp bergamot, vetiver, boardroom precision' },
-        { label: 'Opulent, Warm & Magnetic', value: 'amber', hint: 'Tonka, saffron, golden honeyed amber' },
-        { label: 'Subtle, Intimate & Second-Skin', value: 'musk', hint: 'Clean iris, cashmere, quiet whispers' },
-      ],
-    },
-    {
-      id: 'occasion',
-      title: 'WHEN WILL THIS FRAGRANCE BE WORN?',
-      subtitle: 'Choose the primary atmosphere for your formulation.',
-      options: [
-        { label: 'Evening & Black Tie Gatherings', value: 'evening', hint: 'High projection, memorable trail' },
-        { label: 'Daily Signature Presence', value: 'daily', hint: 'Balanced, versatile, effortlessly refined' },
-        { label: 'Intimate Dates & Close Quarters', value: 'intimate', hint: 'Warm drydown, skin-close sillage' },
-        { label: 'Special Milestones & Celebrations', value: 'special', hint: 'Exotic, distinctive, extrait intensity' },
-      ],
-    },
-    {
-      id: 'intensity',
-      title: 'DESIRED PROJECTION & LONGEVITY',
-      subtitle: 'How prominently should the scent radiate?',
-      options: [
-        { label: 'Subtle & Discreet', value: 'subtle', hint: 'Discovered only in close embrace' },
-        { label: 'Moderate & Elegant', value: 'moderate', hint: 'Noticeable yet polite, 6-8 hours' },
-        { label: 'High & Enveloping', value: 'intense', hint: 'Leaves an unmistakable sillage, 10-14 hours' },
-      ],
-    },
-  ];
+  const currentQ = questions[currentStep] || questions[0];
 
-  const handleSelectOption = (questionId, value) => {
-    const updated = { ...answers, [questionId]: value };
-    setAnswers(updated);
+  const handleSelectOption = (questionId, option) => {
+    const updatedAnswers = { ...answers, [questionId]: option.value };
+    setAnswers(updatedAnswers);
+    trackFeatureEvent('SCENT_FINDER_ANSWERED', 'scent_finder', { questionId, value: option.value });
 
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Calculate best recommendation
-      calculateRecommendation(updated);
+      calculateResult(updatedAnswers);
     }
   };
 
-  const calculateRecommendation = (finalAnswers) => {
-    trackFeatureEvent('QUIZ_COMPLETED', 'scent_finder', { answers: finalAnswers });
+  const calculateResult = (finalAnswers) => {
+    trackFeatureEvent('SCENT_FINDER_COMPLETED', 'scent_finder', { answers: finalAnswers });
 
-    let candidates = [...products];
+    const moodVal = finalAnswers.mood || 'fresh';
+    const occasionVal = finalAnswers.occasion || 'everyday';
+    const intensityVal = finalAnswers.intensity || 'balanced';
 
-    // Priority 1: Fragrance Family match
-    if (finalAnswers.vibe === 'dark') {
-      candidates = candidates.filter(p => 
-        p.fragranceFamily?.toLowerCase().includes('wood') ||
-        p.fragranceFamily?.toLowerCase().includes('oud') ||
-        p.name?.toLowerCase().includes('oud')
-      );
-    } else if (finalAnswers.vibe === 'fresh') {
-      candidates = candidates.filter(p => 
-        p.fragranceFamily?.toLowerCase().includes('fresh') ||
-        p.fragranceFamily?.toLowerCase().includes('citrus') ||
-        p.name?.toLowerCase().includes('aventus')
-      );
-    } else if (finalAnswers.vibe === 'amber') {
-      candidates = candidates.filter(p => 
-        p.fragranceFamily?.toLowerCase().includes('amber') ||
-        p.fragranceFamily?.toLowerCase().includes('spicy') ||
-        p.name?.toLowerCase().includes('baccarat')
-      );
-    } else if (finalAnswers.vibe === 'musk') {
-      candidates = candidates.filter(p => 
-        p.fragranceFamily?.toLowerCase().includes('musk') ||
-        p.fragranceFamily?.toLowerCase().includes('floral')
-      );
-    }
+    // Filter candidate products from live database products
+    let pool = [...products].filter(p => p.status !== 'ARCHIVED' && p.status !== 'DRAFT');
+    if (pool.length === 0) pool = [...products];
 
-    // Fallback if filter too narrow
-    if (candidates.length === 0) {
-      candidates = products.filter(p => p.bestseller) || products;
-    }
+    let scored = pool.map(product => {
+      let score = 0;
+      const fam = (product.fragranceFamily || '').toLowerCase();
+      const top = (product.topNotes || []).join(' ').toLowerCase();
+      const heart = (product.heartNotes || []).join(' ').toLowerCase();
+      const base = (product.baseNotes || []).join(' ').toLowerCase();
+      const allNotes = `${top} ${heart} ${base}`;
+      const occ = (product.occasion || '').toLowerCase();
+      const proj = (product.projection || '').toLowerCase();
 
-    const winner = candidates[0] || products[0];
+      // Mood match
+      if (moodVal === 'fresh' && (fam.includes('fresh') || fam.includes('aquatic') || allNotes.includes('lemon') || allNotes.includes('bergamot'))) score += 40;
+      if (moodVal === 'warm' && (fam.includes('amber') || fam.includes('oriental') || allNotes.includes('amber') || allNotes.includes('vanilla'))) score += 40;
+      if (moodVal === 'woody' && (fam.includes('wood') || fam.includes('oud') || allNotes.includes('wood') || allNotes.includes('cedar'))) score += 40;
+      if (moodVal === 'sweet' && (fam.includes('amber') || allNotes.includes('vanilla') || allNotes.includes('tonka'))) score += 40;
+      if (moodVal === 'clean' && (fam.includes('floral') || fam.includes('fresh') || allNotes.includes('musk') || allNotes.includes('iris'))) score += 40;
+
+      // Occasion match
+      if (occasionVal === 'everyday' && (occ.includes('daily') || product.bestseller)) score += 30;
+      if (occasionVal === 'office' && (occ.includes('executive') || occ.includes('office') || occ.includes('daily'))) score += 30;
+      if (occasionVal === 'date_night' && (occ.includes('evening') || occ.includes('date') || fam.includes('amber'))) score += 30;
+      if (occasionVal === 'evening' && (occ.includes('evening') || fam.includes('wood') || fam.includes('amber'))) score += 30;
+      if (occasionVal === 'weekend' && (occ.includes('casual') || occ.includes('weekend') || fam.includes('fresh'))) score += 30;
+
+      // Intensity match
+      if (intensityVal === 'subtle' && (proj.includes('subtle') || proj.includes('close'))) score += 20;
+      if (intensityVal === 'balanced' && (proj.includes('moderate') || proj.includes('refined'))) score += 20;
+      if (intensityVal === 'bold' && (proj.includes('enveloping') || proj.includes('sillage') || fam.includes('oud'))) score += 20;
+
+      return { product, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    const winner = scored[0]?.product || products[0];
+
+    const moodNames = { fresh: 'fresh accents', warm: 'warm amber', woody: 'rich woods', sweet: 'sweet notes', clean: 'clean florals' };
+    const occNames = { everyday: 'everyday wear', office: 'the office', date_night: 'date nights', evening: 'evening wear', weekend: 'the weekend' };
+    const intNames = { subtle: 'a subtle profile', balanced: 'a balanced projection', bold: 'a bolder profile' };
+
+    const reason = `You chose ${moodNames[moodVal] || moodVal}, ${occNames[occasionVal] || occasionVal} and ${intNames[intensityVal] || intensityVal}.`;
+
     setMatchResult(winner);
+    setMatchReason(reason);
   };
 
   const handleReset = () => {
     setCurrentStep(0);
-    setAnswers({ vibe: null, occasion: null, intensity: null, familyPreference: null });
+    setAnswers({});
     setMatchResult(null);
+    setMatchReason('');
+    trackFeatureEvent('SCENT_FINDER_STARTED', 'scent_finder');
   };
 
-  const handleProceedToProduct = () => {
+  const handleViewProduct = () => {
     if (matchResult && onSelectProduct) {
+      trackFeatureEvent('SCENT_FINDER_RESULT_CLICKED', 'scent_finder', { productId: matchResult.id });
       onSelectProduct(matchResult.id);
-      trackFeatureEvent('RECOMMENDATION_CLICKED', 'scent_finder', { productId: matchResult.id });
       onClose();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div 
-        className="relative w-full max-w-2xl bg-[#0E1011] border border-[#D8BE82]/30 p-6 md:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
-        role="dialog"
-        aria-modal="true"
-      >
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="scent-finder-title"
+    >
+      <div className="relative w-full max-w-xl bg-[#0E1011] border border-[#D8BE82]/30 p-6 md:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.95)]">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-[#AAA297] hover:text-[#D8BE82] transition-colors p-2"
-          aria-label="Close Quiz"
+          className="absolute top-4 right-4 text-[#AAA297] hover:text-[#D8BE82] p-2 transition-colors focus:outline-none"
+          aria-label="Close"
         >
           <X className="w-5 h-5 stroke-[1.5]" />
         </button>
 
-        {/* Top Header */}
-        <div className="text-center space-y-2 mb-8">
+        {/* Modal Brand Eyebrow */}
+        <div className="text-center space-y-1 mb-6">
           <div className="flex items-center justify-center space-x-2">
-            <IllureCrest size={20} className="text-[#C7A866]" />
-            <span className="font-bodoni text-lg tracking-[0.25em] text-[#F7F3EA] uppercase">
+            <IllureCrest size={18} className="text-[#C7A866]" />
+            <span className="font-bodoni text-base tracking-[0.25em] text-[#F7F3EA] uppercase">
               İLLURÊ
             </span>
           </div>
-          <span className="typography-eyebrow text-[#C7A866] block">
-            {quizSubtitle}
-          </span>
-          <h3 className="typography-h2 text-[#F7F3EA]">
+          <h2 id="scent-finder-title" className="font-bodoni text-xl md:text-2xl text-[#F7F3EA] tracking-wide uppercase pt-1">
             {quizTitle}
-          </h3>
+          </h2>
         </div>
 
-        {/* QUIZ IN PROGRESS */}
+        {/* QUIZ FLOW */}
         {!matchResult && (
           <div className="space-y-6">
-            {/* Step Indicator */}
-            <div className="flex items-center justify-between text-xs text-[#AAA297] font-interface-sans border-b border-[#D8BE82]/15 pb-3">
-              <span>STEP 0{currentStep + 1} OF 0{questions.length}</span>
+            {/* Step Counter */}
+            <div className="flex items-center justify-between text-xs text-[#AAA297] border-b border-[#D8BE82]/15 pb-2">
+              <span className="tracking-widest uppercase">QUESTION {currentStep + 1} OF {questions.length}</span>
               <div className="flex space-x-1.5">
                 {questions.map((_, idx) => (
                   <span
@@ -176,108 +210,110 @@ export default function ScentFinderModal({ isOpen, onClose, onSelectProduct, pro
               </div>
             </div>
 
-            {/* Current Question */}
+            {/* Question Prompt */}
             <div className="space-y-1">
-              <h4 className="text-sm md:text-base font-interface-sans font-medium text-[#F7F3EA] tracking-wider uppercase">
-                {questions[currentStep].title}
-              </h4>
-              <p className="text-xs text-[#AAA297]">
-                {questions[currentStep].subtitle}
-              </p>
+              <h3 className="font-editorial-serif text-xl md:text-2xl text-[#F7F3EA]">
+                {currentQ.prompt}
+              </h3>
             </div>
 
-            {/* Options List */}
-            <div className="grid grid-cols-1 gap-3 pt-2">
-              {questions[currentStep].options.map((opt, i) => (
+            {/* Options */}
+            <div className="grid grid-cols-1 gap-2.5 pt-1">
+              {currentQ.options.map((opt, i) => (
                 <button
                   key={i}
-                  onClick={() => handleSelectOption(questions[currentStep].id, opt.value)}
-                  className="w-full text-left p-4 bg-[#14120F] border border-[#D8BE82]/20 hover:border-[#D8BE82]/60 hover:bg-[#1A1814] transition-all duration-200 group flex items-start justify-between"
+                  onClick={() => handleSelectOption(currentQ.id, opt)}
+                  className="w-full text-left p-3.5 bg-[#14120F] border border-[#D8BE82]/20 hover:border-[#D8BE82]/70 hover:bg-[#1A1814] transition-all group flex items-center justify-between focus:outline-none focus:border-[#C7A866]"
                 >
-                  <div className="space-y-0.5">
-                    <span className="text-xs md:text-sm font-medium tracking-wide text-[#F7F3EA] group-hover:text-[#D8BE82] transition-colors">
+                  <div>
+                    <span className="text-xs font-semibold tracking-widest text-[#F7F3EA] group-hover:text-[#D8BE82] uppercase block">
                       {opt.label}
                     </span>
-                    <p className="text-[11px] text-[#AAA297] font-light">
-                      {opt.hint}
-                    </p>
+                    {opt.explanation && (
+                      <span className="text-[11px] text-[#AAA297] font-light block mt-0.5">
+                        {opt.explanation}
+                      </span>
+                    )}
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[#C7A866] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                  <ArrowRight className="w-4 h-4 text-[#C7A866] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* MATCH RESULT FOUND */}
+        {/* MATCH RESULT (HUMAN, CLEAN, NO AI JARGON) */}
         {matchResult && (
-          <div className="space-y-6 pt-2 animate-fade-in">
-            <div className="p-4 bg-[#14120F] border border-[#C7A866]/30 text-center space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#C7A866] block">
-                YOUR ARCHIVAL MATCH
+          <div className="space-y-6 pt-1 animate-fade-in">
+            <div className="text-center space-y-1 border-b border-[#D8BE82]/15 pb-4">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#C7A866] block font-medium">
+                YOUR MATCH
               </span>
-              <p className="font-bodoni text-2xl text-[#F7F3EA]">
+              <h3 className="font-bodoni text-2xl text-[#F7F3EA]">
                 {matchResult.name}
-              </p>
-              <p className="text-xs text-[#AAA297] italic">
-                {matchResult.brand || 'İLLURÊ RESERVE'} · {matchResult.fragranceFamily || 'Master Creation'}
+              </h3>
+              <p className="text-xs text-[#AAA297]">
+                {matchResult.fragranceFamily || 'Master Creation'}
+                {matchResult.occasion ? ` · ${matchResult.occasion}` : ''}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <div className="relative aspect-square max-h-[220px] mx-auto bg-[#080A0B] border border-[#D8BE82]/15 p-2 overflow-hidden flex items-center justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <div className="aspect-square max-h-[180px] mx-auto bg-[#080A0B] border border-[#D8BE82]/15 p-2 overflow-hidden flex items-center justify-center">
                 <img
-                  src={matchResult.images?.[0] || 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=600'}
+                  src={matchResult.images?.[0]?.url || matchResult.images?.[0] || matchResult.image || '/images/illure-placeholder.svg'}
                   alt={matchResult.name}
-                  className="w-full h-full object-cover rounded-xs"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <span className="text-[10px] text-[#C7A866] uppercase tracking-wider block font-medium">
-                    OLFACTORY NOTES
+                  <span className="text-[10px] text-[#C7A866] uppercase tracking-wider block font-semibold">
+                    WHY IT FITS:
                   </span>
-                  <p className="text-[#D8D0C3] line-clamp-2 mt-0.5">
-                    {matchResult.topNotes?.join(', ') || 'Citrus, Rare Woods, Warm Resin'}
+                  <p className="text-[#D8D0C3] text-[11px] leading-relaxed mt-0.5">
+                    {matchReason}
                   </p>
                 </div>
 
-                <div>
-                  <span className="text-[10px] text-[#C7A866] uppercase tracking-wider block font-medium">
-                    CHARACTER
-                  </span>
-                  <p className="text-[#AAA297] line-clamp-2">
-                    {matchResult.shortDescription || matchResult.description || 'Rich complexity with seamless skin longevity.'}
-                  </p>
-                </div>
+                {matchResult.topNotes && matchResult.topNotes.length > 0 && (
+                  <div>
+                    <span className="text-[10px] text-[#C7A866] uppercase tracking-wider block font-semibold">
+                      NOTES:
+                    </span>
+                    <p className="text-[#AAA297] text-[11px] line-clamp-2 mt-0.5">
+                      {matchResult.topNotes.slice(0, 3).join(', ')}
+                    </p>
+                  </div>
+                )}
 
                 {matchResult.price && (
-                  <div className="pt-2">
-                    <span className="text-xs text-[#AAA297] block">From</span>
-                    <span className="font-editorial-serif text-xl text-[#F7F3EA]">
-                      ₹{matchResult.price.toLocaleString('en-IN')}
+                  <div className="pt-1">
+                    <span className="text-[10px] text-[#AAA297] block uppercase tracking-wider">Price</span>
+                    <span className="font-editorial-serif text-lg text-[#F7F3EA]">
+                      ₹{Number(matchResult.price).toLocaleString('en-IN')}
                     </span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#D8BE82]/15">
               <button
                 onClick={handleReset}
-                className="w-full sm:w-auto px-4 py-2.5 text-xs text-[#AAA297] hover:text-[#F7F3EA] flex items-center justify-center space-x-2 transition-colors"
+                className="w-full sm:w-auto px-4 py-2.5 text-xs text-[#AAA297] hover:text-[#F7F3EA] flex items-center justify-center space-x-1.5 transition-colors focus:outline-none"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="tracking-wider uppercase">RETAKE QUIZ</span>
+                <span className="tracking-wider uppercase text-[11px]">RETAKE QUIZ</span>
               </button>
 
               <button
-                onClick={handleProceedToProduct}
-                className="w-full sm:w-auto px-8 py-3 bg-[#C7A866] hover:bg-[#D8BE82] text-[#080A0B] text-xs font-semibold tracking-widest uppercase transition-colors flex items-center justify-center space-x-2 shadow-[0_4px_15px_rgba(199,168,102,0.25)]"
+                onClick={handleViewProduct}
+                className="w-full sm:w-auto px-6 py-3 bg-[#C7A866] hover:bg-[#D8BE82] text-[#080A0B] text-xs font-semibold tracking-widest uppercase transition-colors flex items-center justify-center space-x-2 shadow-sm focus:outline-none"
               >
-                <span>EXPLORE FORMULATION</span>
+                <span>{ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

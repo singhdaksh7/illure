@@ -32,12 +32,45 @@ export const INITIAL_COMMERCE_FEATURES: FeatureSeedDefinition[] = [
     homepageSortOrder: 15,
     sortOrder: 1,
     config: {
-      headline: 'FIND YOUR SIGNATURE',
-      subtitle: 'FRAGRANCE RECOMMENDATION QUIZ',
-      description: 'Answer 4 quick questions. Find the notes matched to your presence.',
-      ctaLabel: 'TAKE THE QUIZ',
-      minMatchPercentage: 70,
-      questionsCount: 4,
+      title: 'FIND YOUR SCENT',
+      subtitle: 'DISCOVER YOUR SIGNATURE',
+      ctaText: 'VIEW FRAGRANCE',
+      questions: [
+        {
+          id: 'mood',
+          prompt: 'What are you in the mood for?',
+          order: 1,
+          options: [
+            { label: 'FRESH', value: 'fresh', taxonomy: { fragranceFamily: 'Fresh & Aquatic' }, explanation: 'clean citrus and mountain air' },
+            { label: 'WARM', value: 'warm', taxonomy: { fragranceFamily: 'Amber & Oriental' }, explanation: 'golden amber and rich vanilla' },
+            { label: 'WOODY', value: 'woody', taxonomy: { fragranceFamily: 'Woody & Smoky' }, explanation: 'smoky cedar and aged woods' },
+            { label: 'SWEET', value: 'sweet', taxonomy: { fragranceFamily: 'Gourmand' }, explanation: 'tonka bean and caramelized honey' },
+            { label: 'CLEAN', value: 'clean', taxonomy: { fragranceFamily: 'Floral & Powdery' }, explanation: 'soft iris and velvet florals' }
+          ]
+        },
+        {
+          id: 'occasion',
+          prompt: 'When will you wear it?',
+          order: 2,
+          options: [
+            { label: 'EVERYDAY', value: 'everyday', taxonomy: { occasion: 'Daily Wear / Office' } },
+            { label: 'OFFICE', value: 'office', taxonomy: { occasion: 'Executive / Boardroom' } },
+            { label: 'DATE NIGHT', value: 'date_night', taxonomy: { occasion: 'Intimate / Date Night' } },
+            { label: 'EVENING', value: 'evening', taxonomy: { occasion: 'Evening Gala / Formal' } },
+            { label: 'WEEKEND', value: 'weekend', taxonomy: { occasion: 'Casual / Weekend' } }
+          ]
+        },
+        {
+          id: 'intensity',
+          prompt: 'How do you like your fragrance?',
+          order: 3,
+          options: [
+            { label: 'SUBTLE', value: 'subtle', taxonomy: { projection: 'Subtle and close to skin' } },
+            { label: 'BALANCED', value: 'balanced', taxonomy: { projection: 'Moderate and refined' } },
+            { label: 'BOLD', value: 'bold', taxonomy: { projection: 'Enveloping sillage' } }
+          ]
+        }
+      ]
     },
   },
   {
@@ -52,7 +85,28 @@ export const INITIAL_COMMERCE_FEATURES: FeatureSeedDefinition[] = [
     homepageSortOrder: 0,
     sortOrder: 2,
     config: {
-      enabledTaxonomies: ['fragranceFamily', 'moods', 'occasions', 'seasons', 'intensity'],
+      fragranceFamilies: [
+        { id: 'woody', name: 'Woody & Smoky', description: 'Cedarwood, sandalwood, vetiver, and smoky rare woods' },
+        { id: 'fresh', name: 'Fresh & Aquatic', description: 'Marine accords, iced citrus zest, green leaves' },
+        { id: 'amber', name: 'Amber & Oriental', description: 'Resins, tonka bean, amber, and vanilla' },
+        { id: 'floral', name: 'Floral & Powdery', description: 'Jasmine, rose, and iris butter' },
+        { id: 'niche', name: 'Niche Editions', description: 'Rare extraction artisanal masterworks' }
+      ],
+      notes: [
+        { name: 'Oud Wood', category: 'HEART', family: 'Woody & Smoky', enabled: true },
+        { name: 'Bergamot', category: 'TOP', family: 'Fresh & Aquatic', enabled: true },
+        { name: 'Cardamom', category: 'TOP', family: 'Woody & Smoky', enabled: true },
+        { name: 'Amber', category: 'BASE', family: 'Amber & Oriental', enabled: true },
+        { name: 'Vanilla', category: 'BASE', family: 'Amber & Oriental', enabled: true },
+        { name: 'Cedarwood', category: 'BASE', family: 'Fresh & Aquatic', enabled: true },
+        { name: 'Pineapple', category: 'TOP', family: 'Niche Editions', enabled: true },
+        { name: 'Patchouli', category: 'HEART', family: 'Niche Editions', enabled: true },
+        { name: 'Rosewood', category: 'TOP', family: 'Woody & Smoky', enabled: true }
+      ],
+      moods: ['FRESH', 'WARM', 'WOODY', 'SWEET', 'CLEAN'],
+      occasions: ['EVERYDAY', 'OFFICE', 'DATE NIGHT', 'EVENING', 'WEEKEND'],
+      intensityOptions: ['SUBTLE', 'BALANCED', 'BOLD'],
+      seasons: ['SPRING', 'SUMMER', 'AUTUMN', 'WINTER', 'ALL_SEASONS']
     },
   },
   {

@@ -18,11 +18,13 @@ import CatalogView from './components/CatalogView';
 import ProductDetailPage from './components/ProductDetailPage';
 import CartDrawer from './components/CartDrawer';
 import SearchModal from './components/SearchModal';
-import ScentFinderModal from './components/discovery/ScentFinderModal';
-import NotesExplorerModal from './components/discovery/NotesExplorerModal';
-import FragranceCompareModal from './components/discovery/FragranceCompareModal';
 import CustomCursor from './components/CustomCursor';
 import IntroOverlay from './components/IntroOverlay';
+
+// Lazy-load optional discovery modals for optimal code-splitting
+const ScentFinderModal = React.lazy(() => import('./components/discovery/ScentFinderModal'));
+const NotesExplorerModal = React.lazy(() => import('./components/discovery/NotesExplorerModal'));
+const FragranceCompareModal = React.lazy(() => import('./components/discovery/FragranceCompareModal'));
 import AdminPortal from './admin/AdminPortal';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
@@ -401,34 +403,45 @@ function StorefrontApp() {
         onSelectProduct={handleSelectProduct}
       />
 
-      {/* DISCOVERY: SCENT FINDER QUIZ MODAL (FEATURE 01) */}
-      <ScentFinderModal
-        isOpen={isScentFinderOpen}
-        onClose={() => setIsScentFinderOpen(false)}
-        products={productsList}
-        onSelectProduct={handleSelectProduct}
-      />
+      {/* DISCOVERY: OPTIONAL LAZY MODALS */}
+      <React.Suspense fallback={null}>
+        {/* SCENT FINDER QUIZ MODAL (FEATURE 01) */}
+        {isScentFinderOpen && (
+          <ScentFinderModal
+            isOpen={isScentFinderOpen}
+            onClose={() => setIsScentFinderOpen(false)}
+            products={productsList}
+            onSelectProduct={handleSelectProduct}
+          />
+        )}
 
-      {/* DISCOVERY: NOTES DIRECTORY MODAL (FEATURE 08) */}
-      <NotesExplorerModal
-        isOpen={isNotesExplorerOpen}
-        onClose={() => setIsNotesExplorerOpen(false)}
-        onSelectNoteFilter={(note) => {
-          setNoteFilter(note);
-          setActiveTab('shop');
-        }}
-      />
+        {/* EXPLORE BY NOTE MODAL (FEATURE 08) */}
+        {isNotesExplorerOpen && (
+          <NotesExplorerModal
+            isOpen={isNotesExplorerOpen}
+            onClose={() => setIsNotesExplorerOpen(false)}
+            products={productsList}
+            onSelectNoteFilter={(note) => {
+              setNoteFilter(note);
+              setActiveTab('shop');
+            }}
+          />
+        )}
 
-      {/* DISCOVERY: FRAGRANCE ACCORD COMPARE MODAL (FEATURE 06) */}
-      <FragranceCompareModal
-        isOpen={isCompareOpen}
-        onClose={() => setIsCompareOpen(false)}
-        comparedProducts={comparedProducts}
-        onRemoveProduct={(id) => {
-          setComparedProducts((prev) => prev.filter((p) => p.id !== id));
-        }}
-        onAddToCart={handleAddToCartItem}
-      />
+        {/* COMPARE FRAGRANCES MODAL (FEATURE 06) */}
+        {isCompareOpen && (
+          <FragranceCompareModal
+            isOpen={isCompareOpen}
+            onClose={() => setIsCompareOpen(false)}
+            comparedProducts={comparedProducts}
+            onRemoveProduct={(id) => {
+              setComparedProducts((prev) => prev.filter((p) => p.id !== id));
+            }}
+            onAddToCart={handleAddToCartItem}
+            onViewProduct={handleSelectProduct}
+          />
+        )}
+      </React.Suspense>
     </div>
   );
 }

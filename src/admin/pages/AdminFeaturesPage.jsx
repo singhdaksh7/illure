@@ -314,6 +314,54 @@ export default function AdminFeaturesPage() {
                   <p className="text-xs text-gray-500 mt-2 line-clamp-3 leading-relaxed">
                     {feat.description}
                   </p>
+
+                  {/* Discovery Specific Live Operational Counts */}
+                  {feat.key === 'scent_finder' && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-[10px]">
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">Questions</span>
+                        <span className="font-semibold text-gray-800">
+                          {feat.config?.questions?.length || 3}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">CTA Text</span>
+                        <span className="font-semibold text-gray-800 truncate block">
+                          {feat.config?.ctaText || 'VIEW FRAGRANCE'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {feat.key === 'fragrance_compare' && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-[10px]">
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">Max Compare</span>
+                        <span className="font-semibold text-gray-800">
+                          {feat.config?.maxCompareCount || 3}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">Selection Mode</span>
+                        <span className="font-semibold text-emerald-700">Safe Variant</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {feat.key === 'find_similar' && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-[10px]">
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">Max Recs</span>
+                        <span className="font-semibold text-gray-800">
+                          {feat.config?.maxItems || 4}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block uppercase tracking-wider">Algorithm</span>
+                        <span className="font-semibold text-gray-800">Deterministic</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Bottom Meta & Quick Actions */}
@@ -448,6 +496,59 @@ export default function AdminFeaturesPage() {
                     placeholder="e.g. Scent Finder"
                     className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#C6AE82]"
                   />
+                </div>
+              )}
+
+              {/* Scent Finder Dedicated Visual Form (when scent_finder is selected) */}
+              {selectedFeature.key === 'scent_finder' && (
+                <div className="p-4 bg-amber-50/50 rounded-xl border border-amber-200/60 space-y-3">
+                  <span className="font-semibold text-gray-900 block text-xs uppercase tracking-wider">
+                    Scent Finder Quiz Controls
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-medium text-gray-700 block">Quiz Title</label>
+                      <input
+                        type="text"
+                        value={(() => {
+                          try {
+                            const c = JSON.parse(editConfig.configJson || '{}');
+                            return c.title || '';
+                          } catch { return ''; }
+                        })()}
+                        onChange={(e) => {
+                          try {
+                            const c = JSON.parse(editConfig.configJson || '{}');
+                            c.title = e.target.value;
+                            setEditConfig({ ...editConfig, configJson: JSON.stringify(c, null, 2) });
+                          } catch {}
+                        }}
+                        placeholder="FIND YOUR SCENT"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-medium text-gray-700 block">Result CTA Button Text</label>
+                      <input
+                        type="text"
+                        value={(() => {
+                          try {
+                            const c = JSON.parse(editConfig.configJson || '{}');
+                            return c.ctaText || '';
+                          } catch { return ''; }
+                        })()}
+                        onChange={(e) => {
+                          try {
+                            const c = JSON.parse(editConfig.configJson || '{}');
+                            c.ctaText = e.target.value;
+                            setEditConfig({ ...editConfig, configJson: JSON.stringify(c, null, 2) });
+                          } catch {}
+                        }}
+                        placeholder="VIEW FRAGRANCE"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 focus:outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 

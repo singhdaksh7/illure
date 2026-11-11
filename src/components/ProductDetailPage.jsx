@@ -86,14 +86,54 @@ export default function ProductDetailPage({
   // Dynamic gift packaging from backend
   const [giftOption, setGiftOption] = useState(null);
 
-  // Derive similar products sharing family or notes (Discovery Feature 05)
+  // Derive similar products sharing family, notes, occasion, or brand (Discovery Feature 05)
+  // Deterministic scoring excludes current product, archived/draft products
   const similarProducts = useMemo(() => {
-    return productsData
-      .filter(p => p.id !== product.id && (
-        p.fragranceFamily?.toLowerCase() === product.fragranceFamily?.toLowerCase() ||
-        p.brandId === product.brandId
-      ))
-      .slice(0, 3);
+    if (!product || !product.id) return [];
+
+    const candidates = productsData.filter(
+      (p) => p.id !== product.id && p.status !== 'ARCHIVED' && p.status !== 'DRAFT'
+    );
+
+    const scored = candidates.map((cand) => {
+      let score = 0;
+      // 1. Fragrance family match (Weight: 40)
+      if (
+        cand.fragranceFamily &&
+        product.fragranceFamily &&
+        cand.fragranceFamily.toLowerCase() === product.fragranceFamily.toLowerCase()
+      ) {
+        score += 40;
+      }
+
+      // 2. Note overlap (Weight: 30)
+      const candNotes = [...(cand.topNotes || []), ...(cand.heartNotes || []), ...(cand.baseNotes || [])].map((n) =>
+        n.toLowerCase()
+      );
+      const prodNotes = [...(product.topNotes || []), ...(product.heartNotes || []), ...(product.baseNotes || [])].map((n) =>
+        n.toLowerCase()
+      );
+      const sharedNotes = candNotes.filter((n) => prodNotes.includes(n));
+      score += Math.min(sharedNotes.length * 10, 30);
+
+      // 3. Occasion / Season match (Weight: 20)
+      if (cand.occasion && product.occasion && cand.occasion.toLowerCase() === product.occasion.toLowerCase()) {
+        score += 15;
+      }
+      if (cand.season && product.season && cand.season.toLowerCase() === product.season.toLowerCase()) {
+        score += 5;
+      }
+
+      // 4. Reference brand match (Weight: 10)
+      if (cand.referenceBrandId && product.referenceBrandId && cand.referenceBrandId === product.referenceBrandId) {
+        score += 10;
+      }
+
+      return { product: cand, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 3).map((s) => s.product);
   }, [product, productsData]);
 
   useEffect(() => {
@@ -607,14 +647,14 @@ export default function ProductDetailPage({
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="space-y-1">
                 <span className="typography-eyebrow text-[#C7A866]">
-                  PARALLEL ACCORDS
+                  SIMILAR SCENTS
                 </span>
                 <h3 className="typography-h2 text-[#F7F3EA]">
-                  SIMILAR OLFACTORY PROFILES
+                  YOU MAY ALSO ENJOY
                 </h3>
               </div>
               <p className="text-xs text-[#AAA297] max-w-sm">
-                Curated formulations sharing equivalent resin, woods, or floral architecture with {product.name}.
+                Fragrances with shared notes and character.
               </p>
             </div>
 
