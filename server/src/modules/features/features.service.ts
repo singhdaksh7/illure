@@ -179,7 +179,7 @@ export class FeaturesService {
 
     // Prepare update payload
     const updatePayload: any = {
-      updatedBy: adminActor.name || adminActor.id,
+      updatedBy: adminActor?.name || adminActor?.id || 'Admin',
       updatedAt: new Date(),
     };
 
@@ -204,9 +204,9 @@ export class FeaturesService {
       data: {
         featureId: existing.id,
         featureKey: existing.key,
-        actorId: adminActor.id,
-        actorName: adminActor.name,
-        actorRole: adminActor.role,
+        actorId: adminActor?.id || null,
+        actorName: adminActor?.name || 'Admin',
+        actorRole: adminActor?.role || 'ADMIN',
         action: data.isEnabled !== undefined && data.isEnabled !== existing.isEnabled ? 'TOGGLE_ENABLED' : 'UPDATE_CONFIG',
         oldValue: {
           isEnabled: existing.isEnabled,

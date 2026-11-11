@@ -74,7 +74,7 @@ export class FeaturesController {
   static async updateFeature(req: Request, res: Response, next: NextFunction) {
     try {
       const key = String(req.params.key);
-      const admin = (req as any).admin;
+      const admin = (req as any).adminUser || (req as any).admin;
       const reqMeta = {
         ipAddress: req.ip,
         userAgent: req.headers['user-agent'],
