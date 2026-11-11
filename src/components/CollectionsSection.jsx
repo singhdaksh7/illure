@@ -50,24 +50,29 @@ export default function CollectionsSection({ onSelectCollection }) {
   return (
     <section 
       id="collections-section" 
-      className="py-24 md:py-36 bg-[#0B0B0C] relative select-none border-b border-white/[0.04]"
+      className="py-24 md:py-36 bg-[#0E1011] relative select-none border-b border-[#D8BE82]/15"
     >
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         
         {/* Section Header */}
         <div className="mb-16 md:mb-20 space-y-4">
-          <div className="flex items-center space-x-3">
-            <span className="w-8 h-[1px] bg-[#B89A62]" />
-            <span className="typography-eyebrow">
-              {subtitle}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="w-8 h-[1px] bg-[#C7A866]" />
+              <span className="typography-eyebrow">
+                {subtitle}
+              </span>
+            </div>
+            <span className="font-mono text-xs tracking-[0.25em] text-[#C7A866]/60 font-medium">
+              02 / EDITIONS
             </span>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="typography-h1 text-[#F7F4EE]">
+            <h2 className="typography-h1 text-[#F7F3EA]">
               {title}
             </h2>
-            <p className="typography-body max-w-sm">
+            <p className="typography-body text-[#D8D0C3] max-w-sm">
               {description}
             </p>
           </div>
@@ -81,7 +86,7 @@ export default function CollectionsSection({ onSelectCollection }) {
             return (
               <div 
                 key={col.id}
-                className="group relative h-[520px] md:h-[620px] rounded-xs overflow-hidden cursor-pointer select-none flex flex-col justify-between p-8 md:p-10 border border-white/[0.08] transition-all duration-700 hover:border-[#B89A62]/60 hover:shadow-[0_20px_45px_rgba(0,0,0,0.85)]"
+                className="group relative h-[520px] md:h-[620px] rounded-xs overflow-hidden cursor-pointer select-none flex flex-col justify-between p-8 md:p-10 border border-[#D8BE82]/20 transition-all duration-700 hover:border-[#D8BE82]/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.85)]"
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => onSelectCollection && onSelectCollection(col.genderFilter, col.categoryFilter)}
@@ -99,20 +104,20 @@ export default function CollectionsSection({ onSelectCollection }) {
                 <div 
                   className={`absolute inset-0 transition-opacity duration-700 ${
                     isHovered 
-                      ? 'bg-gradient-to-t from-[#0B0B0C] via-[#0B0B0C]/65 to-black/30 opacity-95' 
-                      : 'bg-gradient-to-t from-[#0B0B0C] via-[#0B0B0C]/45 to-black/40 opacity-85'
+                      ? 'bg-gradient-to-t from-[#080A0B] via-[#080A0B]/70 to-black/35 opacity-95' 
+                      : 'bg-gradient-to-t from-[#080A0B] via-[#080A0B]/50 to-black/45 opacity-90'
                   }`}
                 />
 
                 {/* Top Meta Bar */}
                 <div className="relative z-10 flex justify-between items-start">
-                  <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                  <span className="typography-eyebrow text-[9px] text-[#D8BE82]">
                     EDITION 0{idx + 1}
                   </span>
                   
                   {/* Arrow Indicator */}
                   <div className={`p-3 rounded-full border border-white/10 backdrop-blur-md transition-all duration-500 ${
-                    isHovered ? 'bg-[#B89A62] text-[#0B0B0C] border-[#B89A62]' : 'bg-[#0B0B0C]/60 text-[#F7F4EE]'
+                    isHovered ? 'bg-[#D8BE82] text-[#080A0B] border-[#D8BE82]' : 'bg-[#080A0B]/70 text-[#F7F3EA]'
                   }`}>
                     <ArrowUpRight className={`w-4 h-4 transition-transform duration-500 ${
                       isHovered ? 'translate-x-0.5 -translate-y-0.5' : ''
@@ -123,10 +128,10 @@ export default function CollectionsSection({ onSelectCollection }) {
                 {/* Bottom Copy Block */}
                 <div className="relative z-10 space-y-4">
                   <div className="space-y-1">
-                    <span className="text-[10px] tracking-[0.25em] text-[#B89A62] uppercase block font-medium">
+                    <span className="text-[10px] tracking-[0.25em] text-[#D8BE82] uppercase block font-medium">
                       {col.subtitle}
                     </span>
-                    <h4 className="font-editorial-serif text-4xl lg:text-5xl text-[#F7F4EE] font-light tracking-wide group-hover:text-[#B89A62] transition-colors duration-500">
+                    <h4 className="font-editorial-serif text-4xl lg:text-5xl text-[#F7F3EA] font-light tracking-wide group-hover:text-[#D8BE82] transition-colors duration-500">
                       {col.title}
                     </h4>
                   </div>
@@ -135,21 +140,21 @@ export default function CollectionsSection({ onSelectCollection }) {
                     {col.descriptors.map((desc, dIdx) => (
                       <span 
                         key={dIdx}
-                        className="text-[11px] text-[#A1A1AA] font-light bg-[#121214]/80 px-2.5 py-1 border border-white/[0.06] rounded-xs"
+                        className="text-[11px] text-[#D8D0C3] font-light bg-[#14120F]/90 px-2.5 py-1 border border-[#D8BE82]/20 rounded-xs"
                       >
                         {desc}
                       </span>
                     ))}
                   </div>
 
-                  <div className="pt-2 flex items-center space-x-2 text-xs tracking-widest text-[#B89A62] uppercase font-semibold">
+                  <div className="pt-2 flex items-center space-x-2 text-xs tracking-widest text-[#D8BE82] uppercase font-semibold">
                     <span>EXPLORE EDITION</span>
                     <span>→</span>
                   </div>
                 </div>
 
                 {/* Bottom Gold Hairline */}
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#B89A62] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D8BE82] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             );
           })}

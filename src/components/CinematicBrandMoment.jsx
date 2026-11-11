@@ -66,7 +66,7 @@ export default function CinematicBrandMoment() {
             İLLURÊ
           </span>
           <span className="typography-eyebrow text-[9px] text-[#A1A1AA]">
-            CONTEMPORARY FRAGRANCE LABEL · NEW DELHI
+            CONTEMPORARY FRAGRANCE LABEL
           </span>
         </div>
 

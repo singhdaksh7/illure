@@ -82,7 +82,7 @@ export default function CustomerLoginPage({ onNavigate }) {
                 Sign In to Your Account
               </h1>
               <p className="typography-body text-xs text-[#A1A1AA]">
-                Enter your patron credentials to access saved formulations, orders, and delivery addresses.
+                Enter your details to view your orders and saved delivery addresses.
               </p>
             </div>
 
@@ -105,7 +105,7 @@ export default function CustomerLoginPage({ onNavigate }) {
                     required
                     value={emailOrPhone}
                     onChange={(e) => setEmailOrPhone(e.target.value)}
-                    placeholder="patron@illurefragrance.com"
+                    placeholder="name@example.com"
                     className="w-full bg-[#0B0B0C] border border-white/[0.1] rounded-xs py-3.5 pl-10 pr-4 text-xs font-interface-sans text-[#F7F4EE] placeholder-[#A1A1AA]/40 focus:outline-none focus:border-[#B89A62] transition-colors"
                   />
                 </div>
@@ -113,7 +113,7 @@ export default function CustomerLoginPage({ onNavigate }) {
 
               <div className="space-y-1.5">
                 <label className="text-[10px] tracking-widest text-[#B89A62] uppercase block font-medium">
-                  CONFIDENTIAL PASSWORD
+                  PASSWORD
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-3.5" />

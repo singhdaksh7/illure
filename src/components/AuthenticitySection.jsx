@@ -41,25 +41,25 @@ export default function AuthenticitySection() {
   return (
     <section 
       id="authenticity-section" 
-      className="py-24 md:py-36 bg-[#0B0B0C] border-b border-white/[0.04] relative select-none"
+      className="py-24 md:py-36 bg-[#0E1011] border-b border-[#D8BE82]/15 relative select-none"
     >
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         
         {/* Section Header with Crest Seal */}
         <div className="mb-20 text-center flex flex-col items-center space-y-4">
-          <div className="mb-2 opacity-90">
-            <IllureCrest size={48} className="text-[#B89A62]" />
+          <div className="mb-2 opacity-95">
+            <IllureCrest size={48} className="text-[#D8BE82]" />
           </div>
 
           <span className="typography-eyebrow">
             {subtitle}
           </span>
 
-          <h2 className="typography-h1 text-[#F7F4EE]">
+          <h2 className="typography-h1 text-[#F7F3EA]">
             {title}
           </h2>
 
-          <div className="w-16 h-[1px] bg-[#B89A62]/30 mt-2" />
+          <div className="w-16 h-[1px] bg-[#C7A866]/40 mt-2" />
         </div>
 
         {/* 4 Refined Editorial Pillars Grid */}
@@ -67,17 +67,17 @@ export default function AuthenticitySection() {
           {pillars.map((pillar, idx) => (
             <div 
               key={idx}
-              className="space-y-4 p-8 border-l border-[#B89A62]/30 hover:border-[#B89A62] transition-colors duration-500 bg-[#121214] rounded-xs group"
+              className="space-y-4 p-8 border-l border-[#C7A866]/40 hover:border-[#D8BE82] transition-colors duration-500 bg-[#14120F] border-t border-r border-b border-[#D8BE82]/10 rounded-xs group"
             >
-              <span className="font-bodoni text-3xl text-[#B89A62] font-light block">
+              <span className="font-bodoni text-4xl text-[#D8BE82] font-light block">
                 {pillar.number || `0${idx + 1}`}
               </span>
 
-              <h3 className="font-interface-sans text-xs tracking-[0.25em] text-[#F7F4EE] uppercase font-semibold group-hover:text-[#B89A62] transition-colors">
+              <h3 className="font-interface-sans text-xs tracking-[0.25em] text-[#F7F3EA] uppercase font-semibold group-hover:text-[#D8BE82] transition-colors">
                 {pillar.title}
               </h3>
 
-              <p className="typography-body text-xs text-[#A1A1AA] leading-relaxed">
+              <p className="typography-body text-xs text-[#D8D0C3] leading-relaxed">
                 {pillar.description}
               </p>
             </div>

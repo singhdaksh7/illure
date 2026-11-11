@@ -84,15 +84,15 @@ export default function ProductCard({
       {/* Top Meta Bar: Badge & Formulation Tag */}
       <div className="flex items-center justify-between z-10 min-h-[22px]">
         {badge ? (
-          <span className="font-interface-sans text-[8px] md:text-[9px] font-semibold tracking-[0.25em] text-[#B89A62] border border-[#B89A62]/30 px-2 py-0.5 rounded-xs uppercase bg-[#0B0B0C]/80">
+          <span className="font-interface-sans text-[8px] md:text-[9px] font-semibold tracking-[0.25em] text-[#D8BE82] border border-[#D8BE82]/40 px-2 py-0.5 rounded-xs uppercase bg-[#080A0B]/90">
             {badge}
           </span>
         ) : (
-          <span className="text-[8px] tracking-[0.25em] text-[#A1A1AA]/70 uppercase">
+          <span className="text-[8px] tracking-[0.25em] text-[#D8D0C3]/80 uppercase">
             EXTRAIT DE PARFUM
           </span>
         )}
-        <span className="text-[9px] tracking-[0.2em] text-[#A1A1AA]/50 font-mono">
+        <span className="text-[9px] tracking-[0.2em] text-[#D8D0C3]/60 font-mono">
           {product?.gender || 'UNISEX'}
         </span>
       </div>
@@ -179,43 +179,43 @@ export default function ProductCard({
       {/* Bottom Editorial Information */}
       <div className="space-y-3 z-10">
         <div>
-          <div className="flex items-center justify-between text-[10px] text-[#A1A1AA] tracking-wider uppercase mb-1">
+          <div className="flex items-center justify-between text-[10px] text-[#D8D0C3] tracking-wider uppercase mb-1">
             <span>{referenceHouse || 'İLLURÊ'}</span>
-            <span className="font-mono text-[#B89A62]">
+            <span className="font-mono text-[#D8BE82] font-medium">
               {product?.variants?.length ? `${product.variants.length} SIZES` : 'EXTRAIT'}
             </span>
           </div>
 
-          <h3 className="font-editorial-serif text-xl md:text-2xl text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors leading-snug">
+          <h3 className="font-editorial-serif text-xl md:text-2xl text-[#F7F3EA] group-hover:text-[#D8BE82] transition-colors leading-snug">
             {product?.name}
           </h3>
 
-          <p className="text-[11px] text-[#A1A1AA] font-light line-clamp-1 mt-0.5">
+          <p className="text-[11px] text-[#D8D0C3] font-light line-clamp-1 mt-0.5">
             Inspired by {inspiredBy}
           </p>
         </div>
 
         {/* Price & Action Row */}
-        <div className="pt-2 border-t border-white/[0.04] flex items-baseline justify-between">
+        <div className="pt-2 border-t border-[#D8BE82]/15 flex items-baseline justify-between">
           <div className="flex items-baseline space-x-1.5">
             {hasValidPrice ? (
               <>
                 {hasPriceRange && (
-                  <span className="text-[9px] tracking-wider text-[#A1A1AA] uppercase">FROM</span>
+                  <span className="text-[9px] tracking-wider text-[#D8D0C3] uppercase">FROM</span>
                 )}
-                <span className="font-mono text-xs md:text-sm font-semibold text-[#F7F4EE]">
+                <span className="font-mono text-xs md:text-sm font-semibold text-[#D8BE82]">
                   ₹{startingPrice.toLocaleString('en-IN')}
                   {hasPriceRange && ` – ₹${maxPrice.toLocaleString('en-IN')}`}
                 </span>
               </>
             ) : (
-              <span className="font-interface-sans text-[10px] tracking-widest text-[#A1A1AA] uppercase">
+              <span className="font-interface-sans text-[10px] tracking-widest text-[#D8D0C3] uppercase">
                 PRICE UNAVAILABLE
               </span>
             )}
           </div>
 
-          <span className="inline-flex items-center space-x-1 text-[9px] font-semibold tracking-widest text-[#B89A62] uppercase group-hover:translate-x-1 transition-transform">
+          <span className="inline-flex items-center space-x-1 text-[9px] font-semibold tracking-widest text-[#D8BE82] uppercase group-hover:translate-x-1 transition-transform">
             <span>SELECT</span>
             <ArrowRight className="w-2.5 h-2.5" />
           </span>

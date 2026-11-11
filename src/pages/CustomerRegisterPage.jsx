@@ -124,7 +124,7 @@ export default function CustomerRegisterPage({ onNavigate }) {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="patron@example.com"
+                    placeholder="you@example.com"
                     className="w-full bg-[#0B0B0C] border border-white/[0.1] rounded-xs py-3 pl-10 pr-4 text-xs font-interface-sans text-[#F7F4EE] placeholder-[#A1A1AA]/40 focus:outline-none focus:border-[#B89A62] transition-colors"
                   />
                 </div>

@@ -37,7 +37,7 @@ export default function HeroSection({ onExplore, onProductSelect }) {
   }
 
   // Content extraction with graceful brand fallbacks
-  const eyebrow = (heroConfig?.subtitle && heroConfig.subtitle.trim()) || 'İLLURÊ · NEW DELHI';
+  const eyebrow = (heroConfig?.subtitle && heroConfig.subtitle.trim()) || 'İLLURÊ FRAGRANCE';
   const heading = (heroConfig?.title && heroConfig.title.trim()) || 'WEAR SOMETHING\nTHEY REMEMBER.';
   const bodyText = (heroConfig?.description && heroConfig.description.trim()) || 'Inspired fragrance. Made the İLLURÊ way.';
   const primaryCta = (heroConfig?.ctaLabel && heroConfig.ctaLabel.trim()) || 'SHOP FRAGRANCES';
@@ -98,9 +98,9 @@ export default function HeroSection({ onExplore, onProductSelect }) {
 
         {/* Ambient Halo Behind Bottle */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[620px] rounded-full pointer-events-none transition-all duration-700 ease-out blur-3xl opacity-50"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[660px] h-[660px] rounded-full pointer-events-none transition-all duration-700 ease-out blur-3xl opacity-60"
           style={{
-            background: 'radial-gradient(circle, rgba(184, 154, 98, 0.15) 0%, rgba(184, 154, 98, 0.03) 50%, transparent 75%)',
+            background: 'radial-gradient(circle, rgba(199, 168, 102, 0.18) 0%, rgba(199, 168, 102, 0.05) 45%, transparent 75%)',
             transform: `translate(-50%, -50%) translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`,
           }}
         />
@@ -216,12 +216,20 @@ export default function HeroSection({ onExplore, onProductSelect }) {
             </div>
 
             {/* Editorial Headline */}
-            <h2 className="typography-display-xl text-[#F7F4EE] whitespace-pre-line">
-              {heading}
+            <h2 className="typography-display-xl text-[#F7F3EA] whitespace-pre-line">
+              {heading.includes('\n') ? (
+                <>
+                  <span>{heading.split('\n')[0]}</span>
+                  <br />
+                  <span className="text-[#D8BE82] font-medium">{heading.split('\n').slice(1).join('\n')}</span>
+                </>
+              ) : (
+                heading
+              )}
             </h2>
 
             {/* Body Description */}
-            <p className="typography-body-large max-w-md">
+            <p className="typography-body-large text-[#D8D0C3] max-w-md">
               {bodyText}
             </p>
 
@@ -229,15 +237,15 @@ export default function HeroSection({ onExplore, onProductSelect }) {
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <button 
                 onClick={handlePrimaryClick}
-                className="group relative inline-flex items-center space-x-3 px-8 py-4 bg-[#B89A62] text-[#0B0B0C] font-interface-sans text-[11px] tracking-[0.28em] uppercase font-semibold transition-all duration-300 hover:bg-[#C0A46D] shadow-[0_10px_30px_rgba(184,154,98,0.2)]"
+                className="btn-primary-gold"
               >
                 <span>{primaryCta}</span>
-                <ArrowRight className="w-4 h-4 text-[#0B0B0C] group-hover:translate-x-1.5 transition-transform duration-300" />
+                <ArrowRight className="w-4 h-4 text-[#080A0B] group-hover:translate-x-1.5 transition-transform duration-300" />
               </button>
 
               <button 
                 onClick={handleSecondaryClick}
-                className="group inline-flex items-center space-x-2 px-6 py-4 border border-white/[0.15] hover:border-[#B89A62] text-[#F7F4EE] hover:text-[#B89A62] font-interface-sans text-[11px] tracking-[0.28em] uppercase transition-all duration-300 backdrop-blur-xs"
+                className="btn-secondary-ivory"
               >
                 <span>{secondaryCta}</span>
               </button>

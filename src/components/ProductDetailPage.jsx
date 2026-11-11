@@ -449,7 +449,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE I · FIRST 30 MINUTES
+                      STAGE I · OPENING ACCORD
                     </span>
                     <Wind className="w-4 h-4 text-[#B89A62]" />
                   </div>
@@ -471,7 +471,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/30 rounded-xs space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE II · 2 TO 6 HOURS
+                      STAGE II · HEART PROFILE
                     </span>
                     <Droplets className="w-4 h-4 text-[#B89A62]" />
                   </div>
@@ -493,7 +493,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE III · 8 TO 14+ HOURS
+                      STAGE III · DRY DOWN
                     </span>
                     <Flame className="w-4 h-4 text-[#B89A62]" />
                   </div>

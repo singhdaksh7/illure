@@ -30,31 +30,34 @@ export default function NewsletterSection() {
   return (
     <section 
       id="newsletter-section" 
-      className="py-24 md:py-32 bg-[#0B0B0C] border-b border-white/[0.04] relative select-none"
+      className="py-28 md:py-36 bg-[#080A0B] border-b border-[#D8BE82]/15 relative select-none overflow-hidden"
     >
-      <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
+      {/* Background warm glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#C7A866]/[0.04] rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto px-6 text-center space-y-6 relative z-10">
         
         <div className="flex items-center justify-center space-x-3">
-          <span className="w-8 h-[1px] bg-[#B89A62]" />
+          <span className="w-8 h-[1px] bg-[#C7A866]" />
           <span className="typography-eyebrow">
             {subtitle}
           </span>
-          <span className="w-8 h-[1px] bg-[#B89A62]" />
+          <span className="w-8 h-[1px] bg-[#C7A866]" />
         </div>
 
-        <h2 className="typography-display text-[#F7F4EE]">
+        <h2 className="typography-display text-[#F7F3EA]">
           {title}
         </h2>
 
-        <p className="typography-body max-w-md mx-auto text-[#A1A1AA]">
+        <p className="typography-body max-w-md mx-auto text-[#D8D0C3]">
           {description}
         </p>
 
         {/* Minimal Integrated Form */}
         <div className="pt-4 max-w-md mx-auto">
           {submitted ? (
-            <div className="flex items-center justify-center space-x-2.5 p-4 border border-[#B89A62] bg-[#121214] text-[#B89A62] rounded-xs animate-fade-up">
-              <CheckCircle2 className="w-4 h-4 text-[#B89A62]" />
+            <div className="flex items-center justify-center space-x-2.5 p-4 border border-[#D8BE82] bg-[#14120F] text-[#D8BE82] rounded-xs animate-fade-up">
+              <CheckCircle2 className="w-4 h-4 text-[#D8BE82]" />
               <span className="text-xs tracking-widest uppercase font-medium">
                 YOU’RE ON THE LIST.
               </span>
@@ -67,21 +70,21 @@ export default function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="YOUR EMAIL" 
-                className="flex-1 bg-[#121214] border border-white/[0.1] px-5 py-3.5 text-xs font-interface-sans tracking-widest text-[#F7F4EE] placeholder-[#A1A1AA]/50 focus:outline-none focus:border-[#B89A62] transition-colors rounded-xs"
+                className="flex-1 bg-[#14120F] border border-[#D8BE82]/30 px-5 py-3.5 text-xs font-interface-sans tracking-widest text-[#F7F3EA] placeholder-[#D8D0C3]/50 focus:outline-none focus:border-[#D8BE82] transition-colors rounded-xs"
               />
               
               <button 
                 type="submit"
-                className="px-7 py-3.5 bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C] font-interface-sans text-xs tracking-[0.25em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-2 whitespace-nowrap rounded-xs shadow-[0_5px_15px_rgba(184,154,98,0.15)]"
+                className="px-7 py-3.5 bg-[#D8BE82] hover:bg-[#C7A866] text-[#080A0B] font-interface-sans text-xs tracking-[0.25em] font-semibold uppercase transition-all duration-300 flex items-center justify-center space-x-2 whitespace-nowrap rounded-xs shadow-[0_5px_15px_rgba(216,190,130,0.15)]"
               >
                 <span>JOIN</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#0B0B0C]" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#080A0B]" />
               </button>
             </form>
           )}
         </div>
 
-        <p className="text-[10px] text-[#A1A1AA]/60 tracking-wider">
+        <p className="text-[11px] text-[#D8D0C3]/70 tracking-wider">
           No spam, ever. Unsubscribe anytime.
         </p>
 

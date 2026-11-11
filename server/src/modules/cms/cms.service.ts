@@ -8,7 +8,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     isEnabled: true,
     layoutVariant: 'CINEMATIC',
     title: 'WEAR SOMETHING\nTHEY REMEMBER.',
-    subtitle: 'İLLURÊ · NEW DELHI',
+    subtitle: 'İLLURÊ FRAGRANCE',
     description: 'Inspired fragrance. Made the İLLURÊ way.',
     ctaLabel: 'SHOP FRAGRANCES',
     ctaUrl: '#catalog',

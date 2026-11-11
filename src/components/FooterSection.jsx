@@ -98,32 +98,63 @@ export default function FooterSection({ onNavigate }) {
   ];
 
   return (
-    <footer className="bg-[#0B0B0C] border-t border-white/[0.06] text-[#F7F4EE] select-none pt-20 pb-12">
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+    <footer className="bg-gradient-to-b from-[#080A0B] via-[#0E1011] to-[#080909] border-t border-[#D8BE82]/20 text-[#F7F3EA] select-none pt-24 pb-12 relative overflow-hidden">
+      
+      {/* 1. PRE-FOOTER CALLOUT */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pb-20 border-b border-[#D8BE82]/15">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 bg-[#14120F] border border-[#D8BE82]/25 p-8 md:p-12 rounded-xs relative overflow-hidden shadow-2xl">
+          {/* Subtle gold glow */}
+          <div className="absolute right-0 top-0 w-80 h-80 bg-[#C7A866]/[0.05] rounded-full blur-3xl pointer-events-none" />
+
+          <div className="space-y-3 relative z-10 max-w-xl">
+            <span className="typography-eyebrow text-[9px] text-[#D8BE82]">
+              FIND YOUR PROFILE
+            </span>
+            <h3 className="font-editorial-serif text-3xl md:text-4xl text-[#F7F3EA] font-light leading-tight">
+              YOUR NEXT SIGNATURE IS WAITING.
+            </h3>
+            <p className="typography-body text-xs md:text-sm text-[#D8D0C3]">
+              Extrait de parfum formulations. Clean notes, high character, designed to be worn every day.
+            </p>
+          </div>
+
+          <div className="relative z-10 shrink-0">
+            <button
+              onClick={() => onNavigate && onNavigate('shop')}
+              className="btn-primary-gold"
+            >
+              <span>EXPLORE FRAGRANCES</span>
+              <span className="text-[#080A0B]">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-16 relative z-10">
         
         {/* Top: Brand Identity & Tagline */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-white/[0.06]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-[#D8BE82]/15">
           
           <div className="lg:col-span-5 space-y-5">
             <div className="flex items-center space-x-3">
-              <IllureCrest size={28} className="text-[#B89A62]" />
-              <span className="font-bodoni text-2xl tracking-[0.3em] uppercase text-[#F7F4EE]">
+              <IllureCrest size={28} className="text-[#D8BE82]" />
+              <span className="font-bodoni text-2xl tracking-[0.3em] uppercase text-[#F7F3EA]">
                 İLLURÊ
               </span>
             </div>
 
-            <p className="font-editorial-serif text-lg text-[#F7F4EE]/90 italic font-light max-w-sm">
+            <p className="font-editorial-serif text-lg text-[#F7F3EA] italic font-light max-w-sm">
               {footer?.tagline || 'Scent, without the noise. Familiar inspiration, our own identity.'}
             </p>
 
-            <div className="space-y-1.5 text-xs text-[#A1A1AA] font-interface-sans font-light">
+            <div className="space-y-1.5 text-xs text-[#D8D0C3] font-interface-sans font-light">
               <div className="flex items-center space-x-2">
-                <span className="text-[#B89A62]">İLLURÊ:</span>
-                <span>Contemporary Fragrance Label · New Delhi</span>
+                <span className="text-[#D8BE82] font-medium">İLLURÊ:</span>
+                <span>Contemporary Fragrance Label</span>
               </div>
               {isValidPhone(brandContacts?.phone) && (
                 <div className="flex items-center space-x-2">
-                  <Phone className="w-3.5 h-3.5 text-[#B89A62]" />
+                  <Phone className="w-3.5 h-3.5 text-[#D8BE82]" />
                   <span>{brandContacts.phone}</span>
                 </div>
               )}
@@ -134,7 +165,7 @@ export default function FooterSection({ onNavigate }) {
           <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-8">
             {columns.map((col, idx) => (
               <div key={idx} className="space-y-4">
-                <h4 className="font-interface-sans text-[10px] tracking-[0.3em] uppercase text-[#B89A62] font-semibold">
+                <h4 className="font-interface-sans text-[10px] tracking-[0.3em] uppercase text-[#D8BE82] font-semibold">
                   {col.title}
                 </h4>
                 <ul className="space-y-2.5">
@@ -142,7 +173,7 @@ export default function FooterSection({ onNavigate }) {
                     <li key={lIdx}>
                       <button
                         onClick={() => handleLinkClick(link.href)}
-                        className="text-xs text-[#A1A1AA] hover:text-[#F7F4EE] font-interface-sans font-light tracking-wider transition-colors text-left"
+                        className="text-xs text-[#D8D0C3] hover:text-[#D8BE82] font-interface-sans font-light tracking-wider transition-colors text-left"
                       >
                         {link.label}
                       </button>
@@ -155,17 +186,32 @@ export default function FooterSection({ onNavigate }) {
 
         </div>
 
+        {/* 2. OVERSIZED FAINT OUTLINE 'İLLURÊ' WORDMARK WATERMARK */}
+        <div className="py-10 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span 
+            className="font-bodoni font-light uppercase tracking-[0.2em] leading-none text-center"
+            style={{
+              fontSize: 'clamp(4.5rem, 14vw, 13rem)',
+              color: 'transparent',
+              WebkitTextStroke: '1px rgba(216, 190, 130, 0.22)',
+              opacity: 0.85,
+            }}
+          >
+            İLLURÊ
+          </span>
+        </div>
+
         {/* Bottom: Socials, Certifications & Copyright */}
-        <div className="pt-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-[#D8BE82]/15">
           
           {/* Social Channels */}
-          <div className="flex items-center space-x-5 text-[#A1A1AA]">
+          <div className="flex items-center space-x-5 text-[#D8D0C3]">
             {isValidSocialUrl(brandContacts?.instagram) && (
               <a 
                 href={brandContacts.instagram} 
                 target="_blank" 
                 rel="noreferrer"
-                className="hover:text-[#B89A62] transition-colors"
+                className="hover:text-[#D8BE82] transition-colors"
                 aria-label="Instagram"
               >
                 <InstagramIcon className="w-4 h-4" />
@@ -176,7 +222,7 @@ export default function FooterSection({ onNavigate }) {
                 href={brandContacts.facebook} 
                 target="_blank" 
                 rel="noreferrer"
-                className="hover:text-[#B89A62] transition-colors"
+                className="hover:text-[#D8BE82] transition-colors"
                 aria-label="Facebook"
               >
                 <FacebookIcon className="w-4 h-4" />
@@ -187,7 +233,7 @@ export default function FooterSection({ onNavigate }) {
                 href={`https://wa.me/${brandContacts.whatsapp.replace(/[^0-9]/g, '')}`} 
                 target="_blank" 
                 rel="noreferrer"
-                className="hover:text-[#B89A62] transition-colors"
+                className="hover:text-[#D8BE82] transition-colors"
                 aria-label="WhatsApp Concierge"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -196,7 +242,7 @@ export default function FooterSection({ onNavigate }) {
             {isValidEmail(brandContacts?.email) && (
               <a 
                 href={`mailto:${brandContacts.email}`} 
-                className="hover:text-[#B89A62] transition-colors"
+                className="hover:text-[#D8BE82] transition-colors"
                 aria-label="Email Concierge"
               >
                 <Mail className="w-4 h-4" />
@@ -205,7 +251,7 @@ export default function FooterSection({ onNavigate }) {
           </div>
 
           {/* Payment Badges (Subtle & Quiet Luxury) */}
-          <div className="flex items-center space-x-3 text-[10px] tracking-widest uppercase font-mono text-[#A1A1AA]/70">
+          <div className="flex items-center space-x-3 text-[10px] tracking-widest uppercase font-mono text-[#D8D0C3]/80">
             <span>UPI</span>
             <span>·</span>
             <span>VISA</span>
@@ -218,15 +264,15 @@ export default function FooterSection({ onNavigate }) {
           </div>
 
           {/* Copyright */}
-          <div className="text-[11px] text-[#A1A1AA]/70 font-light">
+          <div className="text-[11px] text-[#D8D0C3] font-light">
             {footer?.copyright || '© 2026 İLLURÊ FRAGRANCE. All rights reserved.'}
           </div>
 
         </div>
 
         {/* Reference Brand Legal Disclaimer (Requirement 10) */}
-        <div className="pt-8 mt-8 border-t border-white/[0.04] text-center md:text-left">
-          <p className="text-[10px] text-[#71717A] leading-relaxed max-w-4xl font-light">
+        <div className="pt-8 mt-8 border-t border-[#D8BE82]/10 text-center md:text-left">
+          <p className="text-[11px] text-[#F7F3EA]/60 leading-relaxed max-w-4xl font-light">
             {footer?.disclaimer || 'Reference brand names are used only to describe fragrance inspiration and olfactory reference. İLLURÊ FRAGRANCE is an independent brand and is not affiliated with, endorsed by, or sponsored by the referenced trademark owners.'}
           </p>
         </div>

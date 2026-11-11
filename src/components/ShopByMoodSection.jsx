@@ -62,24 +62,29 @@ export default function ShopByMoodSection({ onSelectMood }) {
   return (
     <section 
       id="shop-by-mood-section" 
-      className="py-24 md:py-36 bg-[#0B0B0C] relative select-none border-b border-white/[0.04]"
+      className="py-24 md:py-36 bg-[#080A0B] relative select-none border-b border-[#D8BE82]/15"
     >
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         
         {/* Section Header */}
         <div className="mb-16 md:mb-20 space-y-4">
-          <div className="flex items-center space-x-3">
-            <span className="w-8 h-[1px] bg-[#B89A62]" />
-            <span className="typography-eyebrow">
-              {subtitle}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="w-8 h-[1px] bg-[#C7A866]" />
+              <span className="typography-eyebrow">
+                {subtitle}
+              </span>
+            </div>
+            <span className="font-mono text-xs tracking-[0.25em] text-[#C7A866]/60 font-medium">
+              03 / OCCASION
             </span>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="typography-h1 text-[#F7F4EE]">
+            <h2 className="typography-h1 text-[#F7F3EA]">
               {title}
             </h2>
-            <p className="typography-body max-w-md">
+            <p className="typography-body text-[#D8D0C3] max-w-md">
               {description}
             </p>
           </div>
@@ -93,7 +98,7 @@ export default function ShopByMoodSection({ onSelectMood }) {
             return (
               <div 
                 key={mood.id}
-                className="group relative h-[420px] rounded-xs overflow-hidden cursor-pointer flex flex-col justify-between p-6 border border-white/[0.08] transition-all duration-700 hover:border-[#B89A62]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8)]"
+                className="group relative h-[420px] rounded-xs overflow-hidden cursor-pointer flex flex-col justify-between p-6 border border-[#D8BE82]/20 transition-all duration-700 hover:border-[#D8BE82]/70 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8)]"
                 onMouseEnter={() => setActiveMoodId(mood.id)}
                 onClick={() => onSelectMood && onSelectMood(mood.id || mood.filter)}
               >
@@ -107,37 +112,37 @@ export default function ShopByMoodSection({ onSelectMood }) {
                 />
 
                 {/* Dark Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-[#0B0B0C]/40 to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080A0B] via-[#080A0B]/50 to-transparent opacity-95" />
 
                 {/* Top Label */}
                 <div className="relative z-10 flex justify-between items-center">
-                  <span className="typography-eyebrow text-[9px] text-[#B89A62]">
+                  <span className="typography-eyebrow text-[9px] text-[#D8BE82]">
                     MOOD ARCHIVE
                   </span>
-                  <ArrowRight className={`w-4 h-4 text-[#B89A62] transition-all duration-300 ${
+                  <ArrowRight className={`w-4 h-4 text-[#D8BE82] transition-all duration-300 ${
                     isActive ? 'translate-x-1 opacity-100' : 'opacity-0'
                   }`} />
                 </div>
 
                 {/* Bottom Copy */}
                 <div className="relative z-10 space-y-2.5">
-                  <h4 className="font-editorial-serif text-2xl text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors leading-tight">
+                  <h4 className="font-editorial-serif text-2xl text-[#F7F3EA] group-hover:text-[#D8BE82] transition-colors leading-tight">
                     {mood.name}
                   </h4>
-                  <p className="text-[11px] font-medium text-[#E3DCD0] line-clamp-1">
+                  <p className="text-[11px] font-medium text-[#F7F3EA]/90 line-clamp-1">
                     {mood.tagline}
                   </p>
-                  <p className="text-[10px] text-[#A1A1AA] font-light leading-relaxed line-clamp-2">
+                  <p className="text-[11px] text-[#D8D0C3] font-light leading-relaxed line-clamp-2">
                     {mood.description}
                   </p>
-                  <div className="pt-2 flex items-center space-x-1 text-[9px] tracking-widest text-[#B89A62] uppercase font-semibold">
+                  <div className="pt-2 flex items-center space-x-1 text-[9px] tracking-widest text-[#D8BE82] uppercase font-semibold">
                     <span>EXPLORE MOOD</span>
                     <span>→</span>
                   </div>
                 </div>
 
                 {/* Bottom Gold Hairline */}
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#B89A62] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D8BE82] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             );
           })}

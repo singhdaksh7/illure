@@ -64,7 +64,7 @@ export default function Header({
         <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
           
           {/* LEFT: COMPACT DESKTOP NAVIGATION */}
-          <nav className="hidden lg:flex items-center space-x-8 text-[11px] tracking-[0.25em] font-interface-sans font-medium text-[#A1A1AA]">
+          <nav className="hidden lg:flex items-center space-x-8 text-[11px] tracking-[0.25em] font-interface-sans font-medium text-[#D8D0C3]">
             {/* SHOP WITH MEGA MENU TRIGGER */}
             <div 
               className="relative py-2"
@@ -74,13 +74,13 @@ export default function Header({
               <button
                 onClick={() => handleNavClick('shop')}
                 className={`flex items-center space-x-1.5 uppercase tracking-[0.28em] transition-colors py-1 relative ${
-                  activeTab === 'shop' || activeMegaMenu === 'shop' ? 'text-[#F7F4EE]' : 'hover:text-[#F7F4EE]'
+                  activeTab === 'shop' || activeMegaMenu === 'shop' ? 'text-[#F7F3EA]' : 'hover:text-[#F7F3EA]'
                 }`}
               >
                 <span>SHOP</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeMegaMenu === 'shop' ? 'rotate-180 text-[#B89A62]' : 'opacity-60'}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeMegaMenu === 'shop' ? 'rotate-180 text-[#D8BE82]' : 'opacity-60'}`} />
                 {activeTab === 'shop' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-[#B89A62]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D8BE82]" />
                 )}
               </button>
             </div>
@@ -98,11 +98,11 @@ export default function Header({
                   else handleNavClick('home');
                 }}
                 className={`flex items-center space-x-1.5 uppercase tracking-[0.28em] transition-colors py-1 relative ${
-                  activeMegaMenu === 'discover' ? 'text-[#F7F4EE]' : 'hover:text-[#F7F4EE]'
+                  activeMegaMenu === 'discover' ? 'text-[#F7F3EA]' : 'hover:text-[#F7F3EA]'
                 }`}
               >
                 <span>DISCOVER</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeMegaMenu === 'discover' ? 'rotate-180 text-[#B89A62]' : 'opacity-60'}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeMegaMenu === 'discover' ? 'rotate-180 text-[#D8BE82]' : 'opacity-60'}`} />
               </button>
             </div>
 
@@ -113,7 +113,7 @@ export default function Header({
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                 else handleNavClick('home');
               }}
-              className="hover:text-[#F7F4EE] transition-colors py-1 uppercase tracking-[0.28em]"
+              className="hover:text-[#F7F3EA] transition-colors py-1 uppercase tracking-[0.28em]"
             >
               OUR STORY
             </button>
@@ -125,7 +125,7 @@ export default function Header({
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                 else handleNavClick('home');
               }}
-              className="hover:text-[#F7F4EE] transition-colors py-1 uppercase tracking-[0.28em]"
+              className="hover:text-[#F7F3EA] transition-colors py-1 uppercase tracking-[0.28em]"
             >
               MOOD
             </button>
@@ -159,11 +159,11 @@ export default function Header({
           </div>
 
           {/* RIGHT: SEARCH, ACCOUNT, BAG */}
-          <div className="flex items-center space-x-5 md:space-x-7 text-[#F7F4EE]">
+          <div className="flex items-center space-x-5 md:space-x-7 text-[#F7F3EA]">
             {/* Search Icon */}
             <button
               onClick={onOpenSearch}
-              className="p-1.5 text-[#A1A1AA] hover:text-[#B89A62] transition-colors focus:outline-none"
+              className="p-1.5 text-[#D8D0C3] hover:text-[#D8BE82] transition-colors focus:outline-none"
               aria-label="Search Fragrances"
               title="Search Catalog"
             >
@@ -173,7 +173,7 @@ export default function Header({
             {/* Customer Account Portal */}
             <button
               onClick={() => handleNavClick(isAuthenticated ? 'account' : 'login')}
-              className="p-1.5 text-[#A1A1AA] hover:text-[#B89A62] transition-colors focus:outline-none hidden sm:block"
+              className="p-1.5 text-[#D8D0C3] hover:text-[#D8BE82] transition-colors focus:outline-none hidden sm:block"
               aria-label="Customer Account"
               title={isAuthenticated ? `Account: ${customer?.name || 'Patron'}` : 'Sign In'}
             >
@@ -183,13 +183,13 @@ export default function Header({
             {/* Bag Button with Refined Gold Count Badge */}
             <button
               onClick={onOpenCart}
-              className="group flex items-center space-x-2 py-1 text-[11px] tracking-[0.25em] font-interface-sans font-medium text-[#A1A1AA] hover:text-[#F7F4EE] transition-colors focus:outline-none"
+              className="group flex items-center space-x-2 py-1 text-[11px] tracking-[0.25em] font-interface-sans font-medium text-[#D8D0C3] hover:text-[#F7F3EA] transition-colors focus:outline-none"
               aria-label="Shopping Bag"
             >
               <div className="relative">
-                <ShoppingBag className="w-4 h-4 md:w-4.5 md:h-4.5 stroke-[1.5] text-[#F7F4EE] group-hover:text-[#B89A62] transition-colors" />
+                <ShoppingBag className="w-4 h-4 md:w-4.5 md:h-4.5 stroke-[1.5] text-[#F7F3EA] group-hover:text-[#D8BE82] transition-colors" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-[#B89A62] text-[#0B0B0C] font-semibold text-[9px] min-w-[15px] h-[15px] rounded-full flex items-center justify-center px-1 shadow-sm">
+                  <span className="absolute -top-1.5 -right-2 bg-[#D8BE82] text-[#080A0B] font-semibold text-[9px] min-w-[15px] h-[15px] rounded-full flex items-center justify-center px-1 shadow-sm">
                     {cartCount}
                   </span>
                 )}

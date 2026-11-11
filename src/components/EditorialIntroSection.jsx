@@ -18,12 +18,17 @@ export default function EditorialIntroSection({ onDiscover }) {
   return (
     <section 
       id="editorial-intro-section" 
-      className="relative bg-[#0B0B0C] py-24 md:py-36 px-6 md:px-12 border-b border-white/[0.04] overflow-hidden"
+      className="relative bg-[#0E1011] py-28 md:py-36 px-6 md:px-12 border-b border-[#D8BE82]/15 overflow-hidden"
     >
-      <div className="max-w-[1440px] mx-auto">
+      {/* Subtle warm glow floor */}
+      <div 
+        className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[300px] bg-[#C7A866]/[0.035] rounded-full blur-3xl pointer-events-none"
+      />
+
+      <div className="max-w-[1440px] mx-auto relative z-10">
         
         {/* Subtle background crest accent watermark */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] select-none text-[#B89A62]">
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-[0.035] select-none text-[#C7A866]">
           <span className="font-bodoni text-[20vw] leading-none">İ</span>
         </div>
 
@@ -32,38 +37,38 @@ export default function EditorialIntroSection({ onDiscover }) {
           {/* Left: Oversized Editorial Statement */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center space-x-3">
-              <span className="w-8 h-[1px] bg-[#B89A62]" />
+              <span className="w-8 h-[1px] bg-[#C7A866]" />
               <span className="typography-eyebrow">
                 {subtitle}
               </span>
             </div>
 
-            <h2 className="typography-display text-[#F7F4EE] whitespace-pre-line leading-[1.08]">
+            <h2 className="typography-display text-[#F7F3EA] whitespace-pre-line leading-[1.08]">
               {title}
             </h2>
 
-            <div className="w-16 h-[1px] bg-[#B89A62]/30 mt-4" />
+            <div className="w-20 h-[1px] bg-[#C7A866]/40 mt-4" />
           </div>
 
           {/* Right: Small Explanatory Commentary & Whitespace */}
           <div className="lg:col-span-5 space-y-6 lg:pl-8">
-            <p className="typography-body-large text-[#A1A1AA] font-light">
+            <p className="typography-body-large text-[#D8D0C3] font-light max-w-[560px]">
               {description}
             </p>
 
-            <blockquote className="border-l-2 border-[#B89A62]/40 pl-4 py-1 text-xs md:text-sm text-[#F7F4EE]/90 italic font-editorial-serif">
+            <blockquote className="border-l-2 border-[#C7A866]/50 pl-4 py-1 text-sm md:text-base text-[#F7F3EA] italic font-editorial-serif">
               {callout}
             </blockquote>
 
             <div className="pt-2">
               <button
                 onClick={onDiscover}
-                className="group inline-flex items-center space-x-2 text-xs tracking-[0.25em] uppercase text-[#B89A62] hover:text-[#F7F4EE] transition-colors"
+                className="group inline-flex items-center space-x-2 text-xs tracking-[0.25em] uppercase text-[#D8BE82] hover:text-[#F7F3EA] transition-colors"
               >
-                <span className="border-b border-[#B89A62]/40 group-hover:border-[#F7F4EE] pb-0.5">
+                <span className="border-b border-[#C7A866]/50 group-hover:border-[#F7F3EA] pb-0.5">
                   EXPLORE THE LINEUP
                 </span>
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <span className="group-hover:translate-x-1.5 transition-transform">→</span>
               </button>
             </div>
           </div>
