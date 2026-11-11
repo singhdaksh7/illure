@@ -450,7 +450,7 @@ export default function AdminCmsPage() {
               {/* Bottle Image */}
               <div className="space-y-1.5">
                 <label className="font-semibold text-gray-700 uppercase tracking-wider text-[10px]">
-                  Featured Flacon Image URL
+                  Featured Bottle Image URL
                 </label>
                 <input
                   type="text"
@@ -849,7 +849,7 @@ export default function AdminCmsPage() {
                 <input
                   type="text"
                   name="linkText"
-                  defaultValue={settings.announcement_bar?.linkText || 'EXPLORE FLACONS'}
+                  defaultValue={settings.announcement_bar?.linkText || 'EXPLORE FRAGRANCES'}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#B89A62]"
                 />
               </div>
@@ -947,7 +947,7 @@ export default function AdminCmsPage() {
                       rows={3}
                       defaultValue={
                         content.body ||
-                        'We re-interpret iconic triumphs of olfactory history. Compact flacons, concentrated compositions, and meticulous attention to detail.'
+                        'We re-interpret iconic triumphs of olfactory history. Compact bottles, concentrated compositions, and meticulous attention to detail.'
                       }
                       className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#B89A62]"
                     />

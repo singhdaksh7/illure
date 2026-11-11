@@ -137,7 +137,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
   if (loading) {
     return (
       <div className="pt-32 pb-24 text-center min-h-[60vh] flex items-center justify-center text-[#D8BE82] font-editorial-serif tracking-widest">
-        Preparing Ateliers Coffret...
+        Preparing Discovery Set...
       </div>
     );
   }
@@ -145,7 +145,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
   if (!discoverySet) {
     return (
       <div className="pt-32 pb-24 text-center space-y-4">
-        <p className="text-sm text-[#AAA297]">This Discovery Set coffret is currently unavailable in reserve.</p>
+        <p className="text-sm text-[#AAA297]">This Discovery Set is currently unavailable in reserve.</p>
         {onBack && (
           <button
             onClick={onBack}
@@ -180,7 +180,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
         <div className="lg:col-span-8 space-y-3">
           <div className="flex items-center space-x-2 text-[#D8BE82]">
             <IllureCrest size={18} className="text-[#D8BE82]" />
-            <span className="typography-eyebrow text-[#D8BE82]">ATELIER PRESENTATION COFFRET</span>
+            <span className="typography-eyebrow text-[#D8BE82]">SIGNATURE DISCOVERY BOX</span>
           </div>
           <h1 className="typography-display text-3xl sm:text-4xl md:text-5xl text-[#F7F3EA] leading-tight">
             {discoverySet.title}
@@ -193,7 +193,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
         {/* Status / Sticky Summary */}
         <div className="lg:col-span-4 bg-[#14120F] border border-[#C7A866]/30 p-5 rounded-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-widest text-[#AAA297]">COFFRET PRICE</span>
+            <span className="text-[11px] uppercase tracking-widest text-[#AAA297]">SET PRICE</span>
             <span className="font-editorial-serif text-2xl text-[#D8BE82]">
               ₹{displayPrice.toLocaleString('en-IN')}
             </span>
@@ -202,7 +202,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
           <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
             <span className="text-[#D8D0C3]">Selections ({selectedVariants.length} of {minCount})</span>
             <span className={`font-mono text-xs ${isComplete ? 'text-emerald-400 font-semibold' : 'text-[#C7A866]'}`}>
-              {isComplete ? '✓ Ready for Coffret' : `Choose ${minCount - selectedVariants.length} more`}
+              {isComplete ? '✓ Ready for Discovery Box' : `Choose ${minCount - selectedVariants.length} more`}
             </span>
           </div>
 
@@ -222,7 +222,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>{added ? 'COFFRET ADDED TO BAG' : validating ? 'CALCULATING...' : `ACQUIRE SET · ₹${displayPrice.toLocaleString('en-IN')}`}</span>
+            <span>{added ? 'DISCOVERY SET ADDED TO BAG' : validating ? 'CALCULATING...' : `ACQUIRE SET · ₹${displayPrice.toLocaleString('en-IN')}`}</span>
           </button>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
       {/* Selected Slot Trays */}
       <div className="my-10 bg-[#0E1011] border border-[#C7A866]/20 p-6 rounded-xs space-y-4">
         <span className="text-[10px] tracking-[0.25em] text-[#D8BE82] uppercase block font-semibold">
-          YOUR COFFRET SLOTS ({selectedVariants.length}/{minCount})
+          YOUR SELECTION SLOTS ({selectedVariants.length}/{minCount})
         </span>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -287,7 +287,7 @@ export default function DiscoverySetBuilder({ slug = 'custom-discovery-set', onB
           <span className="text-xs text-[#AAA297]">
             {discoverySet.type === 'PREBUILT'
               ? 'Curated Masterwork Triad'
-              : 'Tap to add or replace flacons in your coffret'}
+              : 'Tap to add or replace fragrances in your set'}
           </span>
         </div>
 

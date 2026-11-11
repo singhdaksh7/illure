@@ -480,7 +480,7 @@ export default function ProductDetailPage({
                 <div className="flex items-center space-x-2 text-[#D8BE82]">
                   <Bell className="w-4 h-4 text-[#C7A866]" />
                   <span className="text-xs uppercase tracking-widest font-semibold font-interface-sans">
-                    Reserve Notification
+                    Notify Me When Back in Stock
                   </span>
                 </div>
                 <p className="text-[12px] text-[#D8D0C3] leading-relaxed">

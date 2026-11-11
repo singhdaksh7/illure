@@ -6,7 +6,7 @@ const DEFAULT_PILLARS = [
   {
     number: "01",
     title: "YOUR SIZE",
-    description: "Choose what works for you. From pocket-friendly flacons to full bottles."
+    description: "Choose what works for you. From pocket-friendly sizes to full bottles."
   },
   {
     number: "02",

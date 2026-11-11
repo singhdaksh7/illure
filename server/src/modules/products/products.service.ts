@@ -483,26 +483,28 @@ export class ProductsService {
     }
 
     if (query.search) {
-      const s = query.search.trim();
-      const searchConditions = [
-        { name: { contains: s, mode: 'insensitive' } },
-        { inspiredByName: { contains: s, mode: 'insensitive' } },
-        { fragranceFamily: { contains: s, mode: 'insensitive' } },
-        { referenceBrand: { name: { contains: s, mode: 'insensitive' } } },
-        { topNotes: { has: s } },
-        { heartNotes: { has: s } },
-        { baseNotes: { has: s } },
-        { occasion: { contains: s, mode: 'insensitive' } },
-      ];
-
-      if (where.OR) {
-        where.AND = [
-          { OR: where.OR },
-          { OR: searchConditions },
+      const s = query.search.replace(/[%_"'\\]/g, ' ').trim().slice(0, 80);
+      if (s.length >= 2) {
+        const searchConditions = [
+          { name: { contains: s, mode: 'insensitive' } },
+          { inspiredByName: { contains: s, mode: 'insensitive' } },
+          { fragranceFamily: { contains: s, mode: 'insensitive' } },
+          { referenceBrand: { name: { contains: s, mode: 'insensitive' } } },
+          { topNotes: { has: s } },
+          { heartNotes: { has: s } },
+          { baseNotes: { has: s } },
+          { occasion: { contains: s, mode: 'insensitive' } },
         ];
-        delete where.OR;
-      } else {
-        where.OR = searchConditions;
+
+        if (where.OR) {
+          where.AND = [
+            { OR: where.OR },
+            { OR: searchConditions },
+          ];
+          delete where.OR;
+        } else {
+          where.OR = searchConditions;
+        }
       }
     }
 
@@ -748,11 +750,12 @@ export class ProductsService {
   }
 
   static async advancedSearch(query: string) {
-    const q = (query || '').trim();
-    if (!q) {
+    const clean = (query || '').replace(/[%_"'\-]/g, ' ').trim().slice(0, 80);
+    const keywords = clean.split(/\s+/).filter((k) => k.length >= 2);
+    if (keywords.length === 0) {
       return { fragrances: [], notes: [], families: [] };
     }
-
+    const q = keywords[0];
     const products = await prisma.product.findMany({
       where: {
         status: ProductStatus.ACTIVE,

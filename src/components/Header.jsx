@@ -190,7 +190,7 @@ export default function Header({
               onClick={() => handleNavClick(isAuthenticated ? 'account' : 'login')}
               className="p-1.5 text-[#D8D0C3] hover:text-[#D8BE82] transition-colors focus:outline-none hidden sm:block"
               aria-label="Customer Account"
-              title={isAuthenticated ? `Account: ${customer?.name || 'Patron'}` : 'Sign In'}
+              title={isAuthenticated ? `Account: ${customer?.name || 'Client'}` : 'Sign In'}
             >
               <User className="w-4 h-4 md:w-4.5 md:h-4.5 stroke-[1.5]" />
             </button>
@@ -535,7 +535,7 @@ export default function Header({
                 onClick={() => handleNavClick(isAuthenticated ? 'account' : 'login')}
                 className="w-full py-3 bg-[#121214] border border-[#B89A62]/30 text-center font-interface-sans text-xs tracking-[0.25em] uppercase text-[#F7F4EE] hover:bg-[#B89A62] hover:text-[#0B0B0C] transition-all"
               >
-                {isAuthenticated ? `PORTAL (${customer?.name?.split(' ')[0] || 'PATRON'})` : 'PATRON SIGN IN'}
+                {isAuthenticated ? `PORTAL (${customer?.name?.split(' ')[0] || 'PATRON'})` : 'ACCOUNT SIGN IN'}
               </button>
               <p className="text-[10px] tracking-widest text-center text-[#A1A1AA] uppercase">
                 {shipping?.freeShippingThreshold

@@ -10,7 +10,7 @@ export class StockAlertsController {
       const { variantId, email } = req.body;
       const customerId = req.customer?.id;
       const sub = await StockAlertsService.subscribe(variantId, email, customerId);
-      return sendSuccess(res, { subscription: sub, message: 'You will be notified as soon as this flacon returns to stock.' }, 201);
+      return sendSuccess(res, { subscription: sub, message: 'You will be notified as soon as this fragrance returns to stock.' }, 201);
     } catch (error) {
       next(error);
     }

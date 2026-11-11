@@ -65,15 +65,15 @@ export default function AdminDiscoverySetsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-gray-200 gap-4">
         <div>
-          <h1 className="text-2xl font-serif text-[#0D1112]">Discovery Sets &amp; Coffrets</h1>
+          <h1 className="text-2xl font-serif text-[#0D1112]">Discovery Sets &amp; Bundles</h1>
           <p className="text-xs text-gray-500 mt-1">
-            Configure custom 3-flacon discovery sets and prebuilt curated coffrets.
+            Configure custom 3-item discovery sets and prebuilt curated boxes.
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
           <span className="px-3 py-1 bg-[#C6AE82]/20 text-[#8C6D32] font-medium text-xs rounded-full border border-[#C6AE82]/30">
-            {sets.length} Coffrets Configured
+            {sets.length} Sets Configured
           </span>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function AdminDiscoverySetsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">Required Selections:</span>
-                  <span className="font-mono text-gray-700">{set.minSelections} Flacons</span>
+                  <span className="font-mono text-gray-700">{set.minSelections} Fragrances</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">Eligible Products:</span>

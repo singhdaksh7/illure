@@ -20,7 +20,7 @@ export default function CustomerRegisterPage({ onNavigate }) {
       await register(name, email, phone, password);
       if (onNavigate) onNavigate('account');
     } catch (err) {
-      setError(err.message || 'Failed to create patron account.');
+      setError(err.message || 'Failed to create client account.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ export default function CustomerRegisterPage({ onNavigate }) {
             
             <div className="space-y-1.5">
               <span className="typography-eyebrow">
-                PATRON REGISTRATION
+                CREATE YOUR ACCOUNT
               </span>
               <h1 className="typography-h2 text-[#F7F4EE]">
                 Inscribe Your Name
@@ -170,7 +170,7 @@ export default function CustomerRegisterPage({ onNavigate }) {
                 disabled={loading}
                 className="w-full py-4 bg-[#B89A62] hover:bg-[#C0A46D] text-[#0B0B0C] font-interface-sans text-xs font-semibold tracking-[0.28em] uppercase transition-all duration-300 rounded-xs cursor-pointer disabled:opacity-50 flex items-center justify-center space-x-2 shadow-[0_5px_20px_rgba(184,154,98,0.2)] mt-2"
               >
-                <span>{loading ? 'CREATING PATRON ACCOUNT...' : 'INSCRIBE & CONTINUE'}</span>
+                <span>{loading ? 'CREATING YOUR ACCOUNT...' : 'INSCRIBE & CONTINUE'}</span>
                 <ArrowRight className="w-4 h-4 text-[#0B0B0C]" />
               </button>
             </form>
@@ -194,7 +194,7 @@ export default function CustomerRegisterPage({ onNavigate }) {
 
       {/* Bottom Minimal Copyright */}
       <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 py-6 text-center text-[10px] tracking-widest text-[#A1A1AA]/60 uppercase border-t border-white/[0.04]">
-        © 2026 İLLURÊ FRAGRANCE · ALL PATRON DATA IS CONFIDENTIAL
+        © 2026 İLLURÊ FRAGRANCE · ALL CLIENT DATA IS CONFIDENTIAL
       </div>
 
     </div>

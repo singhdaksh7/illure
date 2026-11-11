@@ -155,7 +155,7 @@ export default function CustomerAccountPage({ onNavigate }) {
             <div className="flex items-center space-x-2.5">
               <IllureCrest size={18} className="text-[#B89A62]" />
               <span className="typography-eyebrow text-[#B89A62]">
-                PATRON CLIENT ARCHIVE
+                CLIENT ORDER ARCHIVE
               </span>
             </div>
             <h1 className="typography-h1 text-[#F7F4EE]">
@@ -168,7 +168,7 @@ export default function CustomerAccountPage({ onNavigate }) {
               onClick={() => onNavigate && onNavigate('shop')}
               className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#121214] border border-[#B89A62]/30 hover:border-[#B89A62] text-[#F7F4EE] text-xs font-interface-sans tracking-widest uppercase transition-colors rounded-xs"
             >
-              <span>EXPLORE FLACONS</span>
+              <span>EXPLORE FRAGRANCES</span>
             </button>
             <button
               onClick={handleLogout}
@@ -190,7 +190,7 @@ export default function CustomerAccountPage({ onNavigate }) {
               { id: 'wishlist', label: 'SAVED FRAGRANCES', icon: Heart },
               { id: 'orders', label: 'ORDERS ARCHIVE', icon: Package },
               { id: 'addresses', label: 'DELIVERY ADDRESSES', icon: MapPin },
-              { id: 'profile', label: 'PATRON PROFILE', icon: User },
+              { id: 'profile', label: 'CUSTOMER PROFILE', icon: User },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -235,7 +235,7 @@ export default function CustomerAccountPage({ onNavigate }) {
                       TIER STATUS
                     </span>
                     <p className="font-editorial-serif text-2xl text-[#F7F4EE]">
-                      GOLD PATRON
+                      GOLD MEMBER
                     </p>
                     <span className="text-[11px] text-[#A1A1AA] block">
                       Guaranteed priority dispatch
@@ -471,13 +471,13 @@ export default function CustomerAccountPage({ onNavigate }) {
             {activeTab === 'profile' && (
               <div className="space-y-6 animate-fade-up">
                 <div>
-                  <h3 className="typography-h2 text-[#F7F4EE]">Patron Profile</h3>
+                  <h3 className="typography-h2 text-[#F7F4EE]">Customer Profile</h3>
                   <p className="typography-body text-xs text-[#A1A1AA]">Your verified client identification.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 font-interface-sans">
                   <div className="p-5 bg-[#0B0B0C] border border-white/[0.06] rounded-xs space-y-1">
-                    <span className="text-[10px] text-[#B89A62] uppercase tracking-wider block">FULL PATRON NAME</span>
+                    <span className="text-[10px] text-[#B89A62] uppercase tracking-wider block">FULL NAME</span>
                     <p className="text-sm font-medium text-[#F7F4EE]">{customer.name}</p>
                   </div>
 
@@ -493,7 +493,7 @@ export default function CustomerAccountPage({ onNavigate }) {
 
                   <div className="p-5 bg-[#0B0B0C] border border-white/[0.06] rounded-xs space-y-1">
                     <span className="text-[10px] text-[#B89A62] uppercase tracking-wider block">ACCOUNT CLASSIFICATION</span>
-                    <p className="text-sm font-medium text-[#B89A62]">VERIFIED PATRON</p>
+                    <p className="text-sm font-medium text-[#B89A62]">VERIFIED CLIENT</p>
                   </div>
                 </div>
               </div>

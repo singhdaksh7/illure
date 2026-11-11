@@ -182,7 +182,7 @@ export default function HeroSection({ onExplore, onProductSelect }) {
                 EXTRAIT DE PARFUM
               </span>
               <span className="font-editorial-serif text-sm text-[#F7F4EE]">
-                Royal Oud Wood · 50 ML Flacon
+                Royal Oud Wood · 50 ML
               </span>
             </div>
           </div>

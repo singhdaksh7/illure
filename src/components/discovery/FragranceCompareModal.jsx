@@ -160,7 +160,7 @@ export default function FragranceCompareModal({
                   {comparedProducts.map((p) => {
                     const sizes = p.variants && p.variants.length > 0
                       ? p.variants.map((v) => v.sizeLabel).join(', ')
-                      : (p.sizes ? p.sizes.map((s) => s.size || s).join(', ') : 'Standard Flacon');
+                      : (p.sizes ? p.sizes.map((s) => s.size || s).join(', ') : 'Standard Fragrance');
                     return (
                       <td key={p.id} className="p-3 text-center text-[11px] text-[#AAA297]">
                         {sizes}

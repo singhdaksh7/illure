@@ -377,7 +377,7 @@ export default function CatalogView({
         {/* Right: Sort UI & Flacon Counter */}
         <div className="flex items-center space-x-4">
           <span className="text-xs text-[#AAA297] font-mono tracking-wider hidden sm:inline">
-            {filteredProducts.length} FLACONS
+            {filteredProducts.length} FRAGRANCES
           </span>
 
           <div className="flex items-center space-x-2">

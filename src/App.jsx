@@ -330,7 +330,7 @@ function StorefrontApp() {
           <React.Suspense
             fallback={
               <div className="pt-32 text-center text-[#D8BE82] font-editorial-serif tracking-widest text-sm">
-                Assembling Presentation Coffret...
+                Assembling Discovery Set...
               </div>
             }
           >

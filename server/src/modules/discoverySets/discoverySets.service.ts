@@ -49,14 +49,14 @@ export class DiscoverySetsService {
 
       const config = await prisma.discoverySetConfig.create({
         data: {
-          name: 'Signature Discovery Set (3 Flacons)',
+          name: 'Signature Discovery Set (3 Fragrances)',
           slug: defaultSlug,
           type: DiscoverySetType.CUSTOM,
           status: DiscoverySetStatus.ACTIVE,
           title: 'BUILD YOUR DISCOVERY SET',
           subtitle: 'Three 3ml or 6ml Miniature Masterworks',
           description:
-            'Select any three miniature compositions from the İLLURÊ private collection. Presented in our bespoke obsidian presentation coffret with parchment discovery blotters.',
+            'Select any three miniature compositions from the İLLURÊ private collection. Presented in our bespoke obsidian presentation box with parchment discovery blotters.',
           imageUrl: '/images/discovery_set.jpg',
           selectionMode: DiscoverySetSelectionMode.PRODUCT,
           minSelections: 3,

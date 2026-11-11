@@ -20,6 +20,12 @@ import { publicFeaturesRouter, adminFeaturesRouter } from '../modules/features/f
 import wishlistRouter from '../modules/wishlist/wishlist.router.js';
 import { publicStockAlertsRouter, adminStockAlertsRouter } from '../modules/stockAlerts/stockAlerts.router.js';
 import { publicDiscoverySetsRouter, adminDiscoverySetsRouter } from '../modules/discoverySets/discoverySets.router.js';
+import { giftingRouter } from '../modules/gifting/gifting.router.js';
+import { retentionRouter } from '../modules/retention/retention.router.js';
+import { loyaltyRouter } from '../modules/loyalty/loyalty.router.js';
+import { operationsRouter } from '../modules/operations/operations.router.js';
+import { analyticsRouter } from '../modules/analytics/analytics.router.js';
+import { notificationsRouter } from '../modules/notifications/notifications.router.js';
 
 const apiRouter = Router();
 
@@ -44,6 +50,8 @@ apiRouter.use('/admin/cms', adminCmsRouter);
 apiRouter.use('/admin/features', adminFeaturesRouter);
 apiRouter.use('/admin/discovery-sets', adminDiscoverySetsRouter);
 apiRouter.use('/admin/stock-alerts', adminStockAlertsRouter);
+apiRouter.use('/admin/analytics', analyticsRouter);
+apiRouter.use('/admin/notifications', notificationsRouter);
 
 // Customer & Public Module Endpoints
 apiRouter.use('/features', publicFeaturesRouter);
@@ -64,5 +72,11 @@ apiRouter.use('/cms', publicCmsRouter);
 apiRouter.use('/wishlist', wishlistRouter);
 apiRouter.use('/stock-alerts', publicStockAlertsRouter);
 apiRouter.use('/discovery-sets', publicDiscoverySetsRouter);
+
+// New Phases 4-8 Modules
+apiRouter.use('/gifting', giftingRouter);
+apiRouter.use('/retention', retentionRouter);
+apiRouter.use('/loyalty', loyaltyRouter);
+apiRouter.use('/operations', operationsRouter);
 
 export default apiRouter;

@@ -1,6 +1,6 @@
 import { prisma } from '../../utils/prisma.js';
 import { StockAlertStatus } from '@prisma/client';
-import { EmailService } from '../../utils/email.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 export class StockAlertsService {
   static async subscribe(variantId: string, email: string, customerId?: string) {
@@ -62,16 +62,20 @@ export class StockAlertsService {
     if (activeSubs.length === 0) return { notifiedCount: 0 };
 
     const now = new Date();
-    let sentCount = 0;
+    let queuedCount = 0;
 
     for (const sub of activeSubs) {
       try {
-        await EmailService.sendBackInStockEmail({
-          to: sub.email,
-          productName: sub.variant.product.name,
-          variantSize: sub.variant.sizeLabel,
-          productSlug: sub.variant.product.slug,
-          price: Number(sub.variant.price),
+        // Enqueue async notification job in DB queue
+        await NotificationsService.enqueue({
+          type: 'STOCK_ALERT',
+          payload: {
+            to: sub.email,
+            productName: sub.variant.product.name,
+            size: sub.variant.sizeLabel,
+            productUrl: `/fragrance/${sub.variant.product.slug}`,
+            price: Number(sub.variant.price),
+          },
         });
 
         await prisma.stockAlertSubscription.update({
@@ -81,13 +85,18 @@ export class StockAlertsService {
             sentAt: now,
           },
         });
-        sentCount++;
+        queuedCount++;
       } catch (err) {
-        console.error(`Failed to send stock alert email to ${sub.email}:`, err);
+        console.error(`Failed to enqueue stock alert for ${sub.email}:`, err);
       }
     }
 
-    return { notifiedCount: sentCount };
+    // Attempt immediate async queue drain without blocking response
+    NotificationsService.drainQueue(10).catch((err) =>
+      console.error('Queue drain error in notifyRestock:', err)
+    );
+
+    return { notifiedCount: queuedCount };
   }
 
   static async listAdminAlerts(page = 1, pageSize = 20) {

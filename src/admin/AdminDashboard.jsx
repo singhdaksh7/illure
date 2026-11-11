@@ -1,3 +1,4 @@
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import AdminCmsPage from './pages/AdminCmsPage';
@@ -60,6 +61,10 @@ export default function AdminDashboard({ activeTab }) {
     }
     fetchAdminUsers();
   }, [activeTab, accessToken]);
+
+  if (activeTab === 'analytics') {
+    return <AdminAnalyticsPage />;
+  }
 
   if (activeTab === 'features') {
     return <AdminFeaturesPage />;

@@ -264,4 +264,29 @@ export class EmailService {
       return false;
     }
   }
+
+  static async sendGenericEmail(data: {
+    to: string;
+    subject: string;
+    text?: string;
+    html: string;
+  }): Promise<boolean> {
+    try {
+      if (env.NODE_ENV === 'test') {
+        return true;
+      }
+      const transport = getTransporter();
+      await transport.sendMail({
+        from: `"${env.SMTP_FROM_NAME}" <${env.SMTP_FROM_EMAIL}>`,
+        to: data.to,
+        subject: data.subject,
+        text: data.text,
+        html: data.html,
+      });
+      return true;
+    } catch (err) {
+      console.error('⚠️ [EmailService] Failed to send generic email:', err);
+      return false;
+    }
+  }
 }

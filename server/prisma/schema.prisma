@@ -173,6 +173,7 @@ model Product {
   wishlistItems     WishlistItem[]
   discoveryEligibleItems DiscoverySetEligibleItem[]
   discoveryPrebuiltItems DiscoverySetPrebuiltItem[]
+  reviews                ProductReview[]
 
   @@index([referenceBrandId])
   @@index([status])
@@ -212,6 +213,7 @@ model ProductVariant {
   stockAlerts        StockAlertSubscription[]
   discoveryEligibleItems DiscoverySetEligibleItem[]
   discoveryPrebuiltItems DiscoverySetPrebuiltItem[]
+  reviews                ProductReview[]
 
   @@index([productId])
   @@map("product_variants")
@@ -280,8 +282,15 @@ model Customer {
   orders       Order[]
   sessions     CustomerSession[]
   cart         Cart?
-  wishlist     WishlistItem[]
-  stockAlerts  StockAlertSubscription[]
+  wishlist       WishlistItem[]
+  stockAlerts    StockAlertSubscription[]
+  scentProfile   CustomerScentProfile?
+  reviews        ProductReview[]
+  giftCardsPurchased GiftCard[]   @relation("CustomerGiftCards")
+  loyaltyAccount LoyaltyAccount?
+  referralsMade  Referral[]       @relation("ReferrerCust")
+  referredBy     Referral?        @relation("ReferredCust")
+  returnRequests OrderReturnRequest[]
 
   @@index([phone])
   @@map("customers")
@@ -386,6 +395,7 @@ model Order {
   shippingAddress     OrderAddress?
   statusHistory       OrderStatusHistory[]
   payments            Payment[]
+  returnRequests      OrderReturnRequest[]
 
   @@index([customerId])
   @@index([status])
@@ -776,3 +786,260 @@ model StockAlertSubscription {
   @@map("stock_alert_subscriptions")
 }
 
+
+
+// ==========================================
+// PHASE 3H: ASYNC NOTIFICATION JOBS
+// ==========================================
+enum NotificationJobStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
+model NotificationJob {
+  id            String                @id @default(uuid())
+  type          String                // STOCK_ALERT, ABANDONED_CART, REVIEW_REQUEST, etc.
+  status        NotificationJobStatus @default(PENDING)
+  payload       Json
+  attempts      Int                   @default(0)
+  maxAttempts   Int                   @default(3)
+  nextAttemptAt DateTime?             @default(now())
+  lastError     String?
+  processedAt   DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([status, nextAttemptAt])
+  @@index([type])
+  @@map("notification_jobs")
+}
+
+// ==========================================
+// PHASE 4: GIFTING & GIFT CARDS
+// ==========================================
+enum GiftCardStatus {
+  ACTIVE
+  REDEEMED
+  EXPIRED
+  CANCELLED
+}
+
+model GiftCard {
+  id                    String         @id @default(uuid())
+  code                  String         @unique
+  initialBalance        Decimal        @db.Decimal(10, 2)
+  currentBalance        Decimal        @db.Decimal(10, 2)
+  currency              String         @default("INR")
+  status                GiftCardStatus @default(ACTIVE)
+  recipientEmail        String?
+  recipientName         String?
+  senderName            String?
+  message               String?
+  purchasedByCustomerId String?
+  purchasedByCustomer   Customer?      @relation("CustomerGiftCards", fields: [purchasedByCustomerId], references: [id], onDelete: SetNull)
+  expiresAt             DateTime?
+  redeemedAt            DateTime?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@index([code])
+  @@index([status])
+  @@map("gift_cards")
+}
+
+// ==========================================
+// PHASE 5: RETENTION & REVIEWS
+// ==========================================
+model CustomerScentProfile {
+  id                String    @id @default(uuid())
+  customerId        String    @unique
+  customer          Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  preferredFamilies String[]  @default([])
+  likedNotes        String[]  @default([])
+  avoidedNotes      String[]  @default([])
+  moods             String[]  @default([])
+  occasions         String[]  @default([])
+  intensity         String?
+  quizAnswers       Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("customer_scent_profiles")
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ProductReview {
+  id              String          @id @default(uuid())
+  productId       String
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  customerId      String
+  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderId         String?
+  rating          Int          // 1-5
+  scentRating     Int?         // 1-5
+  longevityRating Int?         // 1-5
+  valueRating     Int?         // 1-5
+  wouldBuyAgain   Boolean?     @default(true)
+  title           String?
+  comment         String
+  mediaUrls       String[]     @default([])
+  isVerified      Boolean      @default(false)
+  status          ReviewStatus @default(PENDING)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([productId, status])
+  @@index([customerId])
+  @@map("product_reviews")
+}
+
+// ==========================================
+// PHASE 6: LOYALTY & REFERRALS & DROPS
+// ==========================================
+model LoyaltyAccount {
+  id           String               @id @default(uuid())
+  customerId   String               @unique
+  customer     Customer             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  balance      Int                  @default(0)
+  tier         String               @default("OBSIDIAN") // BRONZE, SILVER, GOLD, OBSIDIAN
+  transactions LoyaltyTransaction[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@map("loyalty_accounts")
+}
+
+enum LoyaltyTxType {
+  EARN
+  REDEEM
+  ADJUST
+  EXPIRE
+}
+
+model LoyaltyTransaction {
+  id        String         @id @default(uuid())
+  accountId String
+  account   LoyaltyAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type      LoyaltyTxType
+  points    Int
+  orderId   String?
+  reason    String
+  createdAt DateTime       @default(now())
+
+  @@index([accountId])
+  @@index([orderId])
+  @@map("loyalty_transactions")
+}
+
+model Referral {
+  id            String    @id @default(uuid())
+  referrerId    String
+  referrer      Customer  @relation("ReferrerCust", fields: [referrerId], references: [id], onDelete: Cascade)
+  code          String    @unique
+  referredEmail String?
+  referredId    String?   @unique
+  referred      Customer? @relation("ReferredCust", fields: [referredId], references: [id], onDelete: SetNull)
+  rewardClaimed Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@index([code])
+  @@index([referrerId])
+  @@map("referrals")
+}
+
+model LimitedDrop {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  title       String
+  description String?
+  imageUrl    String?
+  startsAt    DateTime
+  endsAt      DateTime?
+  earlyAccess Boolean   @default(false)
+  productIds  String[]  @default([])
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("limited_drops")
+}
+
+// ==========================================
+// PHASE 7: OPERATIONS, RETURNS, PINCODES & RISK
+// ==========================================
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
+model OrderReturnRequest {
+  id           String       @id @default(uuid())
+  orderId      String
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customerId   String
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items        Json         // array of { orderItemId, quantity, reason }
+  reason       String
+  evidenceUrls String[]     @default([])
+  status       ReturnStatus @default(PENDING)
+  resolution   String?
+  adminNotes   String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([status])
+  @@map("order_return_requests")
+}
+
+model PincodeRule {
+  id            String   @id @default(uuid())
+  pincode       String   @unique
+  isServiceable Boolean  @default(true)
+  isCodAllowed  Boolean  @default(true)
+  estimatedDays Int      @default(3)
+  state         String?
+  city          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([pincode])
+  @@map("pincode_rules")
+}
+
+enum RiskSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model RiskFlag {
+  id         String       @id @default(uuid())
+  orderId    String?
+  customerId String?
+  reason     String
+  severity   RiskSeverity @default(MEDIUM)
+  isResolved Boolean      @default(false)
+  resolvedAt DateTime?
+  createdAt  DateTime     @default(now())
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([isResolved])
+  @@map("risk_flags")
+}

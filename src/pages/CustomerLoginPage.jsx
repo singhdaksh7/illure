@@ -145,7 +145,7 @@ export default function CustomerLoginPage({ onNavigate }) {
                   onClick={() => onNavigate && onNavigate('register')}
                   className="text-[#B89A62] hover:underline font-semibold cursor-pointer ml-1"
                 >
-                  Create Patron Account
+                  Create Account
                 </button>
               </p>
             </div>

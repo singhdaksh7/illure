@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import {
   LayoutDashboard,
+  BarChart3,
   Sparkles,
   SlidersHorizontal,
   Package,
@@ -21,6 +22,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'analytics', label: 'Executive Analytics', icon: BarChart3 },
     { id: 'features', label: 'Commerce Features', icon: SlidersHorizontal },
     { id: 'discoverySets', label: 'Discovery Sets', icon: Boxes },
     { id: 'cms', label: 'Storefront CMS', icon: Sparkles },
