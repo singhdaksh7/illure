@@ -18,6 +18,9 @@ import CatalogView from './components/CatalogView';
 import ProductDetailPage from './components/ProductDetailPage';
 import CartDrawer from './components/CartDrawer';
 import SearchModal from './components/SearchModal';
+import ScentFinderModal from './components/discovery/ScentFinderModal';
+import NotesExplorerModal from './components/discovery/NotesExplorerModal';
+import FragranceCompareModal from './components/discovery/FragranceCompareModal';
 import CustomCursor from './components/CustomCursor';
 import IntroOverlay from './components/IntroOverlay';
 import AdminPortal from './admin/AdminPortal';
@@ -65,6 +68,11 @@ function StorefrontApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [genderFilter, setGenderFilter] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
+  const [noteFilter, setNoteFilter] = useState(null);
+  const [isScentFinderOpen, setIsScentFinderOpen] = useState(false);
+  const [isNotesExplorerOpen, setIsNotesExplorerOpen] = useState(false);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [comparedProducts, setComparedProducts] = useState([]);
 
   // Synchronize dynamic products from live catalog API
   useEffect(() => {
@@ -190,6 +198,8 @@ function StorefrontApp() {
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenScentFinder={() => setIsScentFinderOpen(true)}
+        onOpenNotesExplorer={() => setIsNotesExplorerOpen(true)}
         cartCount={cartCount}
         activeTab={activeTab}
         setActiveTab={handleNavigate}
@@ -303,6 +313,8 @@ function StorefrontApp() {
           onAddToCart={handleAddToCartItem}
           initialGender={genderFilter}
           initialCategory={categoryFilter}
+          noteFilter={noteFilter}
+          onClearNoteFilter={() => setNoteFilter(null)}
         />
       )}
 
@@ -315,6 +327,13 @@ function StorefrontApp() {
             onBack={() => setActiveTab('home')}
             onAddToCart={handleAddToCartItem}
             onSelectProduct={handleSelectProduct}
+            onCompareProduct={(prod) => {
+              setComparedProducts((prev) => {
+                if (prev.some((p) => p.id === prod.id)) return prev;
+                return [...prev, prod].slice(-3);
+              });
+              setIsCompareOpen(true);
+            }}
           />
         </main>
       )}
@@ -380,6 +399,35 @@ function StorefrontApp() {
         onClose={() => setIsSearchOpen(false)}
         productsData={productsList}
         onSelectProduct={handleSelectProduct}
+      />
+
+      {/* DISCOVERY: SCENT FINDER QUIZ MODAL (FEATURE 01) */}
+      <ScentFinderModal
+        isOpen={isScentFinderOpen}
+        onClose={() => setIsScentFinderOpen(false)}
+        products={productsList}
+        onSelectProduct={handleSelectProduct}
+      />
+
+      {/* DISCOVERY: NOTES DIRECTORY MODAL (FEATURE 08) */}
+      <NotesExplorerModal
+        isOpen={isNotesExplorerOpen}
+        onClose={() => setIsNotesExplorerOpen(false)}
+        onSelectNoteFilter={(note) => {
+          setNoteFilter(note);
+          setActiveTab('shop');
+        }}
+      />
+
+      {/* DISCOVERY: FRAGRANCE ACCORD COMPARE MODAL (FEATURE 06) */}
+      <FragranceCompareModal
+        isOpen={isCompareOpen}
+        onClose={() => setIsCompareOpen(false)}
+        comparedProducts={comparedProducts}
+        onRemoveProduct={(id) => {
+          setComparedProducts((prev) => prev.filter((p) => p.id !== id));
+        }}
+        onAddToCart={handleAddToCartItem}
       />
     </div>
   );

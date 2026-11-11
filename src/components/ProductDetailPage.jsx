@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ShoppingBag, ArrowLeft, Check, Sparkles, ShieldCheck, Gift, Clock, Wind, Flame, Sun, Droplets } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Check, Sparkles, ShieldCheck, Gift, Clock, Wind, Flame, Sun, Droplets, Layers, GitCompare } from 'lucide-react';
 import IllureCrest from './IllureCrest';
 import ProductCard from './ProductCard';
 import { giftPackagingApi } from '../api/giftPackaging';
+import { useFeatures } from '../context/FeaturesContext';
 
 export default function ProductDetailPage({ 
   productId, 
   productsData = [], 
   onBack, 
   onAddToCart, 
-  onSelectProduct 
+  onSelectProduct,
+  onCompareProduct
 }) {
+  const { isFeatureEnabled, trackFeatureEvent } = useFeatures();
   const product = useMemo(() => {
     return productsData.find(p => p.id === productId || p.slug === productId) || productsData[0] || {};
   }, [productId, productsData]);
@@ -82,6 +85,16 @@ export default function ProductDetailPage({
 
   // Dynamic gift packaging from backend
   const [giftOption, setGiftOption] = useState(null);
+
+  // Derive similar products sharing family or notes (Discovery Feature 05)
+  const similarProducts = useMemo(() => {
+    return productsData
+      .filter(p => p.id !== product.id && (
+        p.fragranceFamily?.toLowerCase() === product.fragranceFamily?.toLowerCase() ||
+        p.brandId === product.brandId
+      ))
+      .slice(0, 3);
+  }, [product, productsData]);
 
   useEffect(() => {
     giftPackagingApi.getPublic()
@@ -413,6 +426,20 @@ export default function ProductDetailPage({
                       : `ADD TO BAG · ₹${totalBatchPrice.toLocaleString('en-IN')}`}
                   </span>
                 </button>
+
+                {/* COMPARE BUTTON (DISCOVERY FEATURE 06) */}
+                {isFeatureEnabled('fragrance_compare') && (
+                  <button
+                    onClick={() => {
+                      trackFeatureEvent('PRODUCT_COMPARE_CLICKED', 'fragrance_compare', { productId: product.id });
+                      if (onCompareProduct) onCompareProduct(product);
+                    }}
+                    className="p-4 bg-[#14120F] border border-[#D8BE82]/25 hover:border-[#D8BE82]/70 text-[#D8BE82] transition-colors rounded-xs flex items-center justify-center"
+                    title="Compare with another fragrance"
+                  >
+                    <GitCompare className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               {/* Guarantees */}
@@ -570,6 +597,36 @@ export default function ProductDetailPage({
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* FIND SIMILAR FRAGRANCES (DISCOVERY FEATURE 05) */}
+        {isFeatureEnabled('find_similar') && similarProducts.length > 0 && (
+          <div className="py-16 border-t border-white/[0.06] space-y-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-1">
+                <span className="typography-eyebrow text-[#C7A866]">
+                  PARALLEL ACCORDS
+                </span>
+                <h3 className="typography-h2 text-[#F7F3EA]">
+                  SIMILAR OLFACTORY PROFILES
+                </h3>
+              </div>
+              <p className="text-xs text-[#AAA297] max-w-sm">
+                Curated formulations sharing equivalent resin, woods, or floral architecture with {product.name}.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {similarProducts.map((item) => (
+                <ProductCard
+                  key={item.id}
+                  product={item}
+                  onSelectProduct={onSelectProduct}
+                  onAddToCart={onAddToCart}
+                />
+              ))}
             </div>
           </div>
         )}

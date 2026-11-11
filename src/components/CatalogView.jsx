@@ -8,12 +8,23 @@ export default function CatalogView({
   onAddToCart,
   initialGender = null,
   initialCategory = null,
+  noteFilter = null,
+  onClearNoteFilter,
 }) {
   const [genderFilter, setGenderFilter] = useState(initialGender);
   const [familyFilter, setFamilyFilter] = useState(initialCategory);
   const [sortBy, setSortBy] = useState('featured'); // featured | newest | price-asc | price-desc | name
   const [inStockOnly, setInStockOnly] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Keep internal filter state synchronized if props change (e.g. from nav or mood section)
+  React.useEffect(() => {
+    if (initialCategory !== undefined) setFamilyFilter(initialCategory);
+  }, [initialCategory]);
+
+  React.useEffect(() => {
+    if (initialGender !== undefined) setGenderFilter(initialGender);
+  }, [initialGender]);
 
   // Available fragrance families
   const fragranceFamilies = [
@@ -30,6 +41,17 @@ export default function CatalogView({
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
+        // Note filter (from notes explorer modal)
+        if (noteFilter) {
+          const allNotes = [
+            ...(p.topNotes || []),
+            ...(p.heartNotes || []),
+            ...(p.baseNotes || [])
+          ].map(n => n.toLowerCase());
+          const matchNote = allNotes.some(n => n.includes(noteFilter.toLowerCase()) || noteFilter.toLowerCase().includes(n));
+          if (!matchNote) return false;
+        }
+
         // Gender filter
         if (genderFilter && p.gender !== genderFilter && p.gender !== 'UNISEX' && p.gender !== 'Unisex') {
           return false;
@@ -37,10 +59,23 @@ export default function CatalogView({
 
         // Fragrance family filter
         if (familyFilter && familyFilter !== 'all') {
-          const matchFam = p.fragranceFamily?.toLowerCase().includes(familyFilter.toLowerCase());
-          const matchCat = p.category?.toLowerCase() === familyFilter.toLowerCase();
-          const matchNiche = familyFilter === 'niche' && p.niche;
-          if (!matchFam && !matchCat && !matchNiche) return false;
+          const target = familyFilter.toLowerCase();
+          const matchFam = p.fragranceFamily?.toLowerCase().includes(target);
+          const matchCat = p.category?.toLowerCase() === target;
+          const matchNiche = target === 'niche' && p.niche;
+          // Support mood filters passed from ShopByMoodSection
+          const matchMood = (
+            (target === 'evening' && (p.fragranceFamily?.toLowerCase().includes('wood') || p.fragranceFamily?.toLowerCase().includes('amber') || p.fragranceFamily?.toLowerCase().includes('oud'))) ||
+            (target === 'after-dark' && (p.fragranceFamily?.toLowerCase().includes('wood') || p.fragranceFamily?.toLowerCase().includes('oud') || p.fragranceFamily?.toLowerCase().includes('amber'))) ||
+            (target === 'day' && (p.fragranceFamily?.toLowerCase().includes('fresh') || p.fragranceFamily?.toLowerCase().includes('citrus'))) ||
+            (target === 'first-impression' && (p.fragranceFamily?.toLowerCase().includes('fresh') || p.fragranceFamily?.toLowerCase().includes('citrus'))) ||
+            (target === 'signature' && p.bestseller) ||
+            (target === 'everyday' && (p.bestseller || p.fragranceFamily?.toLowerCase().includes('woody'))) ||
+            (target === 'date-night' && (p.fragranceFamily?.toLowerCase().includes('amber') || p.fragranceFamily?.toLowerCase().includes('spicy'))) ||
+            (target === 'the-weekend' && (p.fragranceFamily?.toLowerCase().includes('fresh') || p.fragranceFamily?.toLowerCase().includes('citrus')))
+          );
+
+          if (!matchFam && !matchCat && !matchNiche && !matchMood) return false;
         }
 
         // In Stock filter
@@ -90,6 +125,37 @@ export default function CatalogView({
             Familiar profiles. Distinct character. Concentrated extrait formulations designed to be worn anywhere.
           </p>
         </div>
+
+        {/* ACTIVE NOTE / MOOD FILTER BADGE */}
+        {(noteFilter || familyFilter) && (
+          <div className="mt-4 flex items-center space-x-2">
+            <span className="text-[10px] text-[#C7A866] uppercase tracking-widest font-interface-sans font-medium">
+              FILTER APPLIED:
+            </span>
+            {noteFilter && (
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-[#14120F] border border-[#D8BE82]/40 rounded-xs text-xs text-[#D8BE82]">
+                <span>Note: {noteFilter}</span>
+                <button
+                  onClick={onClearNoteFilter}
+                  className="hover:text-[#F7F3EA] text-[#AAA297] ml-1"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {familyFilter && (
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-[#14120F] border border-[#D8BE82]/40 rounded-xs text-xs text-[#D8BE82]">
+                <span>Category/Mood: {familyFilter}</span>
+                <button
+                  onClick={() => setFamilyFilter(null)}
+                  className="hover:text-[#F7F3EA] text-[#AAA297] ml-1"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ==================================================

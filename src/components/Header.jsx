@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Menu, X, User, ChevronDown, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, User, ChevronDown, ChevronRight, Sparkles, ArrowRight, Compass, BookOpen } from 'lucide-react';
 import IllureCrest from './IllureCrest';
 import { useCms } from '../context/CmsContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import { useFeatures } from '../context/FeaturesContext';
 
 export default function Header({
   onOpenSearch,
   onOpenCart,
+  onOpenScentFinder,
+  onOpenNotesExplorer,
   cartCount = 0,
   activeTab = 'home',
   setActiveTab,
@@ -15,6 +18,7 @@ export default function Header({
 }) {
   const { navigation, shipping } = useCms();
   const { customer, isAuthenticated } = useCustomerAuth();
+  const { isFeatureEnabled } = useFeatures();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState(null); // 'shop' | 'discover' | 'editorial' | null
@@ -129,6 +133,17 @@ export default function Header({
             >
               MOOD
             </button>
+
+            {/* SCENT FINDER QUIZ TRIGGER */}
+            {isFeatureEnabled('scent_finder') && (
+              <button
+                onClick={onOpenScentFinder}
+                className="hover:text-[#D8BE82] text-[#C7A866] transition-colors py-1 uppercase tracking-[0.28em] flex items-center space-x-1"
+              >
+                <Compass className="w-3 h-3 text-[#C7A866]" />
+                <span>FINDER</span>
+              </button>
+            )}
           </nav>
 
           {/* MOBILE HAMBURGER BUTTON */}
@@ -250,6 +265,34 @@ export default function Header({
                   DISCOVER & NOTES
                 </h4>
                 <ul className="space-y-2.5 text-xs font-light tracking-wider">
+                  {isFeatureEnabled('scent_finder') && (
+                    <li>
+                      <button
+                        onClick={() => {
+                          setActiveMegaMenu(null);
+                          if (onOpenScentFinder) onOpenScentFinder();
+                        }}
+                        className="text-[#D8BE82] hover:text-[#F7F4EE] hover:translate-x-1 transition-all flex items-center space-x-1.5 py-0.5"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-[#C7A866]" />
+                        <span>Scent Finder Quiz</span>
+                      </button>
+                    </li>
+                  )}
+                  {isFeatureEnabled('notes_explorer') && (
+                    <li>
+                      <button
+                        onClick={() => {
+                          setActiveMegaMenu(null);
+                          if (onOpenNotesExplorer) onOpenNotesExplorer();
+                        }}
+                        className="text-[#D8BE82] hover:text-[#F7F4EE] hover:translate-x-1 transition-all flex items-center space-x-1.5 py-0.5"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-[#C7A866]" />
+                        <span>Notes Directory & Accords</span>
+                      </button>
+                    </li>
+                  )}
                   {(megaData.discover || [
                     { label: 'The Inspired Collections', href: '#collections' },
                     { label: 'Fragrance Families & Pyramids', href: '#catalog' },
@@ -420,6 +463,28 @@ export default function Header({
                   </button>
                   {mobileAccordion.discover && (
                     <div className="pl-4 pt-2 space-y-3 font-interface-sans text-xs tracking-wider text-[#A1A1AA]">
+                      {isFeatureEnabled('scent_finder') && (
+                        <button
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            if (onOpenScentFinder) onOpenScentFinder();
+                          }}
+                          className="block text-[#D8BE82] hover:text-[#F7F4EE]"
+                        >
+                          Scent Finder Quiz
+                        </button>
+                      )}
+                      {isFeatureEnabled('notes_explorer') && (
+                        <button
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            if (onOpenNotesExplorer) onOpenNotesExplorer();
+                          }}
+                          className="block text-[#D8BE82] hover:text-[#F7F4EE]"
+                        >
+                          Notes & Accords Archive
+                        </button>
+                      )}
                       <button onClick={() => {
                         const el = document.getElementById('collections-section');
                         if (el) el.scrollIntoView({ behavior: 'smooth' });
