@@ -11,7 +11,7 @@ export default function EditorialIntroSection({ onDiscover }) {
 
   const title = section?.title || 'Your scent should say something\nbefore you do.';
   const subtitle = section?.subtitle || 'THE İLLURÊ POINT OF VIEW';
-  const description = section?.description || 'Familiar inspiration. A different identity. We formulate with high concentration so your scent holds its ground without shouting.';
+  const description = section?.description || 'Familiar inspiration. A different identity. Thoughtfully balanced so your scent holds its ground without shouting.';
   const custom = section?.customData || {};
   const callout = custom.calloutNote || 'Good fragrance doesn’t need a long explanation.';
 

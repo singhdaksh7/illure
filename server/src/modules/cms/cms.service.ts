@@ -33,7 +33,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
     layoutVariant: 'DEFAULT',
     title: 'Your scent should say something\nbefore you do.',
     subtitle: 'THE İLLURÊ POINT OF VIEW',
-    description: 'Familiar inspiration. A different identity. We formulate with high concentration so your scent holds its ground without shouting.',
+    description: 'Familiar inspiration. A different identity. Thoughtfully balanced so your scent holds its ground without shouting.',
     ctaLabel: 'EXPLORE THE LINEUP',
     ctaUrl: '#catalog',
     customData: {

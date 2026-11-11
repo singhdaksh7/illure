@@ -31,7 +31,7 @@ export default function Header({
   const megaData = navigation?.megaMenu || {};
   const promo = megaData.featuredPromotion || {
     title: 'ROYAL OUD REIMAGINED',
-    subtitle: 'The Signature Extrait',
+    subtitle: 'Signature Fragrance',
     imageUrl: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=600',
     ctaText: 'Discover Scent',
     ctaUrl: '#catalog',
@@ -222,7 +222,7 @@ export default function Header({
                     { label: 'All Fragrances', filter: 'all' },
                     { label: 'For Him', filter: 'MEN' },
                     { label: 'For Her', filter: 'WOMEN' },
-                    { label: 'Unisex Extraits', filter: 'UNISEX' },
+                    { label: 'Unisex', filter: 'UNISEX' },
                     { label: 'The Bestsellers', filter: 'bestsellers' },
                     { label: 'New Arrivals', filter: 'new' },
                   ]).map((item, idx) => (

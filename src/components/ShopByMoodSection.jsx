@@ -68,15 +68,10 @@ export default function ShopByMoodSection({ onSelectMood }) {
         
         {/* Section Header */}
         <div className="mb-16 md:mb-20 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="w-8 h-[1px] bg-[#C7A866]" />
-              <span className="typography-eyebrow">
-                {subtitle}
-              </span>
-            </div>
-            <span className="font-mono text-xs tracking-[0.25em] text-[#C7A866]/60 font-medium">
-              03 / OCCASION
+          <div className="flex items-center space-x-3">
+            <span className="w-8 h-[1px] bg-[#C7A866]" />
+            <span className="typography-eyebrow">
+              {subtitle}
             </span>
           </div>
 
@@ -117,7 +112,7 @@ export default function ShopByMoodSection({ onSelectMood }) {
                 {/* Top Label */}
                 <div className="relative z-10 flex justify-between items-center">
                   <span className="typography-eyebrow text-[9px] text-[#D8BE82]">
-                    MOOD ARCHIVE
+                    BY MOOD
                   </span>
                   <ArrowRight className={`w-4 h-4 text-[#D8BE82] transition-all duration-300 ${
                     isActive ? 'translate-x-1 opacity-100' : 'opacity-0'

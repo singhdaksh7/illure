@@ -419,7 +419,7 @@ export default function ProductDetailPage({
               <div className="flex items-center justify-between text-[10px] tracking-wider text-[#A1A1AA] uppercase pt-2 border-t border-white/[0.04]">
                 <div className="flex items-center space-x-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#B89A62]" />
-                  <span>Concentrated Extrait · İLLURÊ</span>
+                  <span>Signature Scent · İLLURÊ</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#B89A62]" />
@@ -449,7 +449,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE I · OPENING ACCORD
+                      FIRST IMPRESSION
                     </span>
                     <Wind className="w-4 h-4 text-[#B89A62]" />
                   </div>
@@ -471,7 +471,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/30 rounded-xs space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE II · HEART PROFILE
+                      CORE PROFILE
                     </span>
                     <Droplets className="w-4 h-4 text-[#B89A62]" />
                   </div>
@@ -493,7 +493,7 @@ export default function ProductDetailPage({
                 <div className="p-8 bg-[#121214] border border-[#B89A62]/20 rounded-xs space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="typography-eyebrow text-[9px] text-[#B89A62]">
-                      STAGE III · DRY DOWN
+                      LASTING DRY DOWN
                     </span>
                     <Flame className="w-4 h-4 text-[#B89A62]" />
                   </div>

@@ -108,13 +108,13 @@ export default function FooterSection({ onNavigate }) {
 
           <div className="space-y-3 relative z-10 max-w-xl">
             <span className="typography-eyebrow text-[9px] text-[#D8BE82]">
-              FIND YOUR PROFILE
+              FIND YOUR SIGNATURE
             </span>
             <h3 className="font-editorial-serif text-3xl md:text-4xl text-[#F7F3EA] font-light leading-tight">
-              YOUR NEXT SIGNATURE IS WAITING.
+              YOUR NEXT SCENT IS WAITING.
             </h3>
             <p className="typography-body text-xs md:text-sm text-[#D8D0C3]">
-              Extrait de parfum formulations. Clean notes, high character, designed to be worn every day.
+              Familiar inspiration. Distinct point of view. High character, designed to be worn every day.
             </p>
           </div>
 

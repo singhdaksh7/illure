@@ -56,15 +56,10 @@ export default function CollectionsSection({ onSelectCollection }) {
         
         {/* Section Header */}
         <div className="mb-16 md:mb-20 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="w-8 h-[1px] bg-[#C7A866]" />
-              <span className="typography-eyebrow">
-                {subtitle}
-              </span>
-            </div>
-            <span className="font-mono text-xs tracking-[0.25em] text-[#C7A866]/60 font-medium">
-              02 / EDITIONS
+          <div className="flex items-center space-x-3">
+            <span className="w-8 h-[1px] bg-[#C7A866]" />
+            <span className="typography-eyebrow">
+              {subtitle}
             </span>
           </div>
 
