@@ -17,6 +17,9 @@ import couponsRouter from '../modules/coupons/coupons.router.js';
 import settingsRouter from '../modules/settings/settings.router.js';
 import { publicCmsRouter, adminCmsRouter } from '../modules/cms/cms.router.js';
 import { publicFeaturesRouter, adminFeaturesRouter } from '../modules/features/features.router.js';
+import wishlistRouter from '../modules/wishlist/wishlist.router.js';
+import { publicStockAlertsRouter, adminStockAlertsRouter } from '../modules/stockAlerts/stockAlerts.router.js';
+import { publicDiscoverySetsRouter, adminDiscoverySetsRouter } from '../modules/discoverySets/discoverySets.router.js';
 
 const apiRouter = Router();
 
@@ -39,6 +42,8 @@ apiRouter.use('/admin/inventory', adminInventoryRouter);
 apiRouter.use('/admin/orders', adminOrdersRouter);
 apiRouter.use('/admin/cms', adminCmsRouter);
 apiRouter.use('/admin/features', adminFeaturesRouter);
+apiRouter.use('/admin/discovery-sets', adminDiscoverySetsRouter);
+apiRouter.use('/admin/stock-alerts', adminStockAlertsRouter);
 
 // Customer & Public Module Endpoints
 apiRouter.use('/features', publicFeaturesRouter);
@@ -56,5 +61,8 @@ apiRouter.use('/payments', paymentsRouter);
 apiRouter.use('/coupons', couponsRouter);
 apiRouter.use('/settings', settingsRouter);
 apiRouter.use('/cms', publicCmsRouter);
+apiRouter.use('/wishlist', wishlistRouter);
+apiRouter.use('/stock-alerts', publicStockAlertsRouter);
+apiRouter.use('/discovery-sets', publicDiscoverySetsRouter);
 
 export default apiRouter;

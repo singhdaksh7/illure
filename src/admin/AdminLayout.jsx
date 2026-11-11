@@ -22,6 +22,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'features', label: 'Commerce Features', icon: SlidersHorizontal },
+    { id: 'discoverySets', label: 'Discovery Sets', icon: Boxes },
     { id: 'cms', label: 'Storefront CMS', icon: Sparkles },
     { id: 'products', label: 'Products', icon: Package, badge: 'Future' },
     { id: 'categories', label: 'Categories', icon: Layers, badge: 'Future' },

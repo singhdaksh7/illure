@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { User, MapPin, Package, LogOut, Plus, Trash2, Check, Star, AlertCircle, ChevronRight, Loader2, X, Clock, ShieldCheck, Sparkles, Compass } from 'lucide-react';
+import { User, MapPin, Package, LogOut, Plus, Trash2, Check, Star, AlertCircle, ChevronRight, Loader2, X, Clock, ShieldCheck, Sparkles, Compass, Heart, ArrowRight } from 'lucide-react';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import { useWishlist } from '../context/WishlistContext';
 import { customerAddressesApi } from '../api/customer';
 import { ordersApi } from '../api/orders';
 import IllureCrest from '../components/IllureCrest';
 
 export default function CustomerAccountPage({ onNavigate }) {
   const { customer, logout } = useCustomerAuth();
-  const [activeTab, setActiveTab] = useState('overview'); // overview | orders | addresses | profile
+  const { wishlistItems, removeFromWishlist } = useWishlist();
+  const [activeTab, setActiveTab] = useState('overview'); // overview | orders | addresses | wishlist | profile
 
   // Address state
   const [addresses, setAddresses] = useState([]);
@@ -185,6 +187,7 @@ export default function CustomerAccountPage({ onNavigate }) {
           <div className="md:col-span-3 space-y-2">
             {[
               { id: 'overview', label: 'OVERVIEW', icon: Compass },
+              { id: 'wishlist', label: 'SAVED FRAGRANCES', icon: Heart },
               { id: 'orders', label: 'ORDERS ARCHIVE', icon: Package },
               { id: 'addresses', label: 'DELIVERY ADDRESSES', icon: MapPin },
               { id: 'profile', label: 'PATRON PROFILE', icon: User },
@@ -370,6 +373,95 @@ export default function CustomerAccountPage({ onNavigate }) {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* WISHLIST TAB */}
+            {activeTab === 'wishlist' && (
+              <div className="space-y-6 animate-fade-up">
+                <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+                  <div>
+                    <h3 className="typography-h2 text-[#F7F4EE]">Saved Fragrances</h3>
+                    <p className="typography-body text-xs text-[#A1A1AA]">
+                      Your private wishlist of scents reserved for future acquisition.
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono text-[#D8BE82]">
+                    {wishlistItems.length} SAVED
+                  </span>
+                </div>
+
+                {wishlistItems.length === 0 ? (
+                  <div className="py-20 text-center space-y-3">
+                    <Heart className="w-8 h-8 text-[#C7A866]/40 mx-auto" />
+                    <p className="font-editorial-serif text-xl text-[#F7F3EA]">Your wishlist is currently empty.</p>
+                    <p className="text-xs text-[#AAA297]">
+                      Explore our collection and tap the heart icon on any flacon to save it here.
+                    </p>
+                    <button
+                      onClick={() => onNavigate && onNavigate('shop')}
+                      className="px-6 py-2.5 bg-[#C7A866] text-[#080A0B] text-xs font-semibold uppercase tracking-wider rounded-xs mt-2 cursor-pointer"
+                    >
+                      Explore Collection
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {wishlistItems.map((item) => {
+                      const prod = item.product;
+                      const primaryImg =
+                        prod.primaryImage ||
+                        prod.image ||
+                        (prod.images && prod.images[0]?.url) ||
+                        '/images/illure-placeholder.svg';
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-5 bg-[#080A0B] border border-white/[0.08] hover:border-[#C7A866]/40 rounded-xs space-y-3 flex flex-col justify-between"
+                        >
+                          <div>
+                            <div className="h-40 w-full flex items-center justify-center mb-3">
+                              <img
+                                src={primaryImg}
+                                alt={prod.name}
+                                className="max-h-full max-w-full object-contain filter drop-shadow-md"
+                              />
+                            </div>
+                            <span className="text-[9px] tracking-widest text-[#D8BE82] uppercase block font-mono">
+                              {prod.fragranceFamily || 'EXTRAIT'}
+                            </span>
+                            <h4 className="font-editorial-serif text-lg text-[#F7F3EA]">{prod.name}</h4>
+                            {prod.inspiredByName && (
+                              <p className="text-xs text-[#AAA297]">Inspired by {prod.inspiredByName}</p>
+                            )}
+                            <p className="text-xs font-mono text-[#F7F3EA] pt-2">
+                              {prod.minPrice ? `From ₹${prod.minPrice.toLocaleString('en-IN')}` : 'Inquire'}
+                            </p>
+                          </div>
+
+                          <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                            <button
+                              onClick={() => {
+                                if (onNavigate) onNavigate('shop');
+                              }}
+                              className="text-xs text-[#D8BE82] hover:text-[#F7F3EA] uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>View Flacon</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => removeFromWishlist(prod.id)}
+                              className="text-xs text-rose-400 hover:text-rose-300 uppercase tracking-wider cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

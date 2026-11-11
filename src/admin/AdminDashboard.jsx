@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import AdminCmsPage from './pages/AdminCmsPage';
 import AdminFeaturesPage from './pages/AdminFeaturesPage';
+import AdminDiscoverySetsPage from './pages/AdminDiscoverySetsPage';
 import {
   ShieldCheck,
   CheckCircle,
@@ -62,6 +63,10 @@ export default function AdminDashboard({ activeTab }) {
 
   if (activeTab === 'features') {
     return <AdminFeaturesPage />;
+  }
+
+  if (activeTab === 'discoverySets') {
+    return <AdminDiscoverySetsPage />;
   }
 
   if (activeTab === 'cms') {

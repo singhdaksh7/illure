@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowRight, ShoppingBag, Check, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Check, SlidersHorizontal, Heart } from 'lucide-react';
 import PerfumeBottleVisual from './PerfumeBottleVisual';
+import { useWishlist } from '../context/WishlistContext';
 
 export default function ProductCard({
   product,
@@ -9,6 +10,9 @@ export default function ProductCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const [added, setAdded] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const isFavorited = product?.id ? isInWishlist(product.id) : false;
 
   // Derive valid commercial prices strictly from backend variants or verified product fields
   let validPrices = [];
@@ -92,9 +96,26 @@ export default function ProductCard({
             EXTRAIT DE PARFUM
           </span>
         )}
-        <span className="text-[9px] tracking-[0.2em] text-[#D8D0C3]/60 font-mono">
-          {product?.gender || 'UNISEX'}
-        </span>
+        <div className="flex items-center space-x-2">
+          <span className="text-[9px] tracking-[0.2em] text-[#D8D0C3]/60 font-mono">
+            {product?.gender || 'UNISEX'}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleWishlist(product);
+            }}
+            title={isFavorited ? 'Remove from Wishlist' : 'Save to Wishlist'}
+            className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-[#D8BE82]"
+          >
+            <Heart
+              className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                isFavorited ? 'fill-[#C7A866] text-[#C7A866] scale-110' : 'text-[#D8D0C3]/60 hover:text-[#D8BE82]'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Centerpiece Bottle Image Container */}

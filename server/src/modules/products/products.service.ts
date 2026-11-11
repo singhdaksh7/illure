@@ -465,14 +465,45 @@ export class ProductsService {
       where.fragranceFamily = { contains: query.fragranceFamily, mode: 'insensitive' };
     }
 
+    if (query.occasion) {
+      where.occasion = { contains: query.occasion, mode: 'insensitive' };
+    }
+
+    if (query.season) {
+      where.season = { contains: query.season, mode: 'insensitive' };
+    }
+
+    if (query.note) {
+      const n = query.note.trim();
+      where.OR = [
+        { topNotes: { has: n } },
+        { heartNotes: { has: n } },
+        { baseNotes: { has: n } },
+      ];
+    }
+
     if (query.search) {
       const s = query.search.trim();
-      where.OR = [
+      const searchConditions = [
         { name: { contains: s, mode: 'insensitive' } },
         { inspiredByName: { contains: s, mode: 'insensitive' } },
         { fragranceFamily: { contains: s, mode: 'insensitive' } },
         { referenceBrand: { name: { contains: s, mode: 'insensitive' } } },
+        { topNotes: { has: s } },
+        { heartNotes: { has: s } },
+        { baseNotes: { has: s } },
+        { occasion: { contains: s, mode: 'insensitive' } },
       ];
+
+      if (where.OR) {
+        where.AND = [
+          { OR: where.OR },
+          { OR: searchConditions },
+        ];
+        delete where.OR;
+      } else {
+        where.OR = searchConditions;
+      }
     }
 
     // Price range filters on variants
@@ -658,6 +689,132 @@ export class ProductsService {
       })),
       seoTitle: product.seoTitle || product.name,
       seoDescription: product.seoDescription || product.shortDescription,
+    };
+  }
+
+  static async getCatalogFacets() {
+    const products = await prisma.product.findMany({
+      where: { status: ProductStatus.ACTIVE },
+      select: {
+        fragranceFamily: true,
+        gender: true,
+        occasion: true,
+        season: true,
+        topNotes: true,
+        heartNotes: true,
+        baseNotes: true,
+        variants: {
+          where: { isActive: true },
+          select: { price: true, sizeLabel: true, stockQuantity: true },
+        },
+      },
+    });
+
+    const familiesSet = new Set<string>();
+    const occasionsSet = new Set<string>();
+    const seasonsSet = new Set<string>();
+    const notesSet = new Set<string>();
+    const sizesSet = new Set<string>();
+    let minPrice = Infinity;
+    let maxPrice = 0;
+
+    for (const p of products) {
+      if (p.fragranceFamily) familiesSet.add(p.fragranceFamily);
+      if (p.occasion) occasionsSet.add(p.occasion);
+      if (p.season) seasonsSet.add(p.season);
+      (p.topNotes || []).forEach((n) => notesSet.add(n));
+      (p.heartNotes || []).forEach((n) => notesSet.add(n));
+      (p.baseNotes || []).forEach((n) => notesSet.add(n));
+
+      for (const v of p.variants) {
+        const pr = Number(v.price);
+        if (pr < minPrice) minPrice = pr;
+        if (pr > maxPrice) maxPrice = pr;
+        if (v.sizeLabel) sizesSet.add(v.sizeLabel);
+      }
+    }
+
+    return {
+      families: Array.from(familiesSet).sort(),
+      occasions: Array.from(occasionsSet).sort(),
+      seasons: Array.from(seasonsSet).sort(),
+      notes: Array.from(notesSet).sort(),
+      sizes: Array.from(sizesSet).sort(),
+      priceRange: {
+        min: minPrice === Infinity ? 0 : minPrice,
+        max: maxPrice,
+      },
+    };
+  }
+
+  static async advancedSearch(query: string) {
+    const q = (query || '').trim();
+    if (!q) {
+      return { fragrances: [], notes: [], families: [] };
+    }
+
+    const products = await prisma.product.findMany({
+      where: {
+        status: ProductStatus.ACTIVE,
+        OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          { inspiredByName: { contains: q, mode: 'insensitive' } },
+          { fragranceFamily: { contains: q, mode: 'insensitive' } },
+          { referenceBrand: { name: { contains: q, mode: 'insensitive' } } },
+          { topNotes: { has: q } },
+          { heartNotes: { has: q } },
+          { baseNotes: { has: q } },
+          { occasion: { contains: q, mode: 'insensitive' } },
+        ],
+      },
+      include: {
+        images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], take: 1 },
+        variants: {
+          where: { isActive: true },
+          orderBy: { price: 'asc' },
+          take: 1,
+          select: { price: true, sizeLabel: true, stockQuantity: true },
+        },
+      },
+      take: 8,
+    });
+
+    const allProducts = await prisma.product.findMany({
+      where: { status: ProductStatus.ACTIVE },
+      select: { topNotes: true, heartNotes: true, baseNotes: true, fragranceFamily: true },
+    });
+
+    const matchingNotes = new Set<string>();
+    const matchingFamilies = new Set<string>();
+    const lowerQ = q.toLowerCase();
+
+    for (const p of allProducts) {
+      if (p.fragranceFamily && p.fragranceFamily.toLowerCase().includes(lowerQ)) {
+        matchingFamilies.add(p.fragranceFamily);
+      }
+      for (const n of [...(p.topNotes || []), ...(p.heartNotes || []), ...(p.baseNotes || [])]) {
+        if (n.toLowerCase().includes(lowerQ)) {
+          matchingNotes.add(n);
+        }
+      }
+    }
+
+    const formattedFragrances = products.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      inspiredByName: p.inspiredByName,
+      fragranceFamily: p.fragranceFamily,
+      primaryImage: p.images[0]?.url || null,
+      startingPrice: p.variants[0] ? Number(p.variants[0].price) : null,
+      sizeLabel: p.variants[0]?.sizeLabel || null,
+      inStock: p.variants.some((v) => v.stockQuantity > 0),
+    }));
+
+    return {
+      fragrances: formattedFragrances,
+      notes: Array.from(matchingNotes).slice(0, 6),
+      families: Array.from(matchingFamilies).slice(0, 4),
     };
   }
 }

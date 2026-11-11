@@ -209,4 +209,59 @@ export class EmailService {
       return false;
     }
   }
+
+  static async sendBackInStockEmail(data: {
+    to: string;
+    productName: string;
+    variantSize: string;
+    productSlug: string;
+    price: number;
+  }): Promise<boolean> {
+    try {
+      if (env.NODE_ENV === 'test') {
+        return true;
+      }
+
+      const transport = getTransporter();
+      const productUrl = `${env.FRONTEND_URL || 'https://illure.77.37.45.177.sslip.io'}/shop?product=${data.productSlug}`;
+
+      const htmlContent = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #080A0B; color: #F7F3EA; padding: 40px 24px; border: 1px solid rgba(216,190,130,0.2);">
+          <div style="text-align: center; margin-bottom: 32px;">
+            <h1 style="color: #D8BE82; font-family: 'Cinzel', serif; font-size: 24px; letter-spacing: 0.2em; margin: 0;">İLLURÊ</h1>
+            <p style="color: #AAA297; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px;">Haute Parfumerie</p>
+          </div>
+          <div style="border-top: 1px solid rgba(216,190,130,0.2); border-bottom: 1px solid rgba(216,190,130,0.2); padding: 24px 0; margin-bottom: 32px;">
+            <h2 style="font-size: 18px; color: #F7F3EA; font-weight: 400; margin: 0 0 12px 0;">Back in Stock: ${data.productName}</h2>
+            <p style="color: #D8D0C3; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+              You requested to be notified when <strong>${data.productName} (${data.variantSize})</strong> returned to our atelier reserves. It is now available to order.
+            </p>
+            <p style="color: #D8BE82; font-size: 16px; font-weight: 500; margin: 0;">
+              ₹${data.price.toLocaleString('en-IN')}
+            </p>
+          </div>
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="${productUrl}" style="display: inline-block; background-color: #C7A866; color: #080A0B; padding: 14px 32px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; text-decoration: none; border-radius: 2px;">
+              Acquire Fragrance
+            </a>
+          </div>
+          <p style="color: #7A7267; font-size: 11px; text-align: center; margin: 0;">
+            İLLURÊ FRAGRANCE · Handcrafted Luxury Editions
+          </p>
+        </div>
+      `;
+
+      await transport.sendMail({
+        from: `"${env.SMTP_FROM_NAME}" <${env.SMTP_FROM_EMAIL}>`,
+        to: data.to,
+        subject: `Back in Reserve: ${data.productName} (${data.variantSize}) - İLLURÊ`,
+        html: htmlContent,
+      });
+
+      return true;
+    } catch (err) {
+      console.error('⚠️ [EmailService] Failed to send back in stock email:', err);
+      return false;
+    }
+  }
 }

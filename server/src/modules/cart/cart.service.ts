@@ -70,7 +70,10 @@ export class CartService {
     let itemCount = 0;
 
     const formattedItems = fullCart.items.map((item) => {
-      const variantPrice = Number(item.variant.price);
+      let variantPrice = Number(item.variant.price);
+      if (item.bundleSelections && (item.bundleSelections as any).customPrice !== undefined) {
+        variantPrice = Number((item.bundleSelections as any).customPrice);
+      }
       const giftPackagingPrice = item.giftPackaging ? Number(item.giftPackaging.price) : 0;
       const unitPrice = variantPrice + giftPackagingPrice;
       const lineTotal = unitPrice * item.quantity;
@@ -111,6 +114,8 @@ export class CartService {
         lineTotal,
         giftMessage: item.giftMessage,
         isAvailable,
+        bundleConfigId: item.bundleConfigId,
+        bundleSelections: item.bundleSelections,
       };
     });
 
@@ -127,7 +132,14 @@ export class CartService {
   static async addItem(
     customerId: string | undefined,
     sessionKey: string | undefined,
-    data: { variantId: string; quantity: number; giftPackagingId?: string | null; giftMessage?: string | null }
+    data: {
+      variantId: string;
+      quantity: number;
+      giftPackagingId?: string | null;
+      giftMessage?: string | null;
+      bundleConfigId?: string | null;
+      bundleSelections?: any;
+    }
   ) {
     const cart = await this.getOrCreateCart(customerId, sessionKey);
 
@@ -152,6 +164,22 @@ export class CartService {
     const giftPackagingId = data.giftPackagingId || null;
     const giftMessage = data.giftMessage ? data.giftMessage.trim() : null;
 
+    if (data.bundleConfigId) {
+      await prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          productId: variant.productId,
+          variantId: variant.id,
+          quantity: data.quantity,
+          giftPackagingId,
+          giftMessage,
+          bundleConfigId: data.bundleConfigId,
+          bundleSelections: data.bundleSelections || null,
+        },
+      });
+      return this.getCart(customerId, sessionKey);
+    }
+
     // Check for existing cart item with same variant, gift packaging, and gift message
     const existingItem = await prisma.cartItem.findFirst({
       where: {
@@ -159,6 +187,7 @@ export class CartService {
         variantId: variant.id,
         giftPackagingId,
         giftMessage,
+        bundleConfigId: null,
       },
     });
 

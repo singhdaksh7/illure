@@ -170,6 +170,9 @@ model Product {
   productCategories ProductCategory[]
   orderItems        OrderItem[]
   cartItems         CartItem[]
+  wishlistItems     WishlistItem[]
+  discoveryEligibleItems DiscoverySetEligibleItem[]
+  discoveryPrebuiltItems DiscoverySetPrebuiltItem[]
 
   @@index([referenceBrandId])
   @@index([status])
@@ -206,6 +209,9 @@ model ProductVariant {
   inventoryMovements InventoryMovement[]
   orderItems         OrderItem[]
   cartItems          CartItem[]
+  stockAlerts        StockAlertSubscription[]
+  discoveryEligibleItems DiscoverySetEligibleItem[]
+  discoveryPrebuiltItems DiscoverySetPrebuiltItem[]
 
   @@index([productId])
   @@map("product_variants")
@@ -274,6 +280,8 @@ model Customer {
   orders       Order[]
   sessions     CustomerSession[]
   cart         Cart?
+  wishlist     WishlistItem[]
+  stockAlerts  StockAlertSubscription[]
 
   @@index([phone])
   @@map("customers")
@@ -342,6 +350,9 @@ model CartItem {
   giftPackagingId String?
   giftPackaging   GiftPackaging? @relation(fields: [giftPackagingId], references: [id], onDelete: SetNull)
   giftMessage     String?
+  bundleConfigId  String?
+  bundleConfig    DiscoverySetConfig? @relation(fields: [bundleConfigId], references: [id], onDelete: SetNull)
+  bundleSelections Json?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -400,6 +411,9 @@ model OrderItem {
   giftPackagingName  String?
   giftPackagingPrice Decimal?        @db.Decimal(10, 2)
   giftMessage        String?
+  bundleConfigId     String?
+  bundleConfig       DiscoverySetConfig? @relation(fields: [bundleConfigId], references: [id], onDelete: SetNull)
+  bundleSelections   Json?
 
   @@index([orderId])
   @@map("order_items")
@@ -626,3 +640,139 @@ model CommerceEventLog {
   @@index([createdAt])
   @@map("commerce_event_logs")
 }
+
+// ==========================================
+// PHASE 3: CONVERSION MODELS
+// ==========================================
+
+enum DiscoverySetType {
+  CUSTOM
+  PREBUILT
+}
+
+enum DiscoverySetSelectionMode {
+  PRODUCT
+  VARIANT
+}
+
+enum DiscoverySetPricingMode {
+  FIXED
+  SUM
+  DISCOUNTED_SUM
+}
+
+enum DiscoverySetStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+model DiscoverySetConfig {
+  id              String                    @id @default(uuid())
+  name            String
+  slug            String                    @unique
+  type            DiscoverySetType          @default(CUSTOM)
+  status          DiscoverySetStatus        @default(ACTIVE)
+  title           String
+  subtitle        String?
+  description     String?
+  imageUrl        String?
+  selectionMode   DiscoverySetSelectionMode @default(PRODUCT)
+  minSelections   Int                       @default(3)
+  maxSelections   Int                       @default(3)
+  pricingMode     DiscoverySetPricingMode   @default(FIXED)
+  fixedPrice      Decimal?                  @db.Decimal(10, 2)
+  discountPercent Decimal?                  @db.Decimal(5, 2)
+  allowDuplicates Boolean                   @default(false)
+  maxPerOrder     Int                       @default(5)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  sortOrder       Int                       @default(0)
+  isFeatured      Boolean                   @default(false)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  eligibleItems   DiscoverySetEligibleItem[]
+  prebuiltItems   DiscoverySetPrebuiltItem[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([type])
+  @@map("discovery_set_configs")
+}
+
+model DiscoverySetEligibleItem {
+  id              String              @id @default(uuid())
+  discoverySetId  String
+  discoverySet    DiscoverySetConfig  @relation(fields: [discoverySetId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId       String?
+  variant         ProductVariant?     @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  sortOrder       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+
+  @@unique([discoverySetId, productId, variantId])
+  @@index([discoverySetId])
+  @@index([productId])
+  @@map("discovery_set_eligible_items")
+}
+
+model DiscoverySetPrebuiltItem {
+  id              String              @id @default(uuid())
+  discoverySetId  String
+  discoverySet    DiscoverySetConfig  @relation(fields: [discoverySetId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId       String?
+  variant         ProductVariant?     @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  quantity        Int                 @default(1)
+  sortOrder       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+
+  @@unique([discoverySetId, productId, variantId])
+  @@index([discoverySetId])
+  @@index([productId])
+  @@map("discovery_set_prebuilt_items")
+}
+
+model WishlistItem {
+  id          String    @id @default(uuid())
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([customerId, productId])
+  @@index([customerId])
+  @@index([productId])
+  @@map("wishlist_items")
+}
+
+enum StockAlertStatus {
+  ACTIVE
+  SENT
+  CANCELLED
+}
+
+model StockAlertSubscription {
+  id               String           @id @default(uuid())
+  productVariantId String
+  variant          ProductVariant   @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  customerId       String?
+  customer         Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  email            String
+  status           StockAlertStatus @default(ACTIVE)
+  createdAt        DateTime         @default(now())
+  sentAt           DateTime?
+
+  @@unique([productVariantId, email, status])
+  @@index([productVariantId])
+  @@index([email])
+  @@index([status])
+  @@map("stock_alert_subscriptions")
+}
+

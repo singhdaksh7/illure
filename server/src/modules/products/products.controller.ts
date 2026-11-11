@@ -83,4 +83,23 @@ export class ProductsController {
       next(error);
     }
   }
+
+  static async getFacets(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const facets = await ProductsService.getCatalogFacets();
+      return sendSuccess(res, { facets });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async search(req: Request, res: Response, next: NextFunction) {
+    try {
+      const q = (req.query.q as string) || '';
+      const results = await ProductsService.advancedSearch(q);
+      return sendSuccess(res, results);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

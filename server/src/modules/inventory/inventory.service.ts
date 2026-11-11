@@ -1,6 +1,7 @@
 import { prisma } from '../../utils/prisma.js';
 import { AdjustStockInput, InventoryMovementsFilterInput } from './inventory.validation.js';
 import { InventoryMovementType } from '@prisma/client';
+import { StockAlertsService } from '../stockAlerts/stockAlerts.service.js';
 
 export class InventoryService {
   static async adjustStock(
@@ -8,7 +9,7 @@ export class InventoryService {
     input: AdjustStockInput,
     createdByAdminId?: string
   ) {
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const variant = await tx.productVariant.findUnique({
         where: { id: variantId },
         include: { product: { select: { id: true, name: true } } },
@@ -63,8 +64,22 @@ export class InventoryService {
         },
       });
 
-      return { variant: updatedVariant, movement };
+      return {
+        variant: updatedVariant,
+        movement,
+        previouslyOutOfStock: variant.stockQuantity === 0,
+        nowInStock: newStockQuantity > 0,
+      };
     });
+
+    // If restocked from 0 to >0, fire stock alerts
+    if (result.previouslyOutOfStock && result.nowInStock) {
+      StockAlertsService.notifyRestock(variantId, result.variant.stockQuantity).catch((err) =>
+        console.error('Failed to trigger restock notifications:', err)
+      );
+    }
+
+    return { variant: result.variant, movement: result.movement };
   }
 
   static async getMovements(filters: InventoryMovementsFilterInput) {

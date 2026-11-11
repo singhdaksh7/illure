@@ -25,6 +25,7 @@ import IntroOverlay from './components/IntroOverlay';
 const ScentFinderModal = React.lazy(() => import('./components/discovery/ScentFinderModal'));
 const NotesExplorerModal = React.lazy(() => import('./components/discovery/NotesExplorerModal'));
 const FragranceCompareModal = React.lazy(() => import('./components/discovery/FragranceCompareModal'));
+const DiscoverySetBuilder = React.lazy(() => import('./components/discovery/DiscoverySetBuilder'));
 import AdminPortal from './admin/AdminPortal';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
@@ -37,6 +38,8 @@ import { CmsProvider, useCms } from './context/CmsContext';
 import { CustomerAuthProvider, useCustomerAuth } from './context/CustomerAuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { FeaturesProvider } from './context/FeaturesContext';
+import { WishlistProvider } from './context/WishlistContext';
+import { RecentlyViewedProvider } from './context/RecentlyViewedContext';
 import { productsApi } from './api/products';
 import { PRODUCTS } from './data/products';
 
@@ -113,6 +116,7 @@ function StorefrontApp() {
       setIsAdminRoute(path.startsWith('/admin'));
       if (path === '/' || path === '') setActiveTab('home');
       else if (path.startsWith('/shop')) setActiveTab('shop');
+      else if (path.startsWith('/discovery-set')) setActiveTab('discovery-set');
       else if (path.startsWith('/checkout')) setActiveTab('checkout');
       else if (path.startsWith('/login')) setActiveTab('login');
       else if (path.startsWith('/register')) setActiveTab('register');
@@ -320,6 +324,27 @@ function StorefrontApp() {
         />
       )}
 
+      {/* DISCOVERY SET BUILDER VIEW */}
+      {activeTab === 'discovery-set' && (
+        <main>
+          <React.Suspense
+            fallback={
+              <div className="pt-32 text-center text-[#D8BE82] font-editorial-serif tracking-widest text-sm">
+                Assembling Presentation Coffret...
+              </div>
+            }
+          >
+            <DiscoverySetBuilder
+              slug="custom-discovery-set"
+              onBack={() => {
+                window.history.pushState({}, '', '/shop');
+                setActiveTab('shop');
+              }}
+            />
+          </React.Suspense>
+        </main>
+      )}
+
       {/* PRODUCT DETAIL PAGE */}
       {activeTab === 'product' && (
         <main>
@@ -451,9 +476,13 @@ export default function App() {
     <FeaturesProvider>
       <CmsProvider>
         <CustomerAuthProvider>
-          <CartProvider>
-            <StorefrontApp />
-          </CartProvider>
+          <WishlistProvider>
+            <RecentlyViewedProvider>
+              <CartProvider>
+                <StorefrontApp />
+              </CartProvider>
+            </RecentlyViewedProvider>
+          </WishlistProvider>
         </CustomerAuthProvider>
       </CmsProvider>
     </FeaturesProvider>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ShoppingBag, ArrowLeft, Check, Sparkles, ShieldCheck, Gift, Clock, Wind, Flame, Sun, Droplets, Layers, GitCompare } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Check, Sparkles, ShieldCheck, Gift, Clock, Wind, Flame, Sun, Droplets, Layers, GitCompare, Heart, Bell } from 'lucide-react';
 import IllureCrest from './IllureCrest';
 import ProductCard from './ProductCard';
 import { giftPackagingApi } from '../api/giftPackaging';
 import { useFeatures } from '../context/FeaturesContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 
 export default function ProductDetailPage({ 
   productId, 
@@ -135,6 +137,58 @@ export default function ProductDetailPage({
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, 3).map((s) => s.product);
   }, [product, productsData]);
+
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { recentProductIds, recordView } = useRecentlyViewed();
+  const [stockAlertEmail, setStockAlertEmail] = useState('');
+  const [stockAlertSubscribed, setStockAlertSubscribed] = useState(false);
+  const [stockAlertLoading, setStockAlertLoading] = useState(false);
+
+  // Record viewed product
+  useEffect(() => {
+    if (product?.id) {
+      recordView(product.id);
+      trackFeatureEvent('PRODUCT_VIEWED', 'recently_viewed', { productId: product.id, name: product.name });
+    }
+  }, [product?.id]);
+
+  // Derived recently viewed products (excluding current)
+  const recentlyViewedFragrances = useMemo(() => {
+    if (!recentProductIds || recentProductIds.length === 0) return [];
+    return recentProductIds
+      .filter((id) => id !== product?.id)
+      .map((id) => productsData.find((p) => p.id === id))
+      .filter(Boolean)
+      .slice(0, 4);
+  }, [recentProductIds, product?.id, productsData]);
+
+  const handleStockAlertSubscribe = async (e) => {
+    e.preventDefault();
+    if (!stockAlertEmail || !selectedSizeObj?.variantId) return;
+    setStockAlertLoading(true);
+    try {
+      const res = await fetch('/api/stock-alerts/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          variantId: selectedSizeObj.variantId,
+          email: stockAlertEmail,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStockAlertSubscribed(true);
+        trackFeatureEvent('STOCK_ALERT_SUBSCRIBED', 'stock_alerts', {
+          productId: product.id,
+          variantId: selectedSizeObj.variantId,
+        });
+      }
+    } catch (err) {
+      console.warn('Stock alert subscription error:', err);
+    } finally {
+      setStockAlertLoading(false);
+    }
+  };
 
   useEffect(() => {
     giftPackagingApi.getPublic()
@@ -420,6 +474,46 @@ export default function ProductDetailPage({
               </div>
             )}
 
+            {/* BACK IN STOCK ALERT SUBSCRIPTION (CONVERSION FEATURE 12) */}
+            {!selectedSizeObj?.inStock && isFeatureEnabled('stock_alerts') && (
+              <div className="p-5 bg-[#121214] border border-[#C7A866]/30 rounded-xs space-y-3">
+                <div className="flex items-center space-x-2 text-[#D8BE82]">
+                  <Bell className="w-4 h-4 text-[#C7A866]" />
+                  <span className="text-xs uppercase tracking-widest font-semibold font-interface-sans">
+                    Reserve Notification
+                  </span>
+                </div>
+                <p className="text-[12px] text-[#D8D0C3] leading-relaxed">
+                  The {selectedSizeObj?.size || 'selected flacon'} is currently resting in maceration. Leave your email to receive an instant invitation when this reserve is replenished.
+                </p>
+
+                {stockAlertSubscribed ? (
+                  <div className="p-3 bg-[#080A0B] border border-emerald-500/30 text-emerald-400 text-xs flex items-center space-x-2">
+                    <Check className="w-4 h-4" />
+                    <span>Your invitation has been registered. You will be notified immediately upon bottling.</span>
+                  </div>
+                ) : (
+                  <form onSubmit={handleStockAlertSubscribe} className="flex gap-2">
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter your email address"
+                      value={stockAlertEmail}
+                      onChange={(e) => setStockAlertEmail(e.target.value)}
+                      className="flex-1 bg-[#080A0B] border border-white/10 px-3 py-2.5 text-xs text-[#F7F3EA] focus:outline-none focus:border-[#C7A866]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={stockAlertLoading}
+                      className="px-4 py-2.5 bg-[#C7A866] text-[#080A0B] text-xs font-semibold uppercase tracking-wider hover:bg-[#D8BE82] transition-colors disabled:opacity-50"
+                    >
+                      {stockAlertLoading ? '...' : 'Notify Me'}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
             {/* QUANTITY & ADD TO BAG */}
             <div className="space-y-4 pt-2">
               <div className="flex items-center space-x-4">
@@ -465,6 +559,19 @@ export default function ProductDetailPage({
                       ? 'ADDED TO BAG'
                       : `ADD TO BAG · ₹${totalBatchPrice.toLocaleString('en-IN')}`}
                   </span>
+                </button>
+
+                {/* WISHLIST TOGGLE */}
+                <button
+                  onClick={() => toggleWishlist(product)}
+                  className="p-4 bg-[#14120F] border border-[#D8BE82]/25 hover:border-[#D8BE82]/70 text-[#D8BE82] transition-colors rounded-xs flex items-center justify-center"
+                  title={isInWishlist(product.id) ? 'Remove from Saved' : 'Save to Wishlist'}
+                >
+                  <Heart
+                    className={`w-4 h-4 transition-transform ${
+                      isInWishlist(product.id) ? 'fill-[#C7A866] text-[#C7A866] scale-110' : 'text-[#D8BE82]'
+                    }`}
+                  />
                 </button>
 
                 {/* COMPARE BUTTON (DISCOVERY FEATURE 06) */}
@@ -660,6 +767,36 @@ export default function ProductDetailPage({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {similarProducts.map((item) => (
+                <ProductCard
+                  key={item.id}
+                  product={item}
+                  onSelectProduct={onSelectProduct}
+                  onAddToCart={onAddToCart}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* RECENTLY VIEWED RAIL (CONVERSION FEATURE 10) */}
+        {isFeatureEnabled('recently_viewed') && recentlyViewedFragrances.length > 0 && (
+          <div className="py-16 border-t border-white/[0.06] space-y-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-1">
+                <span className="typography-eyebrow text-[#C7A866]">
+                  BROWSING HISTORY
+                </span>
+                <h3 className="typography-h2 text-[#F7F3EA]">
+                  RECENTLY VIEWED
+                </h3>
+              </div>
+              <p className="text-xs text-[#AAA297] max-w-sm">
+                Fragrances you explored during this session.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {recentlyViewedFragrances.map((item) => (
                 <ProductCard
                   key={item.id}
                   product={item}
