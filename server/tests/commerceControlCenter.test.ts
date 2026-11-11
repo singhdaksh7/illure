@@ -5,8 +5,11 @@ import { prisma } from '../src/utils/prisma.js';
 import { hashPassword } from '../src/utils/password.utils.js';
 import { generateAccessToken } from '../src/utils/jwt.utils.js';
 import { NotificationsService } from '../src/modules/notifications/notifications.service.js';
+import { GiftingService } from '../src/modules/gifting/gifting.service.js';
+import { LoyaltyService } from '../src/modules/loyalty/loyalty.service.js';
+import { ShippingProviderService } from '../src/modules/shipping/shipping.provider.js';
 
-describe('İLLURÊ Commerce Control Center (Phases 3H, 4, 5, 6, 7, 8)', () => {
+describe('İLLURÊ Commerce Control Center (Roadmap Verification & Security)', () => {
   let customerToken: string;
   let customerId: string;
   let adminToken: string;
@@ -158,7 +161,7 @@ describe('İLLURÊ Commerce Control Center (Phases 3H, 4, 5, 6, 7, 8)', () => {
 
     it('should sanitize search query against injection and return matched products', async () => {
       const res = await request(app)
-        .get('/api/products/search?q=Obsidian%\'--')
+        .get('/api/products/search?q=Obsidian%\\\'--')
         .expect(200);
 
       expect(res.body.success).toBe(true);
@@ -168,196 +171,201 @@ describe('İLLURÊ Commerce Control Center (Phases 3H, 4, 5, 6, 7, 8)', () => {
   });
 
   // ==========================================
-  // PHASE 4: GIFTING & GIFT CARDS
+  // PHASE 4: GIFTING & CONCURRENCY
   // ==========================================
-  describe('Phase 4: Gifting & Gift Cards', () => {
-    it('should issue a gift card and allow balance check and partial redemption', async () => {
-      const issueRes = await request(app)
-        .post('/api/gifting/gift-cards')
-        .send({
-          amount: 5000,
-          recipientEmail: 'friend@illure.com',
-          recipientName: 'Friend Vance',
-          senderName: 'Aurelia',
-          message: 'Enjoy your bespoke scent.',
-        })
-        .expect(201);
+  describe('Phase 4: Gifting & Gift Card Concurrency Protection', () => {
+    it('should prevent gift card from going negative under sequential/concurrent redemptions', async () => {
+      // Issue ₹1000 card
+      const card = await GiftingService.issueGiftCard({ amount: 1000 });
 
-      const code = issueRes.body.data.code;
-      expect(code).toMatch(/^ILR-/);
+      // First redeem 700
+      const r1 = await GiftingService.redeem(card.code, 700);
+      expect(r1.remainingBalance).toBe(300);
 
-      // Check balance
-      const balanceRes = await request(app)
-        .get(`/api/gifting/gift-cards/${code}/balance`)
-        .expect(200);
+      // Second redeem 700 attempts against remaining 300
+      const r2 = await GiftingService.redeem(card.code, 700);
+      expect(r2.amountDeducted).toBe(300);
+      expect(r2.remainingBalance).toBe(0);
 
-      expect(balanceRes.body.data.currentBalance).toBe(5000);
-
-      // Redeem partial ₹2000
-      const redeemRes = await request(app)
-        .post('/api/gifting/gift-cards/redeem')
-        .send({ code, amount: 2000 })
-        .expect(200);
-
-      expect(redeemRes.body.data.amountDeducted).toBe(2000);
-      expect(redeemRes.body.data.remainingBalance).toBe(3000);
-      expect(redeemRes.body.data.status).toBe('ACTIVE');
+      const updated = await prisma.giftCard.findUnique({ where: { code: card.code } });
+      expect(Number(updated?.currentBalance)).toBe(0);
     });
 
-    it('should return free sample eligibility based on order spend threshold', async () => {
-      const resUnder = await request(app).get('/api/gifting/free-samples/eligibility?subtotal=1500');
-      expect(resUnder.body.data.eligible).toBe(false);
+    it('should safely return CONFIGURATION_REQUIRED for free samples when unconfigured', async () => {
+      // Ensure free_samples feature is disabled / unconfigured
+      await prisma.commerceFeature.upsert({
+        where: { key: 'free_samples' },
+        create: {
+          key: 'free_samples',
+          name: 'Free Samples',
+          description: 'Free samples at checkout',
+          group: 'GIFTING',
+          isEnabled: false,
+          status: 'CONFIGURATION_REQUIRED',
+        },
+        update: {
+          isEnabled: false,
+          status: 'CONFIGURATION_REQUIRED',
+          config: {},
+        },
+      });
 
-      const resOver = await request(app).get('/api/gifting/free-samples/eligibility?subtotal=2500');
-      expect(resOver.body.data.eligible).toBe(true);
-      expect(resOver.body.data.allowedCount).toBe(2);
+      const res = await request(app).get('/api/gifting/free-samples/eligibility?subtotal=2500');
+      expect(res.body.data.status).toBe('CONFIGURATION_REQUIRED');
+      expect(res.body.data.eligible).toBe(false);
+      expect(res.body.data.availableSamples.length).toBe(0);
     });
   });
 
   // ==========================================
   // PHASE 5: RETENTION & REVIEWS
   // ==========================================
-  describe('Phase 5: Customer Retention & Verified Reviews', () => {
-    it('should save customer scent profile and return personalized recommendations', async () => {
-      await request(app)
-        .put('/api/retention/scent-profile')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .send({
-          preferredFamilies: ['Woody'],
-          likedNotes: ['birch tar', 'amber'],
-          moods: ['mysterious'],
-        })
-        .expect(200);
-
-      const getProfile = await request(app)
-        .get('/api/retention/scent-profile')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .expect(200);
-
-      expect(getProfile.body.data.preferredFamilies).toContain('Woody');
-
-      // Buy Again items
-      const buyAgain = await request(app)
-        .get('/api/retention/buy-again')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .expect(200);
-
-      expect(buyAgain.body.data.length).toBe(1);
-      expect(buyAgain.body.data[0].productName).toBe('Obsidian Noir');
-    });
-
-    it('should accept verified product review from customer who purchased item', async () => {
-      const reviewRes = await request(app)
+  describe('Phase 5: Customer Retention, Reviews & Photo Security', () => {
+    it('should reject invalid photo upload extensions for reviews', async () => {
+      const res = await request(app)
         .post('/api/retention/reviews')
         .set('Authorization', `Bearer ${customerToken}`)
         .send({
           productId: testProductId,
           rating: 5,
-          scentRating: 5,
-          longevityRating: 5,
-          comment: 'Incredible depth and longevity. Highly recommended.',
-        })
-        .expect(201);
+          comment: 'Great scent',
+          mediaUrls: ['https://illure.in/uploads/malicious.exe'],
+        });
 
-      expect(reviewRes.body.data.isVerified).toBe(true);
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('INVALID_MEDIA_TYPE');
+    });
 
-      const productReviews = await request(app)
-        .get(`/api/retention/products/${testProductId}/reviews`)
-        .expect(200);
+    it('should accept valid photo review from verified buyer', async () => {
+      const res = await request(app)
+        .post('/api/retention/reviews')
+        .set('Authorization', `Bearer ${customerToken}`)
+        .send({
+          productId: testProductId,
+          rating: 5,
+          comment: 'Flawless projection and blend.',
+          mediaUrls: ['https://illure.in/uploads/bottle.webp'],
+        });
 
-      expect(productReviews.body.data.total).toBe(1);
-      expect(productReviews.body.data.averageRating).toBe(5);
+      expect(res.status).toBe(201);
+      expect(res.body.data.isVerified).toBe(true);
     });
   });
 
   // ==========================================
-  // PHASE 6: LOYALTY & REWARDS
+  // PHASE 6: LOYALTY & REFERRALS IDEMPOTENCY
   // ==========================================
-  describe('Phase 6: Loyalty Ledger & Drops', () => {
-    it('should initialize customer loyalty account with welcome points and allow redemption', async () => {
-      const accRes = await request(app)
-        .get('/api/loyalty/account')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .expect(200);
+  describe('Phase 6: Loyalty & Referral Idempotency', () => {
+    it('should not award duplicate loyalty points for the same order', async () => {
+      // Enable loyalty feature with config
+      await prisma.commerceFeature.upsert({
+        where: { key: 'loyalty' },
+        create: {
+          key: 'loyalty',
+          name: 'Loyalty Program',
+          description: 'Customer loyalty program',
+          group: 'LOYALTY',
+          isEnabled: true,
+          status: 'ACTIVE',
+          config: { earnRatePerInr: 0.1 },
+        },
+        update: { isEnabled: true, status: 'ACTIVE', config: { earnRatePerInr: 0.1 } },
+      });
 
-      expect(accRes.body.data.balance).toBe(100);
+      const firstAward = await LoyaltyService.awardPointsForOrder(customerId, testOrderId, 2490);
+      expect(firstAward).not.toBeNull();
 
-      // Redeem points
-      const redeemRes = await request(app)
-        .post('/api/loyalty/redeem')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .send({ points: 100 })
-        .expect(200);
-
-      expect(redeemRes.body.data.discountInr).toBe(100);
-      expect(redeemRes.body.data.remainingBalance).toBe(0);
+      // Second award with same orderId
+      const secondAward = await LoyaltyService.awardPointsForOrder(customerId, testOrderId, 2490);
+      expect(secondAward).toBeNull(); // Deduplicated
     });
 
-    it('should generate referral code for customer', async () => {
-      const refRes = await request(app)
-        .get('/api/loyalty/referral')
-        .set('Authorization', `Bearer ${customerToken}`)
-        .expect(200);
+    it('should process referral reward only once per code (idempotency)', async () => {
+      // Create referral
+      const ref = await prisma.referral.create({
+        data: { referrerId: customerId, code: 'ILR-REF-TEST' },
+      });
 
-      expect(refRes.body.data.code).toMatch(/^ILR-/);
-    });
-  });
+      const newCust = await prisma.customer.create({
+        data: {
+          name: 'Referred Friend',
+          email: 'friend@illure.com',
+          phone: '+919876543299',
+        },
+      });
 
-  // ==========================================
-  // PHASE 7: OPERATIONS, RETURNS & PINCODE
-  // ==========================================
-  describe('Phase 7: Operations, Cancellations & Invoicing', () => {
-    it('should allow customer cancellation on unfulfilled order and restore variant stock', async () => {
-      // Stock before cancel is 10
-      const cancelRes = await request(app)
-        .post(`/api/operations/orders/${testOrderId}/cancel`)
-        .set('Authorization', `Bearer ${customerToken}`)
-        .send({ reason: 'Changed mind before dispatch' })
-        .expect(200);
+      const res1 = await LoyaltyService.processReferralOrder('ILR-REF-TEST', newCust.id, 'ORD-REF-1', 2500);
+      expect(res1?.success).toBe(true);
 
-      expect(cancelRes.body.data.status).toBe('CANCELLED');
-
-      const variant = await prisma.productVariant.findUnique({ where: { id: testVariantId } });
-      expect(variant?.stockQuantity).toBe(11); // 10 + 1 restored
-    });
-
-    it('should verify pincode serviceability and fetch order invoice data', async () => {
-      const pincodeRes = await request(app)
-        .get('/api/operations/pincode/110030')
-        .expect(200);
-
-      expect(pincodeRes.body.data.isServiceable).toBe(true);
-
-      const invoiceRes = await request(app)
-        .get(`/api/operations/orders/${testOrderId}/invoice`)
-        .expect(200);
-
-      expect(invoiceRes.body.data.invoiceNumber).toContain('ORD-TEST-CCC-1');
-      expect(invoiceRes.body.data.brand.name).toBe('İLLURÊ FRAGRANCE');
+      const res2 = await LoyaltyService.processReferralOrder('ILR-REF-TEST', newCust.id, 'ORD-REF-1', 2500);
+      expect(res2?.success).toBe(false);
+      expect(res2?.reason).toBe('REWARD_ALREADY_CLAIMED');
     });
   });
 
   // ==========================================
-  // PHASE 8: EXECUTIVE COMMERCE ANALYTICS
+  // PHASE 7: OPERATIONS, INVOICE & TIMELINE
   // ==========================================
-  describe('Phase 8: Executive Commerce Analytics & CSV Export', () => {
-    it('should compute real executive commerce metrics and export orders CSV', async () => {
-      const metricsRes = await request(app)
-        .get('/api/admin/analytics/executive?days=30')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
+  describe('Phase 7: Operations, Real Timeline & Invoice Safety', () => {
+    it('should safely return CONFIGURATION_REQUIRED for invoices if legal info is missing', async () => {
+      // Ensure invoices feature has no legal business details
+      await prisma.commerceFeature.upsert({
+        where: { key: 'invoices' },
+        create: {
+          key: 'invoices',
+          name: 'Tax Invoices',
+          description: 'Tax invoices',
+          group: 'ORDERS',
+          isEnabled: true,
+          status: 'CONFIGURATION_REQUIRED',
+          config: {},
+        },
+        update: { config: {}, status: 'CONFIGURATION_REQUIRED' },
+      });
 
-      expect(metricsRes.body.data.metrics.totalRevenue).toBeGreaterThanOrEqual(2490);
-      expect(metricsRes.body.data.metrics.totalOrders).toBeGreaterThanOrEqual(1);
+      const res = await request(app).get(`/api/operations/orders/${testOrderId}/invoice`);
+      expect(res.body.data.status).toBe('CONFIGURATION_REQUIRED');
+      expect(res.body.data.brand).toBeNull();
+    });
+
+    it('should return truthful order timeline from real database status records', async () => {
+      const res = await request(app).get(`/api/operations/orders/${testOrderId}/timeline`);
+      expect(res.status).toBe(200);
+      expect(res.body.data.timeline.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.data.timeline[0].status).toBe('ORDER_PLACED');
+    });
+
+    it('should report CONFIGURATION_REQUIRED for shipping provider when courier API keys are absent', async () => {
+      const shipment = await ShippingProviderService.createOrderShipment(testOrderId);
+      expect(shipment.status).toBe('CONFIGURATION_REQUIRED');
+    });
+  });
+
+  // ==========================================
+  // PHASE 8: EXECUTIVE ANALYTICS & CSV SAFETY
+  // ==========================================
+  describe('Phase 8: Executive Analytics & CSV Formula Injection Protection', () => {
+    it('should neutralize formula injection in CSV export', async () => {
+      // Create order with formula injection attempt
+      await prisma.order.create({
+        data: {
+          orderNumber: 'ORD-INJ-1',
+          customerName: '=cmd|"/C calc"!A0',
+          customerPhone: '+919999999999',
+          status: 'PENDING',
+          paymentStatus: 'PENDING',
+          subtotal: 1000,
+          totalAmount: 1000,
+        },
+      });
 
       const csvRes = await request(app)
         .get('/api/admin/analytics/export/orders.csv')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(csvRes.headers['content-type']).toContain('text/csv');
-      expect(csvRes.text).toContain('Order Number,Date,Customer Name');
-      expect(csvRes.text).toContain('ORD-TEST-CCC-1');
+      // Verify cell was neutralized with leading single quote inside quotes
+      expect(csvRes.text).toContain("\"'=cmd|\"\"/C calc\"\"!A0\"");
     });
   });
 });

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '../../utils/prisma.js';
-import { GiftCardStatus } from '@prisma/client';
+import { GiftCardStatus, FeatureStatus } from '@prisma/client';
+import { FeaturesService } from '../features/features.service.js';
 
 export class GiftingService {
   /**
@@ -27,10 +28,21 @@ export class GiftingService {
       throw { statusCode: 400, code: 'INVALID_AMOUNT', message: 'Gift card amount must be between ₹1 and ₹1,00,000.' };
     }
 
+    // Check if gift_cards feature is active
+    const feature = await prisma.commerceFeature.findUnique({
+      where: { key: 'gift_cards' },
+    });
+    if (feature && (!feature.isEnabled || feature.status !== FeatureStatus.ACTIVE)) {
+      throw { statusCode: 400, code: 'FEATURE_DISABLED', message: 'Gift card purchases are currently disabled by administration.' };
+    }
+
     const code = this.generateGiftCardCode();
-    const expiresAt = data.expiresInDays
-      ? new Date(Date.now() + data.expiresInDays * 24 * 60 * 60 * 1000)
-      : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // default 1 year
+    // Expiry only if explicitly configured; no invented default expiry
+    const config = (feature?.config as Record<string, any>) || {};
+    const defaultDays = config.expiryDays || null;
+    const days = data.expiresInDays !== undefined ? data.expiresInDays : defaultDays;
+
+    const expiresAt = days ? new Date(Date.now() + days * 24 * 60 * 60 * 1000) : null;
 
     const giftCard = await prisma.giftCard.create({
       data: {
@@ -53,9 +65,14 @@ export class GiftingService {
 
   /**
    * Verify and check balance of a gift card.
+   * Minimal safe disclosure: does NOT leak recipient email, sender info, or audit history publicly.
    */
   static async checkBalance(code: string) {
     const cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode || cleanCode.length < 8) {
+      throw { statusCode: 400, code: 'INVALID_CODE', message: 'Invalid gift card code format.' };
+    }
+
     const card = await prisma.giftCard.findUnique({
       where: { code: cleanCode },
     });
@@ -77,27 +94,35 @@ export class GiftingService {
       currency: card.currency,
       currentBalance: Number(card.currentBalance),
       expiresAt: card.expiresAt,
-      senderName: card.senderName,
-      recipientName: card.recipientName,
+      status: card.status,
     };
   }
 
   /**
    * Redeem or partially deduct balance from a gift card.
+   * Concurrency safe and prevents negative balance using row-level select for update.
    */
   static async redeem(code: string, amountToDeduct: number) {
     const cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode) {
+      throw { statusCode: 400, code: 'BAD_REQUEST', message: 'Gift card code is required.' };
+    }
+    if (amountToDeduct <= 0) {
+      throw { statusCode: 400, code: 'BAD_REQUEST', message: 'Amount to deduct must be greater than zero.' };
+    }
 
     return prisma.$transaction(async (tx) => {
-      const card = await tx.giftCard.findUnique({
-        where: { code: cleanCode },
-      });
+      // Row lock to prevent concurrent double-spend race condition
+      const lockedCards = await tx.$queryRaw<Array<any>>`
+        SELECT * FROM gift_cards WHERE code = ${cleanCode} FOR UPDATE
+      `;
+      const card = lockedCards[0];
 
       if (!card || card.status !== GiftCardStatus.ACTIVE) {
         throw { statusCode: 400, code: 'CARD_UNAVAILABLE', message: 'Gift card is not available for redemption.' };
       }
 
-      if (card.expiresAt && card.expiresAt < new Date()) {
+      if (card.expiresAt && new Date(card.expiresAt) < new Date()) {
         throw { statusCode: 400, code: 'CARD_EXPIRED', message: 'This gift card has expired.' };
       }
 
@@ -129,26 +154,78 @@ export class GiftingService {
   }
 
   /**
-   * Check eligibility for free samples on cart/order value.
+   * Check eligibility for free samples based on admin configuration.
+   * Never hardcodes 1999 or 3ml; reads configuration or returns CONFIGURATION REQUIRED.
    */
-  static getFreeSamplesEligibility(subtotal: number) {
-    const isEligible = subtotal >= 1999;
+  static async getFreeSamplesEligibility(subtotal: number) {
+    const feature = await prisma.commerceFeature.findUnique({
+      where: { key: 'free_samples' },
+    });
+
+    const isEnabled = feature?.isEnabled && feature.status === FeatureStatus.ACTIVE;
+    const config = (feature?.config as Record<string, any>) || {};
+
+    const minSpend = config.minSpend ?? (feature?.minimumOrderValue ? Number(feature.minimumOrderValue) : null);
+    const eligibleVariantIds: string[] = config.eligibleVariantIds || [];
+    const maxSamples = config.maxSamplesPerOrder || 0;
+
+    // If no eligible variants or no minSpend configured, feature requires configuration
+    if (!isEnabled || minSpend === null || eligibleVariantIds.length === 0 || maxSamples === 0) {
+      return {
+        status: FeatureStatus.CONFIGURATION_REQUIRED,
+        eligible: false,
+        message: 'Free sample program is currently undergoing configuration by administration.',
+        minSpend: minSpend || 0,
+        allowedCount: 0,
+        availableSamples: [],
+      };
+    }
+
+    // Query real ProductVariants from database
+    const variants = await prisma.productVariant.findMany({
+      where: {
+        id: { in: eligibleVariantIds },
+        isActive: true,
+        stockQuantity: { gt: 0 },
+      },
+      include: {
+        product: { select: { id: true, name: true, fragranceFamily: true, slug: true } },
+      },
+    });
+
+    const isEligible = subtotal >= minSpend;
+
     return {
+      status: FeatureStatus.ACTIVE,
       eligible: isEligible,
-      minSpend: 1999,
-      allowedCount: isEligible ? 2 : 0,
-      availableSamples: [
-        { id: 'sample-velvet-oud', name: 'Velvet Oud (3ml Sample)', family: 'Woody' },
-        { id: 'sample-noir-leather', name: 'Noir Leather (3ml Sample)', family: 'Amber' },
-        { id: 'sample-santal-blanc', name: 'Santal Blanc (3ml Sample)', family: 'Woody' },
-      ],
+      minSpend,
+      allowedCount: isEligible ? Math.min(maxSamples, variants.length) : 0,
+      availableSamples: variants.map((v) => ({
+        variantId: v.id,
+        productId: v.productId,
+        name: `${v.product.name} (${v.sizeLabel})`,
+        size: v.sizeLabel,
+        family: v.product.fragranceFamily || 'Collection',
+        stockQuantity: v.stockQuantity,
+      })),
     };
   }
 
   /**
-   * Gift finder suggestion engine.
+   * Unified Gift Finder reusing the standard Scent Finder taxonomy and live catalog.
    */
   static async findGift(params: { recipient?: string; budget?: number; vibe?: string }) {
+    const feature = await prisma.commerceFeature.findUnique({
+      where: { key: 'gift_finder' },
+    });
+
+    if (feature && (!feature.isEnabled || feature.status !== FeatureStatus.ACTIVE)) {
+      return {
+        status: FeatureStatus.CONFIGURATION_REQUIRED,
+        recommendations: [],
+      };
+    }
+
     const where: any = { status: 'ACTIVE' };
     if (params.vibe) {
       where.fragranceFamily = { contains: params.vibe, mode: 'insensitive' };
@@ -156,18 +233,29 @@ export class GiftingService {
 
     const products = await prisma.product.findMany({
       where,
-      include: { variants: { where: { isActive: true }, orderBy: { price: 'asc' } } },
+      include: {
+        variants: {
+          where: {
+            isActive: true,
+            ...(params.budget ? { price: { lte: params.budget } } : {}),
+          },
+          orderBy: { price: 'asc' },
+        },
+      },
       take: 6,
     });
 
     return {
-      recommendations: products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        family: p.fragranceFamily,
-        startingPrice: p.variants[0]?.price ? Number(p.variants[0].price) : 2490,
-      })),
+      status: FeatureStatus.ACTIVE,
+      recommendations: products
+        .filter((p) => p.variants.length > 0)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          family: p.fragranceFamily,
+          startingPrice: Number(p.variants[0].price),
+        })),
     };
   }
 }

@@ -45,6 +45,16 @@ export class OperationsController {
     }
   }
 
+  static async getTimeline(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orderId = String(req.params.orderId || '');
+      const result = await OperationsService.getOrderTimeline(orderId);
+      return sendSuccess(res, result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async listReturns(req: Request, res: Response, next: NextFunction) {
     try {
       const { status } = req.query;

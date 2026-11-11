@@ -42,7 +42,7 @@ export class GiftingController {
   static async getFreeSamplesEligibility(req: Request, res: Response, next: NextFunction) {
     try {
       const subtotal = Number(req.query.subtotal || 0);
-      const result = GiftingService.getFreeSamplesEligibility(subtotal);
+      const result = await GiftingService.getFreeSamplesEligibility(subtotal);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);

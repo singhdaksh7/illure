@@ -6,3 +6,4 @@ export const analyticsRouter = Router();
 
 analyticsRouter.get('/executive', requireAdminAuth, AnalyticsController.getExecutiveMetrics);
 analyticsRouter.get('/export/orders.csv', requireAdminAuth, AnalyticsController.exportOrdersCsv);
+analyticsRouter.get('/export/inventory.csv', requireAdminAuth, AnalyticsController.exportInventoryCsv);

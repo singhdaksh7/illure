@@ -1,5 +1,6 @@
 import { prisma } from '../../utils/prisma.js';
-import { ReviewStatus } from '@prisma/client';
+import { ReviewStatus, FeatureStatus } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 export class RetentionService {
   /**
@@ -132,7 +133,7 @@ export class RetentionService {
   }
 
   /**
-   * Submit product review (with verified buyer check).
+   * Submit product review (with verified buyer check, photo upload validation, moderation support).
    */
   static async submitReview(customerId: string, data: {
     productId: string;
@@ -153,6 +154,25 @@ export class RetentionService {
       throw { statusCode: 400, code: 'INVALID_COMMENT', message: 'Comment must be at least 5 characters.' };
     }
 
+    // Validate photo URLs (only jpg, jpeg, png, webp allowed)
+    if (data.mediaUrls && data.mediaUrls.length > 0) {
+      if (data.mediaUrls.length > 5) {
+        throw { statusCode: 400, code: 'TOO_MANY_MEDIA', message: 'Maximum 5 photos allowed per review.' };
+      }
+      for (const url of data.mediaUrls) {
+        if (!/\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(url)) {
+          throw { statusCode: 400, code: 'INVALID_MEDIA_TYPE', message: 'Only JPG, PNG, and WEBP image formats are supported.' };
+        }
+      }
+    }
+
+    // Check review config
+    const feature = await prisma.commerceFeature.findUnique({
+      where: { key: 'reviews' },
+    });
+    const config = (feature?.config as Record<string, any>) || {};
+    const autoApprove = config.autoApprove !== undefined ? config.autoApprove : true;
+
     // Check if customer is a verified buyer of this product
     const pastOrder = await prisma.order.findFirst({
       where: {
@@ -170,20 +190,20 @@ export class RetentionService {
         orderId: pastOrder ? pastOrder.id : null,
         rating: data.rating,
         scentRating: data.scentRating || null,
-        longevityRating: data.longevityRating || null,
+        longevityRating: config.allowLongevity ? (data.longevityRating || null) : null,
         valueRating: data.valueRating || null,
         wouldBuyAgain: data.wouldBuyAgain ?? true,
         title: data.title?.trim() || null,
         comment: data.comment.trim(),
         mediaUrls: data.mediaUrls || [],
         isVerified: Boolean(pastOrder),
-        status: ReviewStatus.APPROVED, // auto-approve verified, or pending
+        status: autoApprove ? ReviewStatus.APPROVED : ReviewStatus.PENDING,
       },
     });
   }
 
   /**
-   * List reviews for a product with statistics.
+   * List reviews for a product with statistics (only APPROVED reviews).
    */
   static async getProductReviews(productId: string) {
     const reviews = await prisma.productReview.findMany({
@@ -205,13 +225,38 @@ export class RetentionService {
         rating: r.rating,
         scentRating: r.scentRating,
         longevityRating: r.longevityRating,
+        valueRating: r.valueRating,
         wouldBuyAgain: r.wouldBuyAgain,
         title: r.title,
         comment: r.comment,
+        mediaUrls: r.mediaUrls,
         authorName: r.customer?.name || 'Customer',
         isVerified: r.isVerified,
         createdAt: r.createdAt,
       })),
     };
+  }
+
+  /**
+   * Schedule automated review request for delivered orders using NotificationJob.
+   */
+  static async scheduleReviewRequest(orderId: string) {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { customer: true },
+    });
+
+    if (!order || !order.customerEmail) return null;
+
+    return NotificationsService.enqueue({
+      type: 'REVIEW_REQUEST',
+      payload: {
+        to: order.customerEmail,
+        customerName: order.customerName,
+        orderNumber: order.orderNumber,
+        reviewUrl: `/account?tab=orders&reviewOrder=${order.id}`,
+      },
+      delaySeconds: 3 * 24 * 60 * 60, // 3 days after delivery
+    });
   }
 }

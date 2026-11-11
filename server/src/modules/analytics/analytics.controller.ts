@@ -23,4 +23,15 @@ export class AnalyticsController {
       next(err);
     }
   }
+
+  static async exportInventoryCsv(req: Request, res: Response, next: NextFunction) {
+    try {
+      const csv = await AnalyticsService.exportInventoryCsv();
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="illure-inventory-export.csv"');
+      return res.status(200).send(csv);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
