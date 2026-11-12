@@ -108,4 +108,33 @@ export class CustomerAuthController {
       next(error);
     }
   }
+
+  static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ success: false, error: { message: 'Email is required.' } });
+      }
+      const result = await CustomerAuthService.requestPasswordReset(email);
+      return sendSuccess(res, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) {
+        return res.status(400).json({ success: false, error: { message: 'Token and newPassword are required.' } });
+      }
+      if (newPassword.length < 8) {
+        return res.status(400).json({ success: false, error: { message: 'Password must be at least 8 characters long.' } });
+      }
+      const result = await CustomerAuthService.resetPassword(token, newPassword);
+      return sendSuccess(res, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

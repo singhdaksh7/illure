@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { prisma } from '../../utils/prisma.js';
 import { hashPassword, verifyPassword } from '../../utils/password.utils.js';
 import {
@@ -258,4 +259,85 @@ export class CustomerAuthService {
 
     return customer;
   }
+
+  /**
+   * Request password reset token and queue email
+   */
+  static async requestPasswordReset(email: string) {
+    const customer = await prisma.customer.findUnique({
+      where: { email: email.trim().toLowerCase() },
+    });
+
+    // Timing-safe response: always return success message even if customer not found
+    if (!customer || !customer.isActive) {
+      return { message: 'If an account exists with this email, a reset link has been dispatched.' };
+    }
+
+    // Generate high-entropy reset token (valid for 1 hour)
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        passwordResetToken: resetTokenHash,
+        passwordResetExpires: expiresAt,
+      },
+    });
+
+    // Enqueue async email notification
+    await prisma.notificationJob.create({
+      data: {
+        type: 'PASSWORD_RESET',
+        payload: {
+          recipient: customer.email,
+          subject: 'İLLURÊ — Password Reset Request',
+          name: customer.name,
+          resetToken,
+          resetLink: `${process.env.FRONTEND_URL || 'https://illure.77.37.45.177.sslip.io'}/account/reset-password?token=${resetToken}`,
+        },
+      },
+    });
+
+    return { message: 'If an account exists with this email, a reset link has been dispatched.' };
+  }
+
+  /**
+   * Reset customer password using verified token
+   */
+  static async resetPassword(token: string, newPassword: string) {
+    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const customer = await prisma.customer.findFirst({
+      where: {
+        passwordResetToken: resetTokenHash,
+        passwordResetExpires: { gt: new Date() },
+      },
+    });
+
+    if (!customer) {
+      throw { statusCode: 400, code: 'INVALID_TOKEN', message: 'Password reset link is invalid or has expired.' };
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+
+    // Revoke all active customer sessions for security
+    await prisma.customerSession.updateMany({
+      where: { customerId: customer.id, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+
+    return { message: 'Password updated successfully. You can now log in.' };
+  }
 }
+

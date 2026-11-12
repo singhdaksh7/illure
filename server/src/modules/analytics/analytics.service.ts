@@ -157,4 +157,88 @@ export class AnalyticsService {
 
     return header + rows.join('\n');
   }
+
+  /**
+   * Ingest storefront click event
+   */
+  static async recordClickEvent(data: {
+    targetType: string; // 'PRODUCT' | 'BANNER' | 'HERO_CTA' | 'COLLECTION'
+    targetId?: string;
+    targetTitle?: string;
+    targetUrl?: string;
+    userId?: string;
+    anonymousId?: string;
+    metadata?: Record<string, any>;
+  }) {
+    return prisma.commerceEventLog.create({
+      data: {
+        eventType: 'CLICK',
+        customerId: data.userId || null,
+        sessionId: data.anonymousId || null,
+        metadata: {
+          targetType: data.targetType,
+          targetId: data.targetId,
+          targetTitle: data.targetTitle,
+          targetUrl: data.targetUrl,
+          ...(data.metadata || {}),
+        },
+      },
+    });
+  }
+
+  /**
+   * Aggregate click tracking metrics
+   */
+  static async getClickMetrics(days = 30) {
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const clickEvents = await prisma.commerceEventLog.findMany({
+      where: {
+        eventType: 'CLICK',
+        createdAt: { gte: cutoff },
+      },
+      select: {
+        metadata: true,
+        createdAt: true,
+      },
+    });
+
+    const byTargetType: Record<string, number> = {
+      PRODUCT: 0,
+      BANNER: 0,
+      HERO_CTA: 0,
+      COLLECTION: 0,
+      OTHER: 0,
+    };
+
+    const topItemsMap: Record<string, { title: string; type: string; count: number }> = {};
+
+    for (const ev of clickEvents) {
+      const meta = (ev.metadata as any) || {};
+      const type = meta.targetType || 'OTHER';
+      byTargetType[type] = (byTargetType[type] || 0) + 1;
+
+      const itemKey = `${type}:${meta.targetTitle || meta.targetId || 'Unknown'}`;
+      if (!topItemsMap[itemKey]) {
+        topItemsMap[itemKey] = {
+          title: meta.targetTitle || meta.targetId || 'Unknown',
+          type,
+          count: 0,
+        };
+      }
+      topItemsMap[itemKey].count += 1;
+    }
+
+    const topClicked = Object.values(topItemsMap)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 15);
+
+    return {
+      periodDays: days,
+      totalClicks: clickEvents.length,
+      clicksByType: byTargetType,
+      topClickedItems: topClicked,
+    };
+  }
 }
+

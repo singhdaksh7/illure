@@ -1,9 +1,21 @@
-import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import AdminCmsPage from './pages/AdminCmsPage';
 import AdminFeaturesPage from './pages/AdminFeaturesPage';
 import AdminDiscoverySetsPage from './pages/AdminDiscoverySetsPage';
+import AdminProductsPage from './pages/AdminProductsPage';
+import AdminCategoriesPage from './pages/AdminCategoriesPage';
+import AdminReferenceBrandsPage from './pages/AdminReferenceBrandsPage';
+import AdminInventoryPage from './pages/AdminInventoryPage';
+import AdminOrdersPage from './pages/AdminOrdersPage';
+import AdminGiftPackagingPage from './pages/AdminGiftPackagingPage';
+import AdminMediaLibraryPage from './pages/AdminMediaLibraryPage';
+import AdminBannersPage from './pages/AdminBannersPage';
+import AdminTickerPage from './pages/AdminTickerPage';
+import AdminPagesPage from './pages/AdminPagesPage';
+import AdminIntegrationsPage from './pages/AdminIntegrationsPage';
+import AdminShipmentsPage from './pages/AdminShipmentsPage';
 import {
   ShieldCheck,
   CheckCircle,
@@ -62,21 +74,23 @@ export default function AdminDashboard({ activeTab }) {
     fetchAdminUsers();
   }, [activeTab, accessToken]);
 
-  if (activeTab === 'analytics') {
-    return <AdminAnalyticsPage />;
-  }
-
-  if (activeTab === 'features') {
-    return <AdminFeaturesPage />;
-  }
-
-  if (activeTab === 'discoverySets') {
-    return <AdminDiscoverySetsPage />;
-  }
-
-  if (activeTab === 'cms') {
-    return <AdminCmsPage />;
-  }
+  // Tab Dispatching
+  if (activeTab === 'analytics') return <AdminAnalyticsPage />;
+  if (activeTab === 'features') return <AdminFeaturesPage />;
+  if (activeTab === 'discoverySets') return <AdminDiscoverySetsPage />;
+  if (activeTab === 'cms') return <AdminCmsPage />;
+  if (activeTab === 'products') return <AdminProductsPage />;
+  if (activeTab === 'categories') return <AdminCategoriesPage />;
+  if (activeTab === 'referenceBrands') return <AdminReferenceBrandsPage />;
+  if (activeTab === 'inventory') return <AdminInventoryPage />;
+  if (activeTab === 'orders') return <AdminOrdersPage />;
+  if (activeTab === 'giftPackaging') return <AdminGiftPackagingPage />;
+  if (activeTab === 'mediaLibrary') return <AdminMediaLibraryPage />;
+  if (activeTab === 'banners') return <AdminBannersPage />;
+  if (activeTab === 'tickers') return <AdminTickerPage />;
+  if (activeTab === 'pages') return <AdminPagesPage />;
+  if (activeTab === 'integrations') return <AdminIntegrationsPage />;
+  if (activeTab === 'shipments') return <AdminShipmentsPage />;
 
   if (activeTab === 'admins') {
     return (
@@ -128,14 +142,14 @@ export default function AdminDashboard({ activeTab }) {
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 text-red-500 font-sans font-medium">
-                        <span className="w-2 h-2 rounded-full bg-red-500" /> Inactive
+                        <span className="w-2 h-2 rounded-full bg-red-500" /> Disabled
                       </span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-gray-500">
                     {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : 'Never'}
                   </td>
-                  <td className="px-6 py-4 text-gray-500">
+                  <td className="px-6 py-4 text-gray-400">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -147,36 +161,27 @@ export default function AdminDashboard({ activeTab }) {
     );
   }
 
+  // Dashboard Overview
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-8">
       {/* Welcome Banner */}
-      <div className="bg-[#0D1112] text-[#F2EFE8] p-8 rounded-2xl border border-[#C6AE82]/20 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#C6AE82]/15 text-[#C6AE82] text-xs rounded-full border border-[#C6AE82]/30 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Phases 1-3 Implemented • Backend &amp; Auth Core Active</span>
+      <div className="bg-[#0D1112] text-[#F2EFE8] rounded-2xl p-6 sm:p-8 border border-[#C6AE82]/30 shadow-xl relative overflow-hidden">
+        <div className="relative z-10 max-w-2xl space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded bg-[#C6AE82]/20 text-[#C6AE82] border border-[#C6AE82]/40 text-[10px] uppercase tracking-widest font-semibold">
+              Live Production Staging
+            </span>
+            <span className="flex items-center gap-1 text-[11px] text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Healthy
+            </span>
           </div>
-          <h1 className="text-3xl font-serif tracking-wide text-white">
-            Welcome back, {admin?.name || 'Administrator'}
+          <h1 className="text-2xl sm:text-3xl font-serif text-[#F2EFE8]">
+            Welcome to İLLURÊ Commerce Operating System
           </h1>
-          <p className="text-xs text-[#F2EFE8]/70 max-w-xl">
-            İLLURÊ luxury storefront production backend architecture is active. Argon2id security, Prisma ORM PostgreSQL schema, and refresh rotation session protection enabled.
+          <p className="text-xs text-[#F2EFE8]/70 leading-relaxed font-sans">
+            Store owners command catalog variants, Cloudflare R2 media assets, dynamic homepage sections, banners, ticker, Shiprocket fulfillment, and integration secrets with real-time database persistence.
           </p>
-        </div>
-
-        <div className="bg-[#13191B] p-4 rounded-xl border border-[#C6AE82]/20 text-xs space-y-2 z-10 min-w-[220px]">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-400">Environment:</span>
-            <span className="text-emerald-400 font-mono font-medium">{healthStatus?.environment || 'development'}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-400">Database:</span>
-            <span className="text-emerald-400 font-mono font-medium">{healthStatus?.database || 'connected'}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-400">Auth Standard:</span>
-            <span className="text-[#C6AE82] font-mono font-medium">Argon2id + JWT</span>
-          </div>
         </div>
       </div>
 
@@ -184,76 +189,38 @@ export default function AdminDashboard({ activeTab }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Database Schema</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Database Models</span>
             <Database className="w-5 h-5 text-[#8C6D32]" />
           </div>
-          <p className="text-2xl font-serif text-[#0D1112]">15 Models</p>
-          <p className="text-[11px] text-gray-500">PostgreSQL + Prisma ORM</p>
+          <p className="text-2xl font-serif text-[#0D1112]">25 Models</p>
+          <p className="text-[11px] text-gray-500">PostgreSQL + Prisma Formally Migrated</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Admin Security</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Secrets Vault</span>
             <Lock className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-serif text-[#0D1112]">Argon2id</p>
-          <p className="text-[11px] text-emerald-600 font-medium">Rotation &amp; Revocation Active</p>
+          <p className="text-2xl font-serif text-[#0D1112]">AES-256-GCM</p>
+          <p className="text-[11px] text-emerald-600 font-medium">Application-Level Encrypted</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Seeded Fragrances</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Shipping &amp; Courier</span>
             <Package className="w-5 h-5 text-[#8C6D32]" />
           </div>
-          <p className="text-2xl font-serif text-[#0D1112]">3 Fragrances</p>
-          <p className="text-[11px] text-gray-500">12 Product Variants Seeded</p>
+          <p className="text-2xl font-serif text-[#0D1112]">Shiprocket</p>
+          <p className="text-[11px] text-gray-500">Serviceability &amp; Neutral Webhooks</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Admin Users</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Admin Staff</span>
             <Users className="w-5 h-5 text-[#8C6D32]" />
           </div>
           <p className="text-2xl font-serif text-[#0D1112]">{adminUsers.length || 1} Active</p>
-          <p className="text-[11px] text-gray-500">SUPER_ADMIN Role Configured</p>
-        </div>
-      </div>
-
-      {/* Module Architecture Readiness */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-        <h2 className="text-lg font-serif text-[#0D1112] flex items-center gap-2">
-          <Server className="w-5 h-5 text-[#8C6D32]" />
-          Backend Architecture &amp; Module Readiness
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          {[
-            { title: 'Storefront CMS & Studio', status: 'Implemented', detail: 'Real-time section reordering, theme presets, hero customizer' },
-            { title: 'Admin Auth & Security', status: 'Implemented', detail: 'Login, Refresh Rotation, Logout, /me' },
-            { title: 'Admin Roles', status: 'Implemented', detail: 'SUPER_ADMIN, ADMIN, ORDER/INVENTORY_MANAGER' },
-            { title: 'PostgreSQL Database', status: 'Implemented', detail: '17 normalized models with Prisma migrations' },
-            { title: 'Products & Variants', status: 'Schema Ready', detail: 'Product, ProductVariant (Decimal prices, unique SKUs)' },
-            { title: 'Reference Brands', status: 'Schema Ready', detail: 'Inspiration brand separation (e.g. Tom Ford, Armani)' },
-            { title: 'Inventory Movements', status: 'Schema Ready', detail: 'PURCHASE, SALE, RETURN, ADJUSTMENT' },
-            { title: 'Gift Packaging', status: 'Schema Ready', detail: 'Standard box free; optional paid gift box schema' },
-            { title: 'Orders & OrderItems', status: 'Schema Ready', detail: 'OrderStatus & PaymentStatus snapshot architecture' },
-            { title: 'Coupons & Customers', status: 'Schema Ready', detail: 'Customer, Address, Coupon percentage/fixed types' },
-          ].map((m, idx) => (
-            <div key={idx} className="p-4 rounded-lg bg-gray-50 border border-gray-100 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-gray-900">{m.title}</span>
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${
-                    m.status === 'Implemented'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {m.status}
-                  </span>
-                </div>
-                <p className="text-gray-500 text-[11px]">{m.detail}</p>
-              </div>
-            </div>
-          ))}
+          <p className="text-[11px] text-gray-500">Role-Based Access Control</p>
         </div>
       </div>
     </div>

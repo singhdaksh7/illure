@@ -280,6 +280,24 @@ export class ProductsService {
 
     return prisma.$transaction(async (tx) => {
       // 1. Update basic product fields
+      if (existing.slug && slug && existing.slug !== slug) {
+        // Create 301 automatic redirect from old slug to new slug
+        await tx.urlRedirect.upsert({
+          where: { sourcePath: `/product/${existing.slug}` },
+          create: {
+            sourcePath: `/product/${existing.slug}`,
+            targetPath: `/product/${slug}`,
+            statusCode: 301,
+            isActive: true,
+          },
+          update: {
+            targetPath: `/product/${slug}`,
+            statusCode: 301,
+            isActive: true,
+          },
+        });
+      }
+
       await tx.product.update({
         where: { id },
         data: {
@@ -820,4 +838,107 @@ export class ProductsService {
       families: Array.from(matchingFamilies).slice(0, 4),
     };
   }
+
+  /**
+   * Duplicate an existing product with its variants, images, and categories
+   */
+  static async duplicateProduct(id: string, _adminId?: string) {
+    const source = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        variants: true,
+        images: true,
+        productCategories: true,
+      },
+    });
+
+    if (!source) {
+      throw { statusCode: 404, code: 'PRODUCT_NOT_FOUND', message: 'Product to duplicate not found.' };
+    }
+
+    const timestamp = Date.now().toString().slice(-4);
+    const newName = `${source.name} (Copy ${timestamp})`;
+    const newSlug = `${source.slug}-copy-${timestamp}`;
+
+    return prisma.$transaction(async (tx) => {
+      const duplicated = await tx.product.create({
+        data: {
+          name: newName,
+          slug: newSlug,
+          shortDescription: source.shortDescription,
+          description: source.description,
+          referenceBrandId: source.referenceBrandId,
+          inspiredByName: source.inspiredByName,
+          gender: source.gender,
+          fragranceFamily: source.fragranceFamily,
+          topNotes: source.topNotes,
+          heartNotes: source.heartNotes,
+          baseNotes: source.baseNotes,
+          occasion: source.occasion,
+          season: source.season,
+          longevity: source.longevity,
+          projection: source.projection,
+          featured: false,
+          bestseller: false,
+          newArrival: false,
+          status: 'DRAFT', // Safe draft state for duplicated products
+          seoTitle: source.seoTitle ? `${source.seoTitle} (Copy)` : null,
+          seoDescription: source.seoDescription,
+        },
+      });
+
+      // Duplicate categories
+      if (source.productCategories.length > 0) {
+        await tx.productCategory.createMany({
+          data: source.productCategories.map((pc) => ({
+            productId: duplicated.id,
+            categoryId: pc.categoryId,
+          })),
+        });
+      }
+
+      // Duplicate variants with new unique SKUs
+      if (source.variants.length > 0) {
+        await tx.productVariant.createMany({
+          data: source.variants.map((v, i) => ({
+            productId: duplicated.id,
+            sizeLabel: v.sizeLabel,
+            sizeMl: v.sizeMl,
+            sku: `${v.sku}-COPY-${timestamp}-${i + 1}`,
+            price: v.price,
+            compareAtPrice: v.compareAtPrice,
+            costPrice: v.costPrice,
+            stockQuantity: 0, // Reset inventory to 0 on duplicate for safety
+            lowStockThreshold: v.lowStockThreshold,
+            isActive: v.isActive,
+            sortOrder: v.sortOrder,
+          })),
+        });
+      }
+
+      // Duplicate images
+      if (source.images.length > 0) {
+        await tx.productImage.createMany({
+          data: source.images.map((img) => ({
+            productId: duplicated.id,
+            url: img.url,
+            altText: img.altText,
+            sortOrder: img.sortOrder,
+            isPrimary: img.isPrimary,
+          })),
+        });
+      }
+
+      return tx.product.findUnique({
+        where: { id: duplicated.id },
+        include: {
+          referenceBrand: true,
+          productCategories: { include: { category: true } },
+          images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
+          variants: { orderBy: { sortOrder: 'asc' } },
+        },
+      });
+    });
+  }
 }
+

@@ -23,6 +23,8 @@ customerAuthRouter.post(
 
 customerAuthRouter.post('/refresh', CustomerAuthController.refresh);
 customerAuthRouter.post('/logout', CustomerAuthController.logout);
+customerAuthRouter.post('/forgot-password', loginLimiter, CustomerAuthController.forgotPassword);
+customerAuthRouter.post('/reset-password', loginLimiter, CustomerAuthController.resetPassword);
 customerAuthRouter.get('/me', requireCustomerAuth, CustomerAuthController.me);
 
 export default customerAuthRouter;

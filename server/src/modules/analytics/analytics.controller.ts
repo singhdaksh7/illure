@@ -34,4 +34,37 @@ export class AnalyticsController {
       next(err);
     }
   }
+
+  static async recordClick(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { targetType, targetId, targetTitle, targetUrl, userId, anonymousId, metadata } = req.body;
+      if (!targetType) {
+        return res.status(400).json({ success: false, error: { message: 'targetType is required.' } });
+      }
+
+      await AnalyticsService.recordClickEvent({
+        targetType,
+        targetId,
+        targetTitle,
+        targetUrl,
+        userId,
+        anonymousId,
+        metadata,
+      });
+
+      return res.status(201).json({ success: true, message: 'Click tracked.' });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getClickMetrics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const days = req.query.days ? Number(req.query.days) : 30;
+      const data = await AnalyticsService.getClickMetrics(days);
+      return sendSuccess(res, data);
+    } catch (err) {
+      next(err);
+    }
+  }
 }

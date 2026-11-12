@@ -9,29 +9,41 @@ import {
   Download, 
   RefreshCw,
   IndianRupee,
-  Clock
+  Clock,
+  MousePointerClick
 } from 'lucide-react';
 
 export default function AdminAnalyticsPage() {
   const [metrics, setMetrics] = useState(null);
   const [bestsellers, setBestsellers] = useState([]);
+  const [clickData, setClickData] = useState(null);
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [activeTab, setActiveTab] = useState('executive');
 
   const fetchMetrics = async (selectedDays = days) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminAccessToken') || localStorage.getItem('token');
-      const res = await fetch(`/api/admin/analytics/executive?days=${selectedDays}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (data.success && data.data) {
-        setMetrics(data.data.metrics);
-        setBestsellers(data.data.bestsellers || []);
+      const [resExec, resClicks] = await Promise.all([
+        fetch(`/api/admin/analytics/executive?days=${selectedDays}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`/api/admin/analytics/clicks?days=${selectedDays}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      const dataExec = await resExec.json();
+      if (dataExec.success && dataExec.data) {
+        setMetrics(dataExec.data.metrics);
+        setBestsellers(dataExec.data.bestsellers || []);
+      }
+
+      const dataClicks = await resClicks.json();
+      if (dataClicks.success && dataClicks.data) {
+        setClickData(dataClicks.data);
       }
     } catch (err) {
       console.error('Failed to load executive metrics:', err);
@@ -82,6 +94,25 @@ export default function AdminAnalyticsPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex bg-[#161819] border border-[#2A2D30] rounded p-1">
+            <button
+              onClick={() => setActiveTab('executive')}
+              className={`px-3 py-1.5 text-xs tracking-wider transition ${
+                activeTab === 'executive' ? 'bg-[#C7A866] text-[#080A0B] font-medium' : 'text-[#AAA297]'
+              }`}
+            >
+              COMMERCE
+            </button>
+            <button
+              onClick={() => setActiveTab('clicks')}
+              className={`px-3 py-1.5 text-xs tracking-wider transition ${
+                activeTab === 'clicks' ? 'bg-[#C7A866] text-[#080A0B] font-medium' : 'text-[#AAA297]'
+              }`}
+            >
+              CLICK TRACKING
+            </button>
+          </div>
+
+          <div className="flex bg-[#161819] border border-[#2A2D30] rounded p-1">
             {[7, 30, 90].map((d) => (
               <button
                 key={d}
@@ -116,7 +147,62 @@ export default function AdminAnalyticsPage() {
         </div>
       </div>
 
-      {/* KPI Overview Grid */}
+      {activeTab === 'clicks' ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+            <div className="bg-[#121415] border border-[#2A2D30] p-6 rounded">
+              <span className="text-xs uppercase tracking-wider font-mono text-[#A98A52]">Total Tracked Clicks</span>
+              <div className="text-2xl font-serif text-[#F7F4EE] mt-2">{clickData?.totalClicks || 0}</div>
+              <span className="text-[11px] text-[#7A7267] mt-1 block">Past {days} days storefront activity</span>
+            </div>
+            <div className="bg-[#121415] border border-[#2A2D30] p-6 rounded">
+              <span className="text-xs uppercase tracking-wider font-mono text-[#A98A52]">Product Card Clicks</span>
+              <div className="text-2xl font-serif text-[#F7F4EE] mt-2">{clickData?.clicksByType?.PRODUCT || 0}</div>
+              <span className="text-[11px] text-[#7A7267] mt-1 block">Fragrance detail navigations</span>
+            </div>
+            <div className="bg-[#121415] border border-[#2A2D30] p-6 rounded">
+              <span className="text-xs uppercase tracking-wider font-mono text-[#A98A52]">Hero CTA Clicks</span>
+              <div className="text-2xl font-serif text-[#F7F4EE] mt-2">{clickData?.clicksByType?.HERO_CTA || 0}</div>
+              <span className="text-[11px] text-[#7A7267] mt-1 block">Homepage explore actions</span>
+            </div>
+            <div className="bg-[#121415] border border-[#2A2D30] p-6 rounded">
+              <span className="text-xs uppercase tracking-wider font-mono text-[#A98A52]">Banner Clicks</span>
+              <div className="text-2xl font-serif text-[#F7F4EE] mt-2">{clickData?.clicksByType?.BANNER || 0}</div>
+              <span className="text-[11px] text-[#7A7267] mt-1 block">Promotional banner taps</span>
+            </div>
+          </div>
+
+          <div className="bg-[#121415] border border-[#2A2D30] rounded p-6">
+            <h2 className="text-lg font-serif text-[#F7F4EE] mb-4">Top Clicked Items & Sections</h2>
+            {clickData?.topClickedItems?.length === 0 ? (
+              <div className="text-sm text-[#7A7267] py-6 text-center">No click telemetry recorded yet.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#2A2D30] text-[#A98A52] text-xs font-mono uppercase tracking-wider">
+                      <th className="pb-3">Element / Product</th>
+                      <th className="pb-3">Target Type</th>
+                      <th className="pb-3 text-right">Click Count</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#2A2D30]">
+                    {clickData?.topClickedItems?.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-[#181A1B]">
+                        <td className="py-3 font-medium text-[#F7F4EE]">{item.title}</td>
+                        <td className="py-3 font-mono text-xs text-[#C7A866]">{item.type}</td>
+                        <td className="py-3 text-right font-mono text-[#D8BE82]">{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* KPI Overview Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-[#121415] border border-[#2A2D30] p-6 rounded relative overflow-hidden">
           <div className="flex items-center justify-between text-[#A98A52] mb-3">
@@ -245,6 +331,8 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -224,6 +224,7 @@ model ProductImage {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String
+  storageKey String?
   altText   String?
   sortOrder Int      @default(0)
   isPrimary Boolean  @default(false)
@@ -275,6 +276,8 @@ model Customer {
   phone        String
   name         String
   passwordHash String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
   isActive     Boolean           @default(true)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
@@ -396,6 +399,7 @@ model Order {
   statusHistory       OrderStatusHistory[]
   payments            Payment[]
   returnRequests      OrderReturnRequest[]
+  shipments           Shipment[]
 
   @@index([customerId])
   @@index([status])
@@ -1042,4 +1046,188 @@ model RiskFlag {
   @@index([customerId])
   @@index([isResolved])
   @@map("risk_flags")
+}
+
+
+// ==========================================
+// ADMIN OPERATING SYSTEM MODELS
+// ==========================================
+
+model UrlRedirect {
+  id          String   @id @default(uuid())
+  sourcePath  String   @unique
+  targetPath  String
+  statusCode  Int      @default(301)
+  isActive    Boolean  @default(true)
+  hitCount    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sourcePath])
+  @@map("url_redirects")
+}
+
+model MediaItem {
+  id          String   @id @default(uuid())
+  storageKey  String   @unique
+  publicUrl   String
+  fileName    String
+  mimeType    String
+  fileSize    Int
+  width       Int?
+  height      Int?
+  altText     String?
+  folder      String   @default("general")
+  usedByCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([storageKey])
+  @@index([folder])
+  @@map("media_items")
+}
+
+enum BannerPosition {
+  HOMEPAGE
+  CATALOG
+  PDP
+  CART
+  ACCOUNT
+}
+
+model Banner {
+  id            String         @id @default(uuid())
+  name          String
+  position      BannerPosition @default(HOMEPAGE)
+  desktopImageUrl String
+  mobileImageUrl  String?
+  headline      String?
+  subheadline   String?
+  ctaLabel      String?
+  ctaUrl        String?
+  sortOrder     Int            @default(0)
+  isEnabled     Boolean        @default(true)
+  startAt       DateTime?
+  endAt         DateTime?
+  impressions   Int            @default(0)
+  clicks        Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([position, isEnabled])
+  @@map("banners")
+}
+
+model AnnouncementTicker {
+  id            String    @id @default(uuid())
+  message       String
+  linkLabel     String?
+  linkUrl       String?
+  priority      Int       @default(0)
+  isEnabled     Boolean   @default(true)
+  startAt       DateTime?
+  endAt         DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isEnabled])
+  @@map("announcement_tickers")
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model StaticPage {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  content     String
+  status      PageStatus @default(DRAFT)
+  seoTitle    String?
+  seoDescription String?
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@map("static_pages")
+}
+
+enum IntegrationProvider {
+  R2
+  SHIPROCKET
+  RAZORPAY
+  SMTP
+}
+
+model IntegrationConfig {
+  id                    String              @id @default(uuid())
+  provider              IntegrationProvider @unique
+  isEnabled             Boolean             @default(false)
+  encryptedCredentials  String              // AES-256-GCM ciphertext
+  settings              Json                @default("{}")
+  lastTestedAt          DateTime?
+  lastTestStatus        String?
+  lastTestMessage       String?
+  updatedBy             String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@index([provider])
+  @@map("integration_configs")
+}
+
+enum ShipmentStatus {
+  PENDING
+  READY_TO_SHIP
+  MANIFESTED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RTO
+  CANCELLED
+}
+
+model Shipment {
+  id              String         @id @default(uuid())
+  orderId         String
+  order           Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider        String         @default("SHIPROCKET")
+  providerOrderId String?
+  shipmentId      String?
+  awb             String?        @unique
+  courierName     String?
+  status          ShipmentStatus @default(PENDING)
+  trackingUrl     String?
+  labelUrl        String?
+  manifestUrl     String?
+  rawMetadata     Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([orderId])
+  @@index([awb])
+  @@index([status])
+  @@map("shipments")
+}
+
+model WebhookLog {
+  id          String   @id @default(uuid())
+  provider    String   // RAZORPAY, SHIPROCKET, etc.
+  eventId     String?
+  eventType   String?
+  payload     Json
+  status      String   // PROCESSED, FAILED, IGNORED
+  attempts    Int      @default(1)
+  error       String?
+  receivedAt  DateTime @default(now())
+
+  @@index([provider, eventId])
+  @@index([status])
+  @@map("webhook_logs")
 }

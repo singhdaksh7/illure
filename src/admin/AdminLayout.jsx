@@ -3,7 +3,6 @@ import { useAdminAuth } from './AdminAuthContext';
 import {
   LayoutDashboard,
   BarChart3,
-  Sparkles,
   SlidersHorizontal,
   Package,
   Layers,
@@ -13,26 +12,63 @@ import {
   Users,
   Settings,
   LogOut,
-  Shield,
   ExternalLink,
+  Image,
+  Sparkles,
+  Bell,
+  FileText,
+  Key,
+  Truck,
+  Gift,
 } from 'lucide-react';
 
 export default function AdminLayout({ children, activeTab, setActiveTab, onGoToStore }) {
   const { admin, logout } = useAdminAuth();
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'analytics', label: 'Executive Analytics', icon: BarChart3 },
-    { id: 'features', label: 'Commerce Features', icon: SlidersHorizontal },
-    { id: 'discoverySets', label: 'Discovery Sets', icon: Boxes },
-    { id: 'cms', label: 'Storefront CMS', icon: Sparkles },
-    { id: 'products', label: 'Products', icon: Package, badge: 'Future' },
-    { id: 'categories', label: 'Categories', icon: Layers, badge: 'Future' },
-    { id: 'referenceBrands', label: 'Reference Brands', icon: Award, badge: 'Future' },
-    { id: 'inventory', label: 'Inventory', icon: Boxes, badge: 'Future' },
-    { id: 'orders', label: 'Orders', icon: ShoppingCart, badge: 'Future' },
-    { id: 'admins', label: 'Admin Users', icon: Users },
-    { id: 'settings', label: 'Settings', icon: Settings, badge: 'Future' },
+  const navSections = [
+    {
+      title: 'OVERVIEW',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'analytics', label: 'Executive Analytics', icon: BarChart3 },
+      ],
+    },
+    {
+      title: 'CATALOG & MEDIA',
+      items: [
+        { id: 'products', label: 'Products & Variants', icon: Package },
+        { id: 'categories', label: 'Categories', icon: Layers },
+        { id: 'referenceBrands', label: 'Reference Brands', icon: Award },
+        { id: 'discoverySets', label: 'Discovery Sets', icon: Boxes },
+        { id: 'inventory', label: 'Inventory Stock', icon: Boxes },
+        { id: 'mediaLibrary', label: 'R2 Media Library', icon: Image },
+      ],
+    },
+    {
+      title: 'STOREFRONT CMS',
+      items: [
+        { id: 'cms', label: 'Homepage Builder', icon: Sparkles },
+        { id: 'banners', label: 'Banners', icon: Image },
+        { id: 'tickers', label: 'Announcement Ticker', icon: Bell },
+        { id: 'pages', label: 'Static Pages & Policies', icon: FileText },
+        { id: 'features', label: 'Commerce Features', icon: SlidersHorizontal },
+      ],
+    },
+    {
+      title: 'COMMERCE & OPERATIONS',
+      items: [
+        { id: 'orders', label: 'Orders & Timeline', icon: ShoppingCart },
+        { id: 'shipments', label: 'Shipments & Shiprocket', icon: Truck },
+        { id: 'giftPackaging', label: 'Gift Packaging', icon: Gift },
+      ],
+    },
+    {
+      title: 'SYSTEM & SECURITY',
+      items: [
+        { id: 'integrations', label: 'Integrations Vault', icon: Key },
+        { id: 'admins', label: 'Admin Staff', icon: Users },
+      ],
+    },
   ];
 
   return (
@@ -43,7 +79,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
           <div className="flex items-center gap-2">
             <span className="font-serif text-xl tracking-widest text-[#F2EFE8]">İLLURÊ</span>
             <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-[#C6AE82]/20 text-[#C6AE82] border border-[#C6AE82]/30 font-medium">
-              Admin
+              OPERATING SYSTEM
             </span>
           </div>
         </div>
@@ -81,46 +117,42 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
       {/* Main Body with Sidebar + Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#13191B] border-r border-[#C6AE82]/15 flex flex-col shrink-0">
-          <nav className="p-4 space-y-1 flex-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#C6AE82] text-[#080C0D] font-semibold'
-                      : 'text-[#F2EFE8]/70 hover:text-[#F2EFE8] hover:bg-[#C6AE82]/10'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded uppercase font-normal ${
+        <aside className="w-64 bg-[#13191B] border-r border-[#C6AE82]/15 flex flex-col shrink-0 overflow-y-auto">
+          <nav className="p-4 space-y-6 flex-1">
+            {navSections.map((sec, sIdx) => (
+              <div key={sIdx} className="space-y-1">
+                <span className="px-3 text-[10px] uppercase tracking-widest text-[#C6AE82]/60 font-semibold block mb-1.5">
+                  {sec.title}
+                </span>
+                {sec.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-[#080C0D]/20 text-[#080C0D]'
-                          : 'bg-[#C6AE82]/15 text-[#C6AE82]'
+                          ? 'bg-[#C6AE82] text-[#080C0D] font-semibold shadow-sm'
+                          : 'text-[#F2EFE8]/70 hover:text-[#F2EFE8] hover:bg-[#C6AE82]/10'
                       }`}
                     >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                      <div className="flex items-center gap-2.5">
+                        <Icon className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
 
           {/* System Footer Info */}
           <div className="p-4 border-t border-[#C6AE82]/10 bg-[#080C0D]/50 text-[10px] text-[#F2EFE8]/40 space-y-1">
-            <p className="font-semibold text-[#F2EFE8]/60">İLLURÊ Backend Architecture</p>
-            <p>PostgreSQL • Prisma ORM • Node.js</p>
-            <p>Auth: Argon2id + JWT + Rotation</p>
+            <p className="font-semibold text-[#F2EFE8]/60">İLLURÊ Operating System</p>
+            <p>PostgreSQL • Cloudflare R2 • Shiprocket</p>
+            <p>Vault: AES-256-GCM Encrypted</p>
           </div>
         </aside>
 

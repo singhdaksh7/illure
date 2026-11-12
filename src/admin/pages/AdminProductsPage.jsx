@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '../AdminAuthContext';
 import AdminProductEditorModal from './AdminProductEditorModal';
-import { Package, Plus, Search, Edit2, Archive, Star, Flame, Sparkles, Filter } from 'lucide-react';
+import { Package, Plus, Search, Edit2, Archive, Star, Flame, Sparkles, Filter, Copy } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -88,6 +88,21 @@ export default function AdminProductsPage() {
       }
     } catch (err) {
       console.error('Fetch product detail error:', err);
+    }
+  };
+
+  const handleDuplicate = async (id) => {
+    if (!window.confirm('Duplicate this fragrance product and its variants in draft mode?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/products/${id}/duplicate`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        fetchProducts();
+      }
+    } catch (err) {
+      console.error('Duplicate product error:', err);
     }
   };
 
@@ -302,6 +317,13 @@ export default function AdminProductsPage() {
                   </td>
 
                   <td className="px-6 py-4 text-right space-x-2">
+                    <button
+                      onClick={() => handleDuplicate(prod.id)}
+                      className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      title="Duplicate Product"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleOpenEdit(prod)}
                       className="p-1.5 text-gray-600 hover:text-[#8C6D32] hover:bg-gray-100 rounded transition-colors"

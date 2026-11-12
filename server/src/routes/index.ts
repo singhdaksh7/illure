@@ -26,6 +26,10 @@ import { loyaltyRouter } from '../modules/loyalty/loyalty.router.js';
 import { operationsRouter } from '../modules/operations/operations.router.js';
 import { analyticsRouter } from '../modules/analytics/analytics.router.js';
 import { notificationsRouter } from '../modules/notifications/notifications.router.js';
+import storageRouter from '../modules/storage/storage.router.js';
+import contentRouter from '../modules/content/content.router.js';
+import integrationsRouter from '../modules/integrations/integrations.router.js';
+import shippingRouter from '../modules/shipping/shipping.router.js';
 
 const apiRouter = Router();
 
@@ -52,6 +56,10 @@ apiRouter.use('/admin/discovery-sets', adminDiscoverySetsRouter);
 apiRouter.use('/admin/stock-alerts', adminStockAlertsRouter);
 apiRouter.use('/admin/analytics', analyticsRouter);
 apiRouter.use('/admin/notifications', notificationsRouter);
+apiRouter.use('/', storageRouter);
+apiRouter.use('/', contentRouter);
+apiRouter.use('/', integrationsRouter);
+apiRouter.use('/', shippingRouter);
 
 // Customer & Public Module Endpoints
 apiRouter.use('/features', publicFeaturesRouter);

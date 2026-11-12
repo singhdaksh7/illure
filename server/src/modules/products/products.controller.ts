@@ -61,6 +61,17 @@ export class ProductsController {
     }
   }
 
+  static async duplicate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const adminId = req.adminUser?.id;
+      const id = req.params.id as string;
+      const product = await ProductsService.duplicateProduct(id, adminId);
+      return sendSuccess(res, { product, message: 'Product duplicated successfully.' }, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ==========================================
   // PUBLIC CONTROLLERS
   // ==========================================

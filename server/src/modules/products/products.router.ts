@@ -12,6 +12,7 @@ export const adminProductsRouter = Router();
 adminProductsRouter.use(requireAdminAuth);
 adminProductsRouter.get('/', ProductsController.listAdmin);
 adminProductsRouter.post('/', ProductsController.create);
+adminProductsRouter.post('/:id/duplicate', ProductsController.duplicate);
 adminProductsRouter.get('/:id', ProductsController.getById);
 adminProductsRouter.patch('/:id', ProductsController.update);
 adminProductsRouter.delete('/:id', ProductsController.delete);
