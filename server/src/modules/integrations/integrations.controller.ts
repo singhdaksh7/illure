@@ -4,7 +4,7 @@ import { IntegrationsService } from './integrations.service.js';
 export class IntegrationsController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const isSuperAdmin = (req as any).admin?.role === 'SUPER_ADMIN';
+      const isSuperAdmin = (req as any).adminUser?.role === 'SUPER_ADMIN';
       const list = await IntegrationsService.listIntegrations(isSuperAdmin);
       return res.status(200).json({ success: true, data: { integrations: list } });
     } catch (err) {
