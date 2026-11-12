@@ -159,6 +159,20 @@ describe('İLLURÊ Complete Ecommerce Operating System & Security Test Suite', (
     });
 
     it('should allow regular ADMIN to view integration status with masked credentials while hiding raw secrets', async () => {
+      // First save an R2 config so it exists
+      await prisma.integrationConfig.upsert({
+        where: { provider: 'R2' },
+        create: {
+          provider: 'R2',
+          isEnabled: true,
+          encryptedCredentials: encryptSecret(JSON.stringify({ accessKeyId: 'AKIA_TEST', secretAccessKey: 'SEC_TEST_1234' })),
+        },
+        update: {
+          isEnabled: true,
+          encryptedCredentials: encryptSecret(JSON.stringify({ accessKeyId: 'AKIA_TEST', secretAccessKey: 'SEC_TEST_1234' })),
+        },
+      });
+
       // Create regular ADMIN
       const pwd = await hashPassword('AdminPass123!');
       const admin = await prisma.adminUser.upsert({
