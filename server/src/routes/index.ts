@@ -86,5 +86,9 @@ apiRouter.use('/gifting', giftingRouter);
 apiRouter.use('/retention', retentionRouter);
 apiRouter.use('/loyalty', loyaltyRouter);
 apiRouter.use('/operations', operationsRouter);
+apiRouter.use('/events/click', (req, res, next) => {
+  // Direct shorthand alias for storefront clicks
+  return analyticsRouter(req, res, next);
+});
 
 export default apiRouter;

@@ -49,9 +49,12 @@ export function decryptSecret(cipherPayload: string): string {
 }
 
 /**
- * Mask secret string for safe API responses (e.g. "••••••••")
+ * Mask secret string for safe API responses (e.g. "••••••••••••7890")
  */
 export function maskSecret(secret?: string): string {
   if (!secret) return '';
-  return '••••••••••••';
+  const str = String(secret);
+  if (str.length <= 4) return '••••';
+  const last4 = str.slice(-4);
+  return '••••••••••••' + last4;
 }

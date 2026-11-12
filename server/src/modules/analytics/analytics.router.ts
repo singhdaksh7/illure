@@ -4,7 +4,8 @@ import { requireAdminAuth } from '../../middleware/auth.middleware.js';
 
 export const analyticsRouter = Router();
 
-// Public click tracking event intake
+// Public click tracking event intake (supports both /events/click directly or mounted)
+analyticsRouter.post('/', AnalyticsController.recordClick);
 analyticsRouter.post('/events/click', AnalyticsController.recordClick);
 
 // Admin Analytics Metrics
