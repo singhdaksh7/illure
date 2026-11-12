@@ -58,10 +58,27 @@ export class ShiprocketService {
   static async checkServiceability(deliveryPincode: string, pickupPincode?: string, weightKg = 0.5, cod = 0) {
     const token = await this.getToken();
     if (!token) {
+      // Check if a manual pincode rule exists in DB
+      const manualRule = await prisma.pincodeRule.findUnique({
+        where: { pincode: deliveryPincode },
+      });
+
+      if (manualRule) {
+        return {
+          status: 'MANUAL_RULE_ACTIVE',
+          isServiceable: manualRule.isServiceable,
+          isCodAllowed: manualRule.isCodAllowed,
+          estimatedDays: manualRule.estimatedDays || null,
+          city: manualRule.city || null,
+          state: manualRule.state || null,
+          message: manualRule.isServiceable ? 'Serviceable via manual pincode rule.' : 'Pincode marked unserviceable.',
+        };
+      }
+
       return {
         status: 'CONFIGURATION_REQUIRED',
-        message: 'Shiprocket credentials not configured or inactive.',
-        isServiceable: true, // Graceful fallback
+        message: 'Shiprocket credentials not configured or inactive. No manual pincode rule found.',
+        isServiceable: null, // Truthful unknown status
       };
     }
 

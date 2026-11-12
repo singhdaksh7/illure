@@ -22,7 +22,7 @@ function AdminPortalContent({ onGoToStore }) {
 
   return (
     <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab} onGoToStore={onGoToStore}>
-      <AdminDashboard activeTab={adminTab} />
+      <AdminDashboard activeTab={adminTab} setActiveTab={setAdminTab} />
     </AdminLayout>
   );
 }

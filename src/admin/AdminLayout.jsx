@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
+import AdminGlobalSearchModal from './components/AdminGlobalSearchModal';
 import {
   LayoutDashboard,
   BarChart3,
@@ -20,10 +21,12 @@ import {
   Key,
   Truck,
   Gift,
+  Search,
 } from 'lucide-react';
 
 export default function AdminLayout({ children, activeTab, setActiveTab, onGoToStore }) {
   const { admin, logout } = useAdminAuth();
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const navSections = [
     {
@@ -82,6 +85,15 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
               OPERATING SYSTEM
             </span>
           </div>
+
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#13191B] border border-[#C6AE82]/30 text-xs text-gray-400 hover:text-[#F2EFE8] hover:border-[#C6AE82]/60 transition-all cursor-pointer"
+          >
+            <Search className="w-3.5 h-3.5 text-[#C6AE82]" />
+            <span>Search products, orders, SKUs...</span>
+            <kbd className="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">⌘K</kbd>
+          </button>
         </div>
 
         <div className="flex items-center gap-6">
@@ -161,6 +173,16 @@ export default function AdminLayout({ children, activeTab, setActiveTab, onGoToS
           {children}
         </main>
       </div>
+
+      {/* Global Admin Search Modal */}
+      <AdminGlobalSearchModal
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onNavigateTab={(tab) => {
+          setActiveTab(tab);
+          setSearchOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -64,20 +64,11 @@ export class StorageService {
     const { client, config } = await this.getClient();
 
     if (!client || !config) {
-      // Fallback: If R2 is not configured, record metadata with local fallback URL
-      const publicUrl = `/uploads/${options.storageKey}`;
-      const media = await prisma.mediaItem.create({
-        data: {
-          storageKey: options.storageKey,
-          publicUrl,
-          fileName: options.fileName,
-          mimeType: options.mimeType,
-          fileSize: options.buffer.length,
-          folder: options.folder || 'general',
-          altText: options.altText || null,
-        },
-      });
-      return { storageKey: options.storageKey, publicUrl, id: media.id };
+      throw {
+        statusCode: 400,
+        code: 'R2_STORAGE_CONFIGURATION_REQUIRED',
+        message: 'R2 STORAGE CONFIGURATION REQUIRED. Please configure Cloudflare R2 credentials in the Integrations Vault before uploading media.',
+      };
     }
 
     // Put Object in Cloudflare R2

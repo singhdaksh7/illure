@@ -15,7 +15,7 @@ export class IntegrationsService {
   /**
    * List all integrations with masked credentials
    */
-  static async listIntegrations() {
+  static async listIntegrations(isSuperAdmin = true) {
     const integrations = await prisma.integrationConfig.findMany({
       orderBy: { provider: 'asc' },
     });
@@ -26,7 +26,7 @@ export class IntegrationsService {
     const map = new Map<string, any>();
     for (const item of integrations) {
       let maskedCreds: Record<string, string> = {};
-      if (item.encryptedCredentials) {
+      if (item.encryptedCredentials && isSuperAdmin) {
         try {
           const raw = decryptSecret(item.encryptedCredentials);
           const parsed = JSON.parse(raw);
@@ -36,13 +36,15 @@ export class IntegrationsService {
         } catch {
           maskedCreds = { status: 'DECRYPTION_ERROR' };
         }
+      } else if (item.encryptedCredentials) {
+        maskedCreds = { status: 'CONFIGURED' };
       }
 
       map.set(item.provider, {
         id: item.id,
         provider: item.provider,
         isEnabled: item.isEnabled,
-        settings: item.settings,
+        settings: isSuperAdmin ? item.settings : {},
         maskedCredentials: maskedCreds,
         hasCredentials: !!item.encryptedCredentials,
         lastTestedAt: item.lastTestedAt,

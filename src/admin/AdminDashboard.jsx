@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
+import AdminQuickActions from './components/AdminQuickActions';
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import AdminCmsPage from './pages/AdminCmsPage';
 import AdminFeaturesPage from './pages/AdminFeaturesPage';
@@ -31,7 +32,7 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
-export default function AdminDashboard({ activeTab }) {
+export default function AdminDashboard({ activeTab, setActiveTab }) {
   const { admin, accessToken } = useAdminAuth();
   const [adminUsers, setAdminUsers] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
@@ -184,6 +185,9 @@ export default function AdminDashboard({ activeTab }) {
           </p>
         </div>
       </div>
+
+      {/* Executive Quick Actions */}
+      <AdminQuickActions onAction={(tab) => setActiveTab && setActiveTab(tab)} />
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">

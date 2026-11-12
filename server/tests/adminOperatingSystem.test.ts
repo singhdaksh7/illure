@@ -120,6 +120,71 @@ describe('İLLURÊ Complete Ecommerce Operating System & Security Test Suite', (
       expect(res.body.data.status).toBe('CONFIGURATION_REQUIRED');
       expect(res.body.data.message).toContain('credentials are missing');
     });
+
+    it('should reject R2 upload when R2 storage credentials are not configured', async () => {
+      await expect(
+        StorageService.upload({
+          storageKey: 'catalog/test.jpg',
+          buffer: Buffer.from('fake image data'),
+          mimeType: 'image/jpeg',
+          fileName: 'test.jpg',
+        })
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        code: 'R2_STORAGE_CONFIGURATION_REQUIRED',
+      });
+    });
+
+    it('should return isServiceable as null when Shiprocket is unconfigured and no manual pincode rule exists', async () => {
+      const res = await ShiprocketService.checkServiceability('999999');
+      expect(res.status).toBe('CONFIGURATION_REQUIRED');
+      expect(res.isServiceable).toBeNull();
+    });
+
+    it('should use manual pincode rule if present when Shiprocket is unconfigured', async () => {
+      await prisma.pincodeRule.create({
+        data: {
+          pincode: '110001',
+          isServiceable: true,
+          isCodAllowed: true,
+          city: 'New Delhi',
+          state: 'Delhi',
+        },
+      });
+
+      const res = await ShiprocketService.checkServiceability('110001');
+      expect(res.status).toBe('MANUAL_RULE_ACTIVE');
+      expect(res.isServiceable).toBe(true);
+      expect(res.city).toBe('New Delhi');
+    });
+
+    it('should allow regular ADMIN to view integration status with masked credentials while hiding raw secrets', async () => {
+      // Create regular ADMIN
+      const pwd = await hashPassword('AdminPass123!');
+      const admin = await prisma.adminUser.upsert({
+        where: { email: 'staff-admin-view@illurefragrance.com' },
+        update: { passwordHash: pwd, role: 'ADMIN', isActive: true },
+        create: {
+          email: 'staff-admin-view@illurefragrance.com',
+          name: 'Staff Admin View',
+          passwordHash: pwd,
+          role: 'ADMIN',
+          isActive: true,
+        },
+      });
+      const staffToken = generateAccessToken({ adminId: admin.id, email: admin.email, role: admin.role });
+
+      const res = await request(app)
+        .get('/api/admin/integrations')
+        .set('Authorization', `Bearer ${staffToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      const r2 = res.body.data.integrations.find((i: any) => i.provider === 'R2');
+      expect(r2).toBeDefined();
+      expect(r2.maskedCredentials.status).toBe('CONFIGURED');
+      expect(r2.maskedCredentials.secretAccessKey).toBeUndefined();
+    });
   });
 
   // ==========================================
