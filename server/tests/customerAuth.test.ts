@@ -18,7 +18,7 @@ describe('Customer Authentication API', () => {
     password: 'CustomerPassword123!',
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     await prisma.customer.deleteMany({
       where: { email: { in: [testCustomer.email, testCustomer2.email] } },
     });
