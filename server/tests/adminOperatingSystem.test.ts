@@ -44,7 +44,7 @@ describe('İLLURÊ Complete Ecommerce Operating System & Security Test Suite', (
       },
     });
     superAdminId = admin.id;
-    superAdminToken = generateAccessToken({ adminId: admin.id, role: admin.role });
+    superAdminToken = generateAccessToken({ adminId: admin.id, email: admin.email, role: admin.role });
 
     // Ensure Test Customer
     const cust = await prisma.customer.upsert({
